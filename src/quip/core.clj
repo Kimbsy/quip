@@ -1,7 +1,8 @@
 (ns quip.core
   (:require [quil.core :as q]
             [quil.middleware :as m]
-            [quip.input :as qpinput]))
+            [quip.input :as qpinput]
+            [quip.scene :as qpscene]))
 
 (def event-identity
   (fn [state e] state))
@@ -28,21 +29,32 @@
     (scene-draw state)
     (default-draw state)))
 
+(defn update-wrapper
+  "Allow us to change our update function."
+  [{:keys [parent-update-fn] :as state}]
+  (parent-update-fn state))
+
+(defn draw-wrapper
+  [{:keys [parent-draw-fn] :as state}]
+  (parent-draw-fn state))
+
 (def default-opts
   {:title          "title"
    :size           [600 400]
    :setup          (constantly {})
-   :update         update-state
-   :draw           draw-state
+   :update         update-wrapper
+   :draw           draw-wrapper
    :key-pressed    qpinput/key-pressed
    :key-released   qpinput/key-released
    :mouse-pressed  event-identity
    :mouse-released event-identity
    :middleware     [m/fun-mode]
-   :frame-rate     30})
+   :frame-rate     60})
 
-(def default-initial-state {:held-keys    #{}
-                            :scene-paused? false})
+(def default-initial-state {:held-keys        #{}
+                            :input-enabled?   true
+                            :parent-update-fn update-state
+                            :parent-draw-fn   draw-state})
 
 (defn game
   [{:keys [scenes current-scene] :as override-opts}]
@@ -96,16 +108,36 @@
                         (if (= :space (:key e))
                           (letfn [(shift [coll] (concat (rest coll) (take 1 coll)))]
                             (update state :color shift))
+                          state))
+                      (fn [state e]
+                        (if (= 10 (:key-code e))
+                          (qpscene/transition state :level-1
+                                              :transition-length 30
+                                              :transition-fn
+                                              (fn [state progress max]
+                                                (q/fill 0)
+                                                (q/rect 0 0 (-> progress
+                                                                (/ max)
+                                                                (* (q/width))
+                                                                int)
+                                                        (q/height))))
                           state))]
    :key-released-fns [(fn [state e]
                         (if (= :space (:key e))
                           (update state :y #(- % 10))
                           state))]})
 
+(defn init-level-1
+  []
+  {:key-pressed-fns [(fn [state e]
+                       (if (= 10 (:key-code e))
+                         (qpscene/transition state :menu)
+                         state))]})
+
 (def test-game (game {:title         "some title"
                       :setup         (fn [] {:x 100 :y 300 :color [0 0 255]})
                       :scenes        {:menu    (init-menu)
-                                      :level-1 {}}
+                                      :level-1 (init-level-1)}
                       :current-scene :menu}))
 
 (run test-game)
