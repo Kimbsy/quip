@@ -1,12 +1,19 @@
 (ns quip.scene
   (:require [quil.core :as q]))
 
+(defn get-current-scene
+  [{:keys [current-scene] :as state}]
+  (-> state :scenes current-scene))
+
 (defn fade-to-black
   [state progress max]
   (q/fill 0 (int (* 255 (/ progress max))))
   (q/rect 0 0 (q/width) (q/height)))
 
 (defn transition
+  "Temporarily replace `parent-update-fn` and `parent-draw-fn` with
+  transition handdling versions which will set themselves back to the
+  originals on completion."
   [{:keys [parent-update-fn parent-draw-fn] :as state}
    target-scene
    & {:keys [transition-fn
@@ -27,3 +34,15 @@
                                        (dissoc :transition-progress)))))
       (assoc :parent-draw-fn (fn [{:keys [transition-progress] :as state}]
                                (transition-fn state transition-progress transition-length)))))
+
+(defn update-scene-sprites
+  [{:keys [sprites] :as scene}]
+  (assoc scene :sprites (map (fn [s]
+                               ((:update-fn s) s))
+                             sprites)))
+
+(defn draw-scene-sprites
+  [{:keys [sprites]}]
+  (map (fn [s]
+         ((:draw-fn s) s))
+       sprites))

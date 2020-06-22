@@ -2,7 +2,9 @@
   (:require [quil.core :as q]
             [quil.middleware :as m]
             [quip.input :as qpinput]
-            [quip.scene :as qpscene]))
+            [quip.scene :as qpscene]
+
+            [quip.example :as example]))
 
 (def event-identity
   (fn [state e] state))
@@ -19,9 +21,10 @@
 
 (defn update-state
   [{:keys [scenes current-scene] :as state}]
-  (if-let [scene-update (get-in scenes [current-scene :update-fn])]
-    (scene-update state)
-    state))
+  (let [new-frame (update state :global-frame inc)]
+    (if-let [scene-update (get-in scenes [current-scene :update-fn])]
+      (scene-update new-frame)
+      new-frame)))
 
 (defn draw-state
   [{:keys [scenes current-scene] :as state}]
@@ -53,18 +56,19 @@
 
 (def default-initial-state {:held-keys        #{}
                             :input-enabled?   true
+                            :global-frame     0
                             :parent-update-fn update-state
                             :parent-draw-fn   draw-state})
 
 (defn game
-  [{:keys [scenes current-scene] :as override-opts}]
+  [{:keys [init-scenes-fn current-scene] :as override-opts}]
   (let [opts (merge default-opts override-opts)]
     (-> opts
         (update :setup (fn [setup]
                          (fn []
                            (q/frame-rate (:frame-rate opts))
                            (-> (merge default-initial-state (setup))
-                               (assoc :scenes scenes)
+                               (assoc :scenes (init-scenes-fn))
                                (assoc :current-scene current-scene))))))))
 
 (defn run
@@ -89,55 +93,11 @@
 
 ;;;;;;;;
 
-(defn init-menu
-  []
-  {:draw-fn   (fn [{:keys [x y color] :as state}]
-                (q/background 100)
-                (apply q/fill color)
-                (q/rect x y 10 10))
-   :update-fn (fn [{:keys [held-keys] :as state}]                
-                (cond (held-keys :left)
-                      (update state :x dec)
-                      
-                      (held-keys :right)
-                      (update state :x inc)
-
-                      :default
-                      state))
-   :key-pressed-fns  [(fn [{:keys [held-keys] :as state} e]
-                        (if (= :space (:key e))
-                          (letfn [(shift [coll] (concat (rest coll) (take 1 coll)))]
-                            (update state :color shift))
-                          state))
-                      (fn [state e]
-                        (if (= 10 (:key-code e))
-                          (qpscene/transition state :level-1
-                                              :transition-length 30
-                                              :transition-fn
-                                              (fn [state progress max]
-                                                (q/fill 0)
-                                                (q/rect 0 0 (-> progress
-                                                                (/ max)
-                                                                (* (q/width))
-                                                                int)
-                                                        (q/height))))
-                          state))]
-   :key-released-fns [(fn [state e]
-                        (if (= :space (:key e))
-                          (update state :y #(- % 10))
-                          state))]})
-
-(defn init-level-1
-  []
-  {:key-pressed-fns [(fn [state e]
-                       (if (= 10 (:key-code e))
-                         (qpscene/transition state :menu)
-                         state))]})
-
-(def test-game (game {:title         "some title"
-                      :setup         (fn [] {:x 100 :y 300 :color [0 0 255]})
-                      :scenes        {:menu    (init-menu)
-                                      :level-1 (init-level-1)}
-                      :current-scene :menu}))
+(def test-game (game {:title          "some title"
+                      :setup          (fn [] {:x 100 :y 300 :color [0 0 255]})
+                      :init-scenes-fn (fn []
+                                        {:menu    (example/init-menu)
+                                         :level-1 (example/init-level-1)})
+                      :current-scene  :menu}))
 
 (run test-game)
