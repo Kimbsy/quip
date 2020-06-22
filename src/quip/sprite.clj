@@ -4,23 +4,51 @@
 
 (defn update-pos
   [{:keys [pos vel] :as s}]
-  (assoc s (map + pos vel)))
+  (assoc s :pos (map + pos vel)))
+
+(defn update-frame-delay
+  [{:keys [current-animation] :as s}]
+  (let [animation   (current-animation (:animations s))
+        frame-delay (:frame-delay animation)]
+    (update s :delay-count #(mod (inc %) frame-delay))))
+
+(defn update-animation
+  [{:keys [current-animation delay-count] :as s}]
+  (if (zero? delay-count)
+    (let [animation (current-animation (:animations s))
+          max-frame (:frames animation)]
+      (update s :animation-frame #(mod (inc %) max-frame)))
+    s))
 
 (defn update-static-sprite
   [s]
-  s)
+  (some-> s
+          update-pos))
 
 (defn update-animated-sprite
   [s]
-  s)
+  (some-> s
+          update-frame-delay
+          update-animation
+          update-pos))
 
 (defn draw-static-sprite
-  [s]
-  )
+  [{[x y] :pos image :image}]
+  (q/image image x y))
+
+(def memo-graphics (memoize (fn [w h] (q/create-graphics w h))))
 
 (defn draw-animated-sprite
-  [s]
-  (prn "drawing animated spritesheet-file"))
+  [{:keys [pos w h spritesheet current-animation animation-frame] :as s}]
+  (let [[x y]     pos
+        animation (current-animation (:animations s))
+        x-offset  (* animation-frame w)
+        y-offset  (* (:y-offset animation) h)
+        g         (memo-graphics w h)]
+    (q/with-graphics g
+      (.clear g)
+      (q/image spritesheet (- x-offset) (- y-offset)))
+    (q/image g x y)))
 
 (defn set-animation
   [s animation]
@@ -67,4 +95,6 @@
    :draw-fn           draw-fn
    :spritesheet       (q/load-image spritesheet-file)
    :animations        animations
-   :current-animation current-animation})
+   :current-animation current-animation
+   :delay-count       0
+   :animation-frame   0})

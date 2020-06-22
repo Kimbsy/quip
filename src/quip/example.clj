@@ -58,7 +58,8 @@
                                                 :frame-delay 5}
                                          :jump {:frames      7
                                                 :y-offset    3
-                                                :frame-delay 5}}))
+                                                :frame-delay 5}}
+                            :current-animation :idle))
 
 (defn init-level-1
   []
@@ -66,8 +67,9 @@
                        (if (= 10 (:key-code e))
                          (qpscene/transition state :menu)
                          state))]
-   :sprites [(big-captain [200 200])]
+   :sprites (take 20 (repeat (big-captain [50 0])))
    :draw-fn (fn [{:keys [current-scene] :as state}]
+              (q/background 0 153 255)
               (qpscene/draw-scene-sprites (qpscene/get-current-scene state)))
    :update-fn (fn [{:keys [current-scene] :as state}]
                 (update-in state [:scenes current-scene] qpscene/update-scene-sprites))})

@@ -43,6 +43,6 @@
 
 (defn draw-scene-sprites
   [{:keys [sprites]}]
-  (map (fn [s]
-         ((:draw-fn s) s))
-       sprites))
+  (doall (map (fn [s]
+                ((:draw-fn s) s))
+              sprites)))
