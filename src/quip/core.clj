@@ -3,6 +3,7 @@
             [quil.middleware :as m]
             [quip.input :as qpinput]
             [quip.scene :as qpscene]
+            [quip.profiling :as qpprofiling]
 
             [quip.example :as example]))
 
@@ -52,28 +53,40 @@
    :mouse-pressed  event-identity
    :mouse-released event-identity
    :middleware     [m/fun-mode]
+   :on-close       #_(constantly nil) (fn [& _] (prn "******** SHUTTING DOWN ********"))
    :frame-rate     60})
 
-(def default-initial-state {:held-keys        #{}
-                            :input-enabled?   true
-                            :global-frame     0
-                            :parent-update-fn update-state
-                            :parent-draw-fn   draw-state})
+(def default-initial-state
+  {:held-keys        #{}
+   :input-enabled?   true
+   :global-frame     0
+   :parent-update-fn update-state
+   :parent-draw-fn   draw-state})
 
 (defn game
-  [{:keys [init-scenes-fn current-scene] :as override-opts}]
-  (let [opts (merge default-opts override-opts)]
+  [{:keys [init-scenes-fn current-scene profiling?] :as override-opts}]
+  (let [opts-maps [default-opts
+                   (if profiling?
+                     qpprofiling/profiling-opts
+                     {})
+                   override-opts]
+        opts      (apply merge opts-maps)]
     (-> opts
         (update :setup (fn [setup]
                          (fn []
                            (q/frame-rate (:frame-rate opts))
-                           (-> (merge default-initial-state (setup))
-                               (assoc :scenes (init-scenes-fn))
-                               (assoc :current-scene current-scene))))))))
+                           (let [initial-state-maps [default-initial-state
+                                                     (if profiling?
+                                                       qpprofiling/profiling-initial-state
+                                                       {})
+                                                     (setup)]]
+                             (-> (apply merge initial-state-maps)
+                                 (assoc :scenes (init-scenes-fn))
+                                 (assoc :current-scene current-scene)))))))))
 
 (defn run
   [{:keys [title size setup update draw key-pressed key-released
-           mouse-pressed mouse-released middleware]
+           mouse-pressed mouse-released middleware on-close]
     :as game}]
   (q/sketch
    :title title
@@ -85,7 +98,8 @@
    :key-released key-released
    :mouse-pressed mouse-pressed
    :mouse-released mouse-released
-   :middleware middleware))
+   :middleware middleware
+   :on-close on-close))
 
 
 
@@ -98,6 +112,7 @@
                       :init-scenes-fn (fn []
                                         {:menu    (example/init-menu)
                                          :level-1 (example/init-level-1)})
-                      :current-scene  :menu}))
+                      :current-scene  :level-1
+                      :profiling?     true}))
 
 (run test-game)

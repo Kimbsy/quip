@@ -67,7 +67,7 @@
                        (if (= 10 (:key-code e))
                          (qpscene/transition state :menu)
                          state))]
-   :sprites (take 20 (repeat (big-captain [50 0])))
+   :sprites (take 50 (repeat (big-captain [50 0])))
    :draw-fn (fn [{:keys [current-scene] :as state}]
               (q/background 0 153 255)
               (qpscene/draw-scene-sprites (qpscene/get-current-scene state)))
