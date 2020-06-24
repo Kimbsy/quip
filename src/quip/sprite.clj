@@ -19,7 +19,7 @@
       (update s :animation-frame #(mod (inc %) max-frame)))
     s))
 
-(defn update-static-sprite
+(defn update-image-sprite
   [s]
   (some-> s
           update-pos))
@@ -31,7 +31,7 @@
           update-animation
           update-pos))
 
-(defn draw-static-sprite
+(defn draw-image-sprite
   [{[x y] :pos image :image}]
   (q/image image x y))
 
@@ -55,24 +55,42 @@
       (assoc :current-animation animation)
       (assoc :animation-frame 0)))
 
-
 (defn static-sprite
-  [pos w h image-file &
-   {:keys [vel update-fn draw-fn]
-    :or   {vel       [0 0]
-           update-fn update-static-sprite
-           draw-fn   draw-static-sprite}}]
-  {:pos       pos
-   :vel       vel
-   :w         w
-   :h         h
-   :animated? false
-   :update-fn update-fn
-   :draw-fn   draw-fn
-   :image     (q/load-image image-file)})
+  [sprite-group pos w h image-file &
+   {:keys [update-fn draw-fn]
+    :or   {update-fn identity
+           draw-fn   draw-image-sprite}}]
+  {:sprite-group sprite-group
+   :pos          pos
+   :w            w
+   :h            h
+   :animated?    false
+   :static?      true
+   :update-fn    update-fn
+   :draw-fn      draw-fn
+   :image        (q/load-image image-file)})
+
+(defn image-sprite
+  [sprite-group pos w h image-file &
+   {:keys [vel
+           update-fn
+           draw-fn]
+    :or   {vel           [0 0]
+           update-fn     update-image-sprite
+           draw-fn       draw-image-sprite}}]
+  {:sprite-group sprite-group
+   :pos          pos
+   :vel          vel
+   :w            w
+   :h            h
+   :animated?    false
+   :static?      false
+   :update-fn    update-fn
+   :draw-fn      draw-fn
+   :image        (q/load-image image-file)})
 
 (defn animated-sprite
-  [pos w h spritesheet-file &
+  [sprite-group pos w h spritesheet-file &
    {:keys [vel
            update-fn
            draw-fn
@@ -85,11 +103,13 @@
                                      :y-offset    0
                                      :frame-delay 100}}
            current-animation :none}}]
-  {:pos               pos
+  {:sprite-group      sprite-group
+   :pos               pos
    :vel               vel
    :w                 w
    :h                 h
    :animated?         true
+   :static?           false
    :update-fn         update-fn
    :draw-fn           draw-fn
    :spritesheet       (q/load-image spritesheet-file)

@@ -31,7 +31,8 @@
                            :frame-delay 3}}
         rand-pos   [(- (rand-int (q/width)) 120)
                     (- (rand-int (q/height)) 180)]]
-    (qpsprite/animated-sprite rand-pos
+    (qpsprite/animated-sprite :big-captain
+                              rand-pos
                               240
                               360
                               "captain-big.png"

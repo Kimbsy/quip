@@ -44,7 +44,8 @@
 
 (defn big-captain
   [pos]
-  (qpsprite/animated-sprite pos
+  (qpsprite/animated-sprite :big-captain
+                            pos
                             240
                             360
                             "captain-big.png"
@@ -71,9 +72,9 @@
    :sprites [(big-captain [50 0])]
    :draw-fn (fn [state]
               (q/background 0 153 255)
-              (qpscene/draw-scene-sprites (qpscene/get-current-scene state)))
+              (qpscene/draw-scene-sprites state))
    :update-fn (fn [{:keys [current-scene] :as state}]
-                (update-in state [:scenes current-scene] qpscene/update-scene-sprites))})
+                (qpscene/update-scene-sprites state))})
 
 
 

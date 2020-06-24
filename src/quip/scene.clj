@@ -1,10 +1,6 @@
 (ns quip.scene
   (:require [quil.core :as q]))
 
-(defn get-current-scene
-  [{:keys [current-scene] :as state}]
-  (-> state :scenes current-scene))
-
 (defn fade-to-black
   [state progress max]
   (q/fill 0 (int (* 255 (/ progress max))))
@@ -36,13 +32,17 @@
                                (transition-fn state transition-progress transition-length)))))
 
 (defn update-scene-sprites
-  [{:keys [sprites] :as scene}]
-  (assoc scene :sprites (map (fn [s]
-                               ((:update-fn s) s))
-                             sprites)))
+  [{:keys [current-scene] :as state}]
+  (update-in state [:scenes current-scene :sprites]
+             (fn [sprites]
+               (map (fn [s]
+                      ((:update-fn s) s))
+                    sprites))))
 
 (defn draw-scene-sprites
-  [{:keys [sprites]}]
-  (doall (map (fn [s]
-                ((:draw-fn s) s))
-              sprites)))
+  [{:keys [current-scene] :as state}]
+  (let [sprites (get-in state [:scenes current-scene :sprites])]
+    (doall
+     (map (fn [s]
+            ((:draw-fn s) s))
+          sprites))))
