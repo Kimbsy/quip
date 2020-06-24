@@ -4,12 +4,13 @@
 
 (defn profiling-info
   [frame-times]
-  (let [average-frame-group   (/ (reduce + frame-times)
-                               (count frame-times))
-        average-frame-time-ms (float (/ average-frame-group frame-group-size))
-        average-fps (/ 1000 average-frame-time-ms)]
-    {:average-frame-time-ms average-frame-time-ms
-     :average-fps           average-fps}))
+  (when (seq frame-times)
+    (let [average-frame-group   (/ (reduce + frame-times)
+                                   (count frame-times))
+          average-frame-time-ms (float (/ average-frame-group frame-group-size))
+          average-fps           (/ 1000 average-frame-time-ms)]
+      {:average-frame-time-ms average-frame-time-ms
+       :average-fps           average-fps})))
 
 (defn output-profiling-info
   [{:keys [out-file frame-times] :as state}]

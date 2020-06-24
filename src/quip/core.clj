@@ -2,10 +2,7 @@
   (:require [quil.core :as q]
             [quil.middleware :as m]
             [quip.input :as qpinput]
-            [quip.scene :as qpscene]
-            [quip.profiling :as qpprofiling]
-
-            [quip.example :as example]))
+            [quip.profiling :as qpprofiling]))
 
 (def event-identity
   (fn [state e] state))
@@ -53,7 +50,7 @@
    :mouse-pressed  event-identity
    :mouse-released event-identity
    :middleware     [m/fun-mode]
-   :on-close       #_(constantly nil) (fn [& _] (prn "******** SHUTTING DOWN ********"))
+   :on-close       (fn [& _] (prn "******** SHUTTING DOWN ********"))
    :frame-rate     60})
 
 (def default-initial-state
@@ -64,7 +61,11 @@
    :parent-draw-fn   draw-state})
 
 (defn game
-  [{:keys [init-scenes-fn current-scene profiling?] :as override-opts}]
+  [{:keys [init-scenes-fn current-scene profiling?]
+    :or   {init-scenes-fn (constantly {})
+           current-scene  :none
+           profiling?     false}
+    :as   override-opts}]
   (let [opts-maps [default-opts
                    (if profiling?
                      qpprofiling/profiling-opts
@@ -100,19 +101,3 @@
    :mouse-released mouse-released
    :middleware middleware
    :on-close on-close))
-
-
-
-
-
-;;;;;;;;
-
-(def test-game (game {:title          "some title"
-                      :setup          (fn [] {:x 100 :y 300 :color [0 0 255]})
-                      :init-scenes-fn (fn []
-                                        {:menu    (example/init-menu)
-                                         :level-1 (example/init-level-1)})
-                      :current-scene  :level-1
-                      :profiling?     true}))
-
-(run test-game)

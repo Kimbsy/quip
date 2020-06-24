@@ -1,6 +1,5 @@
 (ns quip.sprite
-  (:require [quil.core :as q]
-            [quil.applet :as ap]))
+  (:require [quil.core :as q]))
 
 (defn update-pos
   [{:keys [pos vel] :as s}]
