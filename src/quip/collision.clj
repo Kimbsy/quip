@@ -1,23 +1,81 @@
 (ns quip.collision)
 
-(defn collider
-  "Define a check for collision between to groups of sprites with
-  functions to be invoked on the sprites when collision is detected."
-  ([group-a-key collide-fn-a]
-   (collider group-a-key group-a-key collide-fn-a collide-fn-a))
-  ([group-a-key group-b-key collide-fn-a collide-fn-b]
-   {:group-a-key  group-a-key
-    :group-b-key  group-b-key
-    :collide-fn-a collide-fn-a
-    :collide-fn-b collide-fn-b}))
-
-(defn collides?
-  "Predicate to determine if two sprites are colliding."
+(defn equal-pos?
+  "Predicate to check if two sprites have the same position."
   [a b]
-  ;; @TODO IMPLEMENT ACTUAL COLLISION CHECKING
   (and (seq (:pos a))
        (seq (:pos b))
        (every? true? (map = (:pos a) (:pos b)))))
+
+(defn w-h-rects-collide?
+  "Predicate to check if the `w` by `h` rects of two sprites intersect."
+  [{[ax1 ay1] :pos
+    aw      :w
+    ah      :h}
+   {[bx1 by1] :pos
+    bw      :w
+    bh      :h}]
+  ;; @TODO: should we be drawing spriters at their center? if so, this
+  ;; should take it into account.
+  (let [ax2 (+ ax1 aw)
+        ay2 (+ ay1 ah)
+        bx2 (+ bx1 bw)
+        by2 (+ by1 bh)]
+    (or (and (<= ax1 bx1 ax2)
+             (or (<= ay1 by1 ay2)
+                 (<= ay1 by2 ay2)))
+        (and (<= ax1 bx2 ax2)
+             (or (<= ay1 by1 ay2)
+                 (<= ay1 by2 ay2))))))
+
+;; @TODO: implement the following:
+
+(defn pos-in-rect?
+  "Predicate to check if the position of sprite `a` is inside the `w` by
+  `h` rect of sprite `b`."
+  [a b]
+  (throw (new Exception "Unimplemented collision detection function")))
+(defn rect-contains-pos?
+  "Predicate to check if the position of sprite `b` is inside the `w` by
+  `h` rect of sprite `a`."
+  [a b]
+  (point-in-rect? b a))
+
+(defn pos-in-poly?
+  "Predicate to check if the position of sprite `a` is inside the
+  bounding polygon of sprite `b`."
+  [a b]
+  (throw (new Exception "Unimplemented collision detection function")))
+(defn poly-contains-pos?
+  "Predicate to check if the position of sprite `b` is inside the
+  bounding polygon of sprite `a`."
+  [a b]
+  (point-in-poly? b a))
+
+(defn pos-in-rotating-poly?
+  "Predicate to check if the position of sprite `a` is inside the
+  bounding polygon of sprite `b`, taking into account the rotation of
+  sprite `b`."
+  [a b]
+  (throw (new Exception "Unimplemented collision detection function")))
+(defn rotating-poly-contains-pos?
+  "Predicate to check if the position of sprite `b` is inside the
+  bounding polygon of sprite `a`, taking into account the rotation of
+  sprite `a`."
+  [a b]
+  (point-in-rotating-poly? b a))
+
+(defn collider
+  "Define a check for collision between to groups of sprites with
+  functions to be invoked on the sprites when collision is detected."
+  [group-a-key group-b-key collide-fn-a collide-fn-b &
+   {:keys [collision-detection-fn]
+    :or   {collision-detection-fn w-h-rects-collide?}}]
+  {:group-a-key            group-a-key
+   :group-b-key            group-b-key
+   :collision-detection-fn collision-detection-fn
+   :collide-fn-a           collide-fn-a
+   :collide-fn-b           collide-fn-b})
 
 (defn collide-sprites
   "Check two sprites for collision and update them with the appropriate
@@ -26,11 +84,15 @@
   In the case that we're checking a group of sprites for collisions in
   the same group we need to check the uuid on the sprites to ensure
   they're not colliding with themselves."
-  [a b {:keys [group-a-key group-b-key collide-fn-a collide-fn-b]}]
+  [a b {:keys [group-a-key
+               group-b-key
+               collision-detection-fn
+               collide-fn-a
+               collide-fn-b]}]
   (let [collision-predicate (if (= group-a-key group-b-key)
                               (and (not= (:uuid a) (:uuid b))
-                                   (collides? a b))
-                              (collides? a b))]
+                                   (collision-detection-fn a b))
+                              (collision-detection-fn a b))]
     (if collision-predicate
       {:a (collide-fn-a a)
        :b (collide-fn-b b)}
