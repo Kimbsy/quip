@@ -1,4 +1,4 @@
-(ns quip.example
+(ns quip.test-games.example
   (:require [quil.core :as q]
             [quip.core :as qp]
             [quip.scene :as qpscene]

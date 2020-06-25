@@ -6,19 +6,19 @@
   [group pos]
   {:sprite-group group :pos pos :collide-count 0 :uuid (java.util.UUID/randomUUID)})
 
-(def sprite-group-a [(test-sprite :a [0 0])
-                     (test-sprite :a [0 1])
-                     (test-sprite :a [0 1])
-                     (test-sprite :a [0 3])])
-(def sprite-group-b [(test-sprite :b [0 0])
-                     (test-sprite :b [0 2])
-                     (test-sprite :b [0 3])
-                     (test-sprite :b [0 3])])
-(def sprite-group-c [(test-sprite :c [0 0])
-                     (test-sprite :c [0 0])
-                     (test-sprite :c [0 0])])
+(def sprite-group-foo [(test-sprite :foo [0 0])
+                       (test-sprite :foo [0 1])
+                       (test-sprite :foo [0 1])
+                       (test-sprite :foo [0 3])])
+(def sprite-group-bar [(test-sprite :bar [0 0])
+                       (test-sprite :bar [0 2])
+                       (test-sprite :bar [0 3])
+                       (test-sprite :bar [0 3])])
+(def sprite-group-baz [(test-sprite :baz [0 0])
+                       (test-sprite :baz [0 0])
+                       (test-sprite :baz [0 0])])
 
-(def sprites (concat sprite-group-a sprite-group-b sprite-group-c))
+(def sprites (concat sprite-group-foo sprite-group-bar sprite-group-baz))
 
 (defn ab-collide-fn-a
   [a]
@@ -31,19 +31,12 @@
   [a]
   (update a :collide-count inc))
 
-(deftest sprite-collision
-  (testing "Sprite a collides with sprite b if they are at the same :pos"
-    (is (true? (sut/collides? (first sprite-group-a)
-                              (first sprite-group-b))))
-    (is (false? (sut/collides? (first sprite-group-a)
-                               (second sprite-group-a))))))
-
 (deftest standard-collisions-ab-collider
-  (let [collider-ab (sut/collider :a :b ab-collide-fn-a ab-collide-fn-b
+  (let [collider-ab (sut/collider :foo :bar ab-collide-fn-a ab-collide-fn-b
                                   :collision-detection-fn sut/equal-pos?)]
     (testing "colliding a with group-b"
-      (let [results (sut/collide-group (first sprite-group-a)
-                                       sprite-group-b
+      (let [results (sut/collide-group (first sprite-group-foo)
+                                       sprite-group-bar
                                        collider-ab)]
         (is (= 1 (-> results
                      :a
@@ -53,14 +46,14 @@
         (is (= 4 (count (:group-b results))))))
 
     (testing "colliding group-a with group-b"
-      (let [results (sut/collide-groups {:a sprite-group-a
-                                         :b sprite-group-b}
+      (let [results (sut/collide-groups {:foo sprite-group-foo
+                                         :bar sprite-group-bar}
                                         collider-ab)]
-        (is (= 4 (count (:a results))))
-        (is (= 4 (count (:b results))))
-        (is (= [1 0 0 2] (->> (:a results)
+        (is (= 4 (count (:foo results))))
+        (is (= 4 (count (:bar results))))
+        (is (= [1 0 0 2] (->> (:foo results)
                               (map :collide-count))))
-        (is (= [1 0 1 1] (->> (:b results)
+        (is (= [1 0 1 1] (->> (:bar results)
                               (map :collide-count))))))
 
     (testing "applying our collider at the top level"
@@ -71,23 +64,23 @@
             results        (sut/update-collisions state)
             result-sprites (get-in results [:scenes :test :sprites])]
         (is (= 11 (count result-sprites)))
-        (let [a-sprites (filter #(#{:a} (:sprite-group %)) result-sprites)
-              b-sprites (filter #(#{:b} (:sprite-group %)) result-sprites)
-              c-sprites (filter #(#{:c} (:sprite-group %)) result-sprites)]
-          (is (= 4 (count a-sprites)))
-          (is (= 4 (count b-sprites)))
-          (is (= 3 (count c-sprites)))
-          (is (= [1 0 0 2] (map :collide-count a-sprites)))
-          (is (= [1 0 1 1] (map :collide-count b-sprites)))
-          (is (= [0 0 0] (map :collide-count c-sprites))))))))
+        (let [foo-sprites (filter #(#{:foo} (:sprite-group %)) result-sprites)
+              bar-sprites (filter #(#{:bar} (:sprite-group %)) result-sprites)
+              baz-sprites (filter #(#{:baz} (:sprite-group %)) result-sprites)]
+          (is (= 4 (count foo-sprites)))
+          (is (= 4 (count bar-sprites)))
+          (is (= 3 (count baz-sprites)))
+          (is (= [1 0 0 2] (map :collide-count foo-sprites)))
+          (is (= [1 0 1 1] (map :collide-count bar-sprites)))
+          (is (= [0 0 0] (map :collide-count baz-sprites))))))))
 
 
 (deftest self-collisions-aa-collider
-  (let [collider-aa (sut/collider :a :a aa-collide-fn aa-collide-fn
+  (let [collider-aa (sut/collider :foo :foo aa-collide-fn aa-collide-fn
                                   :collision-detection-fn sut/equal-pos?)]
     (testing "colliding a with group-a"
-      (let [results (sut/collide-group (second sprite-group-a)
-                                       sprite-group-a
+      (let [results (sut/collide-group (second sprite-group-foo)
+                                       sprite-group-foo
                                        collider-aa)]        
         (is (= 1 (-> results
                      :a
@@ -97,12 +90,12 @@
         (is (= 4 (count (:group-b results))))))
 
     (testing "colliding group-a with group-a"
-      (let [results (sut/collide-groups {:a sprite-group-a
-                                         :b sprite-group-a}
+      (let [results (sut/collide-groups {:foo sprite-group-foo
+                                         :bar sprite-group-foo}
                                         collider-aa)]
         (is (= 1 (count results)))
-        (is (= 4 (count (:a results))))
-        (is (= [0 1 1 0] (->> (:a results)
+        (is (= 4 (count (:foo results))))
+        (is (= [0 1 1 0] (->> (:foo results)
                               (map :collide-count))))))
 
     (testing "applying our collider at the top level"
@@ -113,23 +106,36 @@
             results        (sut/update-collisions state)
             result-sprites (get-in results [:scenes :test :sprites])]
         (is (= 11 (count result-sprites)))
-        (let [a-sprites (filter #(#{:a} (:sprite-group %)) result-sprites)
-              b-sprites (filter #(#{:b} (:sprite-group %)) result-sprites)
-              c-sprites (filter #(#{:c} (:sprite-group %)) result-sprites)]
-          (is (= 4 (count a-sprites)))
-          (is (= 4 (count b-sprites)))
-          (is (= 3 (count c-sprites)))
-          (is (= [0 1 1 0] (map :collide-count a-sprites)))
-          (is (= [0 0 0 0] (map :collide-count b-sprites)))
-          (is (= [0 0 0] (map :collide-count c-sprites))))))))
+        (let [foo-sprites (filter #(#{:foo} (:sprite-group %)) result-sprites)
+              bar-sprites (filter #(#{:bar} (:sprite-group %)) result-sprites)
+              baz-sprites (filter #(#{:baz} (:sprite-group %)) result-sprites)]
+          (is (= 4 (count foo-sprites)))
+          (is (= 4 (count bar-sprites)))
+          (is (= 3 (count baz-sprites)))
+          (is (= [0 1 1 0] (map :collide-count foo-sprites)))
+          (is (= [0 0 0 0] (map :collide-count bar-sprites)))
+          (is (= [0 0 0] (map :collide-count baz-sprites))))))))
 
-(defn removing-colide-fn
+(deftest empty-group-collider
+  (testing "when group b is empty, group a should be unchanged."
+    (let [collider         (sut/collider :foo :non-existent-group ab-collide-fn-a ab-collide-fn-b)
+          only-foo-sprites (filter #(#{:foo} (:sprite-group %)) sprites)
+
+          state {:current-scene :test
+                 :scenes        {:test {:sprites   only-foo-sprites
+                                        :colliders [collider]}}}
+          
+          results        (sut/update-collisions state)
+          result-sprites (get-in results [:scenes :test :sprites])]
+      (is (= result-sprites only-foo-sprites)))))
+
+(defn removing-collide-fn
   [x]
   nil)
 
 (deftest removing-sprites-collider
   (testing "sprites in group a are removed on collision"
-    (let [removing-a-collider (sut/collider :a :b removing-colide-fn-a identity
+    (let [removing-a-collider (sut/collider :foo :bar removing-collide-fn identity
                                             :collision-detection-fn sut/equal-pos?)
 
          state {:current-scene :test
@@ -139,18 +145,18 @@
          results (sut/update-collisions state)
          result-sprites (get-in results [:scenes :test :sprites])]
       (is (= 9 (count result-sprites)))
-      (let [a-sprites (filter #(#{:a} (:sprite-group %)) result-sprites)
-              b-sprites (filter #(#{:b} (:sprite-group %)) result-sprites)
-              c-sprites (filter #(#{:c} (:sprite-group %)) result-sprites)]
-          (is (= 2 (count a-sprites)))
-          (is (= 4 (count b-sprites)))
-          (is (= 3 (count c-sprites)))
-          (is (= [0 0] (map :collide-count a-sprites)))
-          (is (= [0 0 0 0] (map :collide-count b-sprites)))
-          (is (= [0 0 0] (map :collide-count c-sprites))))))
+      (let [foo-sprites (filter #(#{:foo} (:sprite-group %)) result-sprites)
+              bar-sprites (filter #(#{:bar} (:sprite-group %)) result-sprites)
+              baz-sprites (filter #(#{:baz} (:sprite-group %)) result-sprites)]
+          (is (= 2 (count foo-sprites)))
+          (is (= 4 (count bar-sprites)))
+          (is (= 3 (count baz-sprites)))
+          (is (= [0 0] (map :collide-count foo-sprites)))
+          (is (= [0 0 0 0] (map :collide-count bar-sprites)))
+          (is (= [0 0 0] (map :collide-count baz-sprites))))))
 
   (testing "sprites in both groups are removed on collision"
-    (let [removing-a-collider (sut/collider :a :b removing-colide-fn removing-colide-fn
+    (let [removing-a-collider (sut/collider :foo :bar removing-collide-fn removing-collide-fn
                                             :collision-detection-fn sut/equal-pos?)
 
          state {:current-scene :test
@@ -160,15 +166,15 @@
          results (sut/update-collisions state)
          result-sprites (get-in results [:scenes :test :sprites])]
       (is (= 7 (count result-sprites)))
-      (let [a-sprites (filter #(#{:a} (:sprite-group %)) result-sprites)
-              b-sprites (filter #(#{:b} (:sprite-group %)) result-sprites)
-              c-sprites (filter #(#{:c} (:sprite-group %)) result-sprites)]
-          (is (= 2 (count a-sprites)))
-          (is (= 2 (count b-sprites)))
-          (is (= 3 (count c-sprites)))
-          (is (= [0 0] (map :collide-count a-sprites)))
-          (is (= [0 0] (map :collide-count b-sprites)))
-          (is (= [0 0 0] (map :collide-count c-sprites)))))))
+      (let [foo-sprites (filter #(#{:foo} (:sprite-group %)) result-sprites)
+              bar-sprites (filter #(#{:bar} (:sprite-group %)) result-sprites)
+              baz-sprites (filter #(#{:baz} (:sprite-group %)) result-sprites)]
+          (is (= 2 (count foo-sprites)))
+          (is (= 2 (count bar-sprites)))
+          (is (= 3 (count baz-sprites)))
+          (is (= [0 0] (map :collide-count foo-sprites)))
+          (is (= [0 0] (map :collide-count bar-sprites)))
+          (is (= [0 0 0] (map :collide-count baz-sprites)))))))
 
 (deftest provided-collision-detection-function
   (testing "equal-pos?"

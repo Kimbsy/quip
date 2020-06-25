@@ -1,5 +1,6 @@
-(ns quip.stress
+(ns quip.test-games.stress
   (:require [quil.core :as q]
+            [quip.collision :as qpcollision]
             [quip.core :as qp]
             [quip.profiling :as qpprofiling]
             [quip.scene :as qpscene]
@@ -12,7 +13,7 @@
 (defn stress-test-draw
   [{:keys [frame-times] :as state}]
   (q/background 0 153 255)
-  (qpscene/draw-scene-sprites (qpscene/get-current-scene state))
+  (qpscene/draw-scene-sprites state)
   (q/fill 0)
   (q/rect 0 0 100 40)
   (q/fill 255)
@@ -49,17 +50,45 @@
     (let [results (read-string (slurp stress-test-file))]
       (spit stress-test-file
             (conj results {:sprite-count (sprite-count state)
+                           :collisions   (->> (get-in state [:scenes current-scene :sprites])
+                                              (filter #(#{:hit-me} (:sprite-group %)))
+                                              first
+                                              :collisions)
                            :profiling    (qpprofiling/profiling-info frame-times)}))
       (-> state
           (update-in [:scenes current-scene :sprites] add-sprite)
-          (update-in [:scenes current-scene] qpscene/update-scene-sprites)))
-    (update-in state [:scenes current-scene] qpscene/update-scene-sprites)))
+          qpscene/update-scene-sprites
+          qpcollision/update-collisions))
+    (-> state
+        qpscene/update-scene-sprites
+        qpcollision/update-collisions)))
+
+(defn basic-collision-sprite
+  []
+  {:sprite-group :hit-me
+   :pos          [(/ (q/width) 2) (/ (q/height) 2)]
+   :collisions   0
+   :w            20
+   :h            20
+   :update-fn    identity
+   :draw-fn      (fn [_] (q/fill 255 0 0)
+                   (q/rect (/ (q/width) 2) (/ (q/height) 2) 20 20))})
+
+(defn basic-collider-fn
+  [s]
+  (update s :collisions inc))
+
+(defn stress-test-colliders
+  []
+  [(qpcollision/collider :big-captain :hit-me identity basic-collider-fn)])
 
 (defn init-scenes
   []
-  {:stress-test {:sprites   []
+  {:stress-test {:sprites   [(basic-collision-sprite)]
                  :draw-fn   stress-test-draw
-                 :update-fn stress-test-update}})
+                 :update-fn stress-test-update
+                 :colliders (stress-test-colliders)
+                 }})
 
 (defn setup
   []

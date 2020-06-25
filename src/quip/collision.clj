@@ -1,4 +1,5 @@
-(ns quip.collision)
+(ns quip.collision
+  (:require [quil.core :as q]))
 
 (defn equal-pos?
   "Predicate to check if two sprites have the same position."
@@ -15,7 +16,7 @@
    {[bx1 by1] :pos
     bw      :w
     bh      :h}]
-  ;; @TODO: should we be drawing spriters at their center? if so, this
+  ;; @TODO: should we be drawing sprites at their center? if so, this
   ;; should take it into account.
   (let [ax2 (+ ax1 aw)
         ay2 (+ ay1 ah)
@@ -39,7 +40,7 @@
   "Predicate to check if the position of sprite `b` is inside the `w` by
   `h` rect of sprite `a`."
   [a b]
-  (point-in-rect? b a))
+  (pos-in-rect? b a))
 
 (defn pos-in-poly?
   "Predicate to check if the position of sprite `a` is inside the
@@ -50,7 +51,7 @@
   "Predicate to check if the position of sprite `b` is inside the
   bounding polygon of sprite `a`."
   [a b]
-  (point-in-poly? b a))
+  (pos-in-poly? b a))
 
 (defn pos-in-rotating-poly?
   "Predicate to check if the position of sprite `a` is inside the
@@ -63,7 +64,7 @@
   bounding polygon of sprite `a`, taking into account the rotation of
   sprite `a`."
   [a b]
-  (point-in-rotating-poly? b a))
+  (pos-in-rotating-poly? b a))
 
 (defn collider
   "Define a check for collision between to groups of sprites with
@@ -171,8 +172,8 @@
                                                     :as   collider}]
                                      (let [results (collide-groups acc-groups collider)]
                                        (-> acc-groups
-                                           (assoc group-b-key (:b results))
-                                           (assoc group-a-key (:a results)))))
+                                           (assoc group-b-key (group-b-key results))
+                                           (assoc group-a-key (group-a-key results)))))
                                    colliding-groups)
                            vals
                            (apply concat))))))
