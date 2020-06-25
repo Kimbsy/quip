@@ -120,3 +120,48 @@
           (is (= [0 1 1 0] (map :collide-count a-sprites)))
           (is (= [0 0 0 0] (map :collide-count b-sprites)))
           (is (= [0 0 0] (map :collide-count c-sprites))))))))
+
+(defn removing-colide-fn
+  [x]
+  nil)
+
+(deftest removing-sprites-collider
+  (testing "sprites in group a are removed on collision"
+    (let [removing-a-collider (sut/collider :a :b removing-colide-fn-a identity)
+
+         state {:current-scene :test
+                :scenes        {:test {:sprites   sprites
+                                       :colliders [removing-a-collider]}}}
+
+         results (sut/update-collisions state)
+         result-sprites (get-in results [:scenes :test :sprites])]
+      (is (= 9 (count result-sprites)))
+      (let [a-sprites (filter #(#{:a} (:sprite-group %)) result-sprites)
+              b-sprites (filter #(#{:b} (:sprite-group %)) result-sprites)
+              c-sprites (filter #(#{:c} (:sprite-group %)) result-sprites)]
+          (is (= 2 (count a-sprites)))
+          (is (= 4 (count b-sprites)))
+          (is (= 3 (count c-sprites)))
+          (is (= [0 0] (map :collide-count a-sprites)))
+          (is (= [0 0 0 0] (map :collide-count b-sprites)))
+          (is (= [0 0 0] (map :collide-count c-sprites))))))
+
+  (testing "sprites in both groups are removed on collision"
+    (let [removing-a-collider (sut/collider :a :b removing-colide-fn removing-colide-fn)
+
+         state {:current-scene :test
+                :scenes        {:test {:sprites   sprites
+                                       :colliders [removing-a-collider]}}}
+
+         results (sut/update-collisions state)
+         result-sprites (get-in results [:scenes :test :sprites])]
+      (is (= 7 (count result-sprites)))
+      (let [a-sprites (filter #(#{:a} (:sprite-group %)) result-sprites)
+              b-sprites (filter #(#{:b} (:sprite-group %)) result-sprites)
+              c-sprites (filter #(#{:c} (:sprite-group %)) result-sprites)]
+          (is (= 2 (count a-sprites)))
+          (is (= 2 (count b-sprites)))
+          (is (= 3 (count c-sprites)))
+          (is (= [0 0] (map :collide-count a-sprites)))
+          (is (= [0 0] (map :collide-count b-sprites)))
+          (is (= [0 0 0] (map :collide-count c-sprites)))))))

@@ -42,13 +42,18 @@
   another group, updating both as necessary.
 
   Reducing over group-b lets us build up a new version of group-b,
-  updating the value of a as we go."
+  updating the value of a as we go.
+
+  We filter out any b that returns `nil` after colliding to allow
+  collide functions to kill sprites."
   [a group-b collider]
   (reduce (fn [acc b]
             (let [results (collide-sprites (:a acc) b collider)]
               (-> acc
                   (assoc :a (:a results))
-                  (update :group-b #(conj % (:b results))))))
+                  (update :group-b #(->> (conj % (:b results))
+                                         (filter some?)
+                                         vec)))))
           {:a       a
            :group-b []}
           group-b))
@@ -61,6 +66,9 @@
   means that each time we check an `a` against `group-b` we get the
   new value for a, and the new values for each sprite in `group-b`.
 
+  We filter out any a that returns `nil` after colliding to allow
+  collide functions to kill sprites.
+
   We build our results map using the threading macro to handle the
   case where `group-a-key` and `group-b-key` are the same."
   [sprite-groups {:keys [group-a-key group-b-key]
@@ -72,7 +80,9 @@
                           (let [group-result (collide-group a (:group-b acc) collider)]
                             (-> acc
                                 (assoc :group-b (:group-b group-result))
-                                (update :group-a #(conj % (:a group-result))))))
+                                (update :group-a #(->> (conj % (:a group-result))
+                                                       (filter some?)
+                                                       vec)))))
                         {:group-a []
                          :group-b group-b}
                         group-a)]
