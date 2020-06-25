@@ -2,17 +2,21 @@
   (:require [quip.collision :as sut]
             [clojure.test :refer :all]))
 
-(def sprite-group-a [{:sprite-group :a :pos [0 0] :collide-count 0}
-                     {:sprite-group :a :pos [0 1] :collide-count 0}
-                     {:sprite-group :a :pos [0 1] :collide-count 0}
-                     {:sprite-group :a :pos [0 3] :collide-count 0}])
-(def sprite-group-b [{:sprite-group :b :pos [0 0] :collide-count 0}
-                     {:sprite-group :b :pos [0 2] :collide-count 0}
-                     {:sprite-group :b :pos [0 3] :collide-count 0}
-                     {:sprite-group :b :pos [0 3] :collide-count 0}])
-(def sprite-group-c [{:sprite-group :c :pos [0 0] :collide-count 0}
-                     {:sprite-group :c :pos [0 0] :collide-count 0}
-                     {:sprite-group :c :pos [0 0] :collide-count 0}])
+(defn test-sprite
+  [group pos]
+  {:sprite-group group :pos pos :collide-count 0 :uuid (java.util.UUID/randomUUID)})
+
+(def sprite-group-a [(test-sprite :a [0 0])
+                     (test-sprite :a [0 1])
+                     (test-sprite :a [0 1])
+                     (test-sprite :a [0 3])])
+(def sprite-group-b [(test-sprite :b [0 0])
+                     (test-sprite :b [0 2])
+                     (test-sprite :b [0 3])
+                     (test-sprite :b [0 3])])
+(def sprite-group-c [(test-sprite :c [0 0])
+                     (test-sprite :c [0 0])
+                     (test-sprite :c [0 0])])
 
 (def sprites (concat sprite-group-a sprite-group-b sprite-group-c))
 
@@ -83,10 +87,10 @@
       (let [results (sut/collide-group (second sprite-group-a)
                                        sprite-group-a
                                        collider-aa)]        
-        (is (= 2 (-> results
+        (is (= 1 (-> results
                      :a
                      :collide-count)))
-        (is (= [0 1 1 0] (->> (:group-b results)
+        (is (= [0 0 1 0] (->> (:group-b results)
                               (map :collide-count))))
         (is (= 4 (count (:group-b results))))))
 
@@ -106,8 +110,6 @@
 
             results        (sut/update-collisions state)
             result-sprites (get-in results [:scenes :test :sprites])]
-        (prn "***********************")
-        (clojure.pprint/pprint results)
         (is (= 11 (count result-sprites)))
         (let [a-sprites (filter #(#{:a} (:sprite-group %)) result-sprites)
               b-sprites (filter #(#{:b} (:sprite-group %)) result-sprites)
@@ -115,7 +117,6 @@
           (is (= 4 (count a-sprites)))
           (is (= 4 (count b-sprites)))
           (is (= 3 (count c-sprites)))
-          (is (= [1 0 0 2] (map :collide-count a-sprites)))
+          (is (= [0 1 1 0] (map :collide-count a-sprites)))
           (is (= [0 0 0 0] (map :collide-count b-sprites)))
-          (is (= [0 0 0] (map :collide-count c-sprites))))))
-    ))
+          (is (= [0 0 0] (map :collide-count c-sprites))))))))

@@ -1,15 +1,23 @@
 * TODO stuff to do
+
 ** TODO performance profiling (start with fps)
 *** DONE profile fps
 *** DONE create stress test
 *** TODO try and clean up references to profiling in core
 *** TODO bash script to compare stress test results on master vs current branch?
 *** TODO add something to generate graphs based on profiling results?
+
 ** TODO be able to specify a function for determining the order sprites should be drawn
 *** maybe add in some defaults like top-to-bottom?
+
 ** TODO efficient and generic collision detection
 *** performance is one thing, but we also want to try and solve being able to handle updating both entities involved in the collision
+*** DONE create the structure required to check arbitrary sprite groups for collisions defined by collider maps on the scene.
+*** TODO implement a game that uses collision
+*** TODO analyse performance characteristics of colliders
+
 ** TODO figure out how we want sound effects and music to work
 *** can canabalise the toolset from lambdahoy, just need a cleaner definition structure
+
 ** TODO test using quip as a library from a seperate project
 *** reimplement lambdahoy?

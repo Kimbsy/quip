@@ -61,6 +61,7 @@
     :or   {update-fn identity
            draw-fn   draw-image-sprite}}]
   {:sprite-group sprite-group
+   :uuid         (java.util.UUID/randomUUID)
    :pos          pos
    :w            w
    :h            h
@@ -79,6 +80,7 @@
            update-fn     update-image-sprite
            draw-fn       draw-image-sprite}}]
   {:sprite-group sprite-group
+   :uuid         (java.util.UUID/randomUUID)
    :pos          pos
    :vel          vel
    :w            w
@@ -104,6 +106,7 @@
                                      :frame-delay 100}}
            current-animation :none}}]
   {:sprite-group      sprite-group
+   :uuid              (java.util.UUID/randomUUID)
    :pos               pos
    :vel               vel
    :w                 w

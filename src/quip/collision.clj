@@ -21,13 +21,21 @@
 
 (defn collide-sprites
   "Check two sprites for collision and update them with the appropriate
-  `collide-fn-<x>` provided by the collider."
-  [a b {:keys [collide-fn-a collide-fn-b]}]
-  (if (collides? a b)
-    {:a (collide-fn-a a)
-     :b (collide-fn-b b)}
-    {:a a
-     :b b}))
+  `collide-fn-<x>` provided by the collider.
+
+  In the case that we're checking a group of sprites for collisions in
+  the same group we need to check the uuid on the sprites to ensure
+  they're not colliding with themselves."
+  [a b {:keys [group-a-key group-b-key collide-fn-a collide-fn-b]}]
+  (let [collision-predicate (if (= group-a-key group-b-key)
+                              (and (not= (:uuid a) (:uuid b))
+                                   (collides? a b))
+                              (collides? a b))]
+    (if collision-predicate
+      {:a (collide-fn-a a)
+       :b (collide-fn-b b)}
+      {:a a
+       :b b})))
 
 (defn collide-group
   "Check a sprite from one group for collisions with all sprites from
