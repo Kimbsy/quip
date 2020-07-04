@@ -15,7 +15,7 @@
 *** DONE create the structure required to check arbitrary sprite groups for collisions defined by collider maps on the scene.
 *** DONE colliders should default to using w*h rect collision detection, but allow alternative collision detection function f(a,b) to be applied.
 **** TODO provide helpful defaults like equal-positions, point-in-square, point-in-poly, point-in-rotating-poly
-*** TODO implement a game that uses collision
+*** DONE implement a game that uses collision
 *** TODO analyse performance characteristics of colliders
 
 ** TODO figure out how we want sound effects and music to work

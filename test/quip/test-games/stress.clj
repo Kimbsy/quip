@@ -78,9 +78,14 @@
   [s]
   (update s :collisions inc))
 
+(defn removing-collider-fn
+  [s]
+  (prn "HIT")
+  nil)
+
 (defn stress-test-colliders
   []
-  [(qpcollision/collider :big-captain :hit-me identity basic-collider-fn)])
+  [(qpcollision/collider :big-captain :hit-me removing-collider-fn basic-collider-fn)])
 
 (defn init-scenes
   []
