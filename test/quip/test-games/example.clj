@@ -39,7 +39,6 @@
                                                         (q/height)))
                                               :init-fn (fn [state]
                                                          (prn "STARTING LEVEL-1")
-                                                         (qpsound/stop-music)
                                                          (qpsound/loop-music "sound/Captain Scurvy.mp3")
                                                          state))
                           state))]
@@ -76,7 +75,6 @@
                          (qpscene/transition state :menu
                                              :init-fn (fn [state]
                                                         (prn "STARTING MENU")
-                                                        (qpsound/stop-music)
                                                         (qpsound/play-sound "sound/cannon.mp3")
                                                         state))
                          state))]

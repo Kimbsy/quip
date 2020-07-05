@@ -17,9 +17,6 @@
 
 ;;;; It'll do for now.
 
-(defonce ^:dynamic *main-music-thread* (atom nil))
-(def ^:dynamic *sound-enabled* true)
-
 (defn ->player
   [resource-name]
   (-> resource-name
@@ -28,32 +25,32 @@
       java.io.BufferedInputStream.
       javazoom.jl.player.Player.))
 
-(defn loop-music
-  "Continuously loop a music track using the main music thread.
+(defonce ^:dynamic *main-music-thread* (atom nil))
+(defonce ^:dynamic *main-music-player* (atom nil))
 
-  Make sure you first call `(stop-music)` or the tracks will play on
-  top of each other."
+(defn loop-music
+  "Continuously loop a music track using the main music thread."
   [music-file]
-  (when *sound-enabled*
-    (reset! *main-music-thread* (Thread. #(while true (doto (->player music-file)
-                                                        (.play)
-                                                        (.close)))))
-    (.start @*main-music-thread*)))
+  (when @*main-music-player*
+    (.close @*main-music-player*))
+  (reset! *main-music-player* (->player music-file))
+  (reset! *main-music-thread* (Thread. #(doto @*main-music-player*
+                                          (.play)
+                                          (.close))))
+  (.start @*main-music-thread*))
 
 (defn stop-music
-  "Stop the music on the main music thread.
-
-  Pretty sure this will throw if the thread hasn't been started,
-  sorry."
+  "Stop the music on the main music thread."
   []
-  (when *sound-enabled*
+  (when @*main-music-player*
+    (.close @*main-music-player*))
+  (when @*main-music-thread*
     (.stop @*main-music-thread*)))
 
 (defn play-sound
   "Play a sound effect on it's own thread so that we don't kill the
   music when we call `.close`."
   [sound-file]
-  (when *sound-enabled*
-    (.start (Thread. #(doto (->player sound-file)
-                        (.play)
-                        (.close))))))
+  (.start (Thread. #(doto (->player sound-file)
+                      (.play)
+                      (.close)))))
