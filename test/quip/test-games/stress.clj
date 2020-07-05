@@ -4,7 +4,8 @@
             [quip.core :as qp]
             [quip.profiling :as qpprofiling]
             [quip.scene :as qpscene]
-            [quip.sprite :as qpsprite]))
+            [quip.sprite :as qpsprite]
+            [oz.core :as oz]))
 
 (def test-id (str "stress-test_" (System/currentTimeMillis)))
 
@@ -21,10 +22,6 @@
     (when-let [fps (:average-fps (qpprofiling/profiling-info frame-times))]
       (q/text (str "fps: " (int fps)) 10 25))))
 
-(defn sprite-count
-  [{:keys [current-scene] :as state}]
-  (count (get-in state [:scenes current-scene :sprites])))
-
 (defn big-captain
   []
   (let [animations {:jump {:frames      7
@@ -40,68 +37,147 @@
                               :animations animations
                               :current-animation :jump)))
 
-(defn add-sprite
-  [sprites]
-  (cons (big-captain) sprites))
-
-(defn stress-test-update
-  [{:keys [current-scene global-frame test-id frame-times] :as state}]
-  (if (zero? (mod global-frame 100))
-    (let [results (read-string (slurp stress-test-file))]
-      (spit stress-test-file
-            (conj results {:sprite-count (sprite-count state)
-                           :collisions   (->> (get-in state [:scenes current-scene :sprites])
-                                              (filter #(#{:hit-me} (:sprite-group %)))
-                                              first
-                                              :collisions)
-                           :profiling    (qpprofiling/profiling-info frame-times)}))
-      (-> state
-          (update-in [:scenes current-scene :sprites] add-sprite)
-          qpscene/update-scene-sprites
-          qpcollision/update-collisions))
-    (-> state
-        qpscene/update-scene-sprites
-        qpcollision/update-collisions)))
+(defn draw-box
+  [{[x y] :pos}]
+  (q/fill 255 0 0)
+  (q/rect x y 20 20))
 
 (defn basic-collision-sprite
   []
   {:sprite-group :hit-me
-   :pos          [(/ (q/width) 2) (/ (q/height) 2)]
+   :pos          [(- (rand-int (q/width)) 120)
+                  (- (rand-int (q/height)) 180)]
    :collisions   0
    :w            20
    :h            20
    :update-fn    identity
-   :draw-fn      (fn [_] (q/fill 255 0 0)
-                   (q/rect (/ (q/width) 2) (/ (q/height) 2) 20 20))})
+   :draw-fn      draw-box})
+
+(defn add-captain
+  [sprites]
+  (cons (big-captain) sprites))
+
+(defn add-collision-sprite
+  [sprites]
+  (cons (basic-collision-sprite) sprites))
 
 (defn basic-collider-fn
   [s]
   (update s :collisions inc))
 
-(defn removing-collider-fn
-  [s]
-  (prn "HIT")
-  nil)
-
-(defn stress-test-colliders
+(defn stress-test-collider
   []
-  [(qpcollision/collider :big-captain :hit-me removing-collider-fn basic-collider-fn)])
+  (qpcollision/collider :big-captain :hit-me identity basic-collider-fn))
+
+
+
+;;; Stage update functions
+
+(defn increasing-animated-sprites-update
+  [{:keys [current-scene] :as state}]
+  (update-in state [:scenes current-scene :sprites] add-captain))
+
+(defn increasing-as-collide-single-b-update
+  [{:keys [current-scene] :as state}]
+  (update-in state [:scenes current-scene :sprites] add-captain))
+
+(defn increasing-as-collide-increasing-bs-update
+  [{:keys [current-scene] :as state}]
+  (-> state
+      (update-in [:scenes current-scene :sprites] add-captain)
+      (update-in [:scenes current-scene :sprites] add-collision-sprite)))
+
+
+
+;;; Defining the stages of the stress test.
+
+(def stages
+  [{:name      "empty"
+    :update-fn identity
+    :init-fn   identity}
+   {:name      "increasing-animated-sprites"
+    :update-fn increasing-animated-sprites-update
+    :init-fn   (fn [{:keys [current-scene] :as state}]
+                 (-> state
+                     (assoc-in [:scenes current-scene :sprites] [])
+                     (assoc-in [:scenes current-scene :colliders] [])
+                     (assoc :frame-times [])))}
+   {:name      "increasing-as-collide-single-b"
+    :update-fn increasing-as-collide-single-b-update
+    :init-fn   (fn [{:keys [current-scene] :as state}]
+                 (-> state
+                     (assoc-in [:scenes current-scene :sprites] [(basic-collision-sprite)])
+                     (assoc-in [:scenes current-scene :colliders] [(stress-test-collider)])
+                     (assoc :frame-times [])))}
+   {:name      "increasing-as-collide-increasing-bs"
+    :update-fn increasing-as-collide-increasing-bs-update
+    :init-fn   (fn [{:keys [current-scene] :as state}]
+                 (-> state
+                     (assoc-in [:scenes current-scene :sprites] [])
+                     (assoc-in [:scenes current-scene :colliders] [(stress-test-collider)])
+                     (assoc :frame-times [])))}])
+
+(def stage-length 5000)
+
+(defn reset-state
+  [{:keys [stage-idx] :as state}]
+  (when-let [init-fn (get-in stages [stage-idx :init-fn])]
+    (init-fn state)))
+
+(defn stress-test-update
+  [{:keys [current-scene global-frame test-id frame-times] :as state}]
+  (if-let [staged (if (zero? (mod global-frame stage-length))
+                    (-> state
+                        (update :stage-idx inc)
+                        reset-state)
+                    state)]
+
+    (let [stage-idx  (:stage-idx staged)
+          stage      (get stages stage-idx)
+          update-fn  (:update-fn stage)
+          stage-name (:name stage)]
+      (if (zero? (mod global-frame 100))
+        (let [results (read-string (slurp stress-test-file))]
+          (spit stress-test-file
+                (conj results {:stage-frame (mod global-frame stage-length)
+                               :stage-name  stage-name
+                               :profiling   (qpprofiling/profiling-info frame-times)}))
+          (prn stage-name)
+          (-> staged
+              update-fn
+              qpscene/update-scene-sprites
+              qpcollision/update-collisions))
+        (-> staged
+            qpscene/update-scene-sprites
+            qpcollision/update-collisions)))
+
+    (let [viz {:data     {:values (read-string (slurp stress-test-file))}
+               :encoding {:x     {:field "stage-frame" :type "quantitative"}
+                          :y     {:field "profiling.average-fps" :type "quantitative"}
+                          :color {:field "stage-name" :type "nominal"}}
+               :mark     "line"
+               :width    1500
+               :height   400}]
+      (oz/view! viz)
+      (q/exit)
+      state)))
 
 (defn init-scenes
   []
-  {:stress-test {:sprites   [(basic-collision-sprite)]
+  {:stress-test {:sprites   []
                  :draw-fn   stress-test-draw
                  :update-fn stress-test-update
-                 :colliders (stress-test-colliders)
+                 :colliders []
                  }})
 
 (defn setup
   []
+  (oz/start-server!)
   (q/text-font (q/create-font "Ubuntu Mono Bold" 20))
   (prn "++++++++ INITIALISING STRESS TEST FILE ++++++++")
   (prn stress-test-file)
   (spit stress-test-file "[]")
-  {})
+  {:stage-idx 0})
 
 ;;;;;;;; Game definition
 

@@ -174,7 +174,11 @@
           (is (= 3 (count baz-sprites)))
           (is (= [0 0] (map :collide-count foo-sprites)))
           (is (= [0 0] (map :collide-count bar-sprites)))
-          (is (= [0 0 0] (map :collide-count baz-sprites)))))))
+          (is (= [0 0 0] (map :collide-count baz-sprites))))))
+
+  (testing "sprite in group a is removed when hitting multiple sprites in b"
+    ;; @TODO think this is broken currently?
+    ))
 
 (deftest provided-collision-detection-function
   (testing "equal-pos?"
@@ -236,7 +240,7 @@
         (is (true? (sut/w-h-rects-collide? a c)))
         (is (true? (sut/w-h-rects-collide? b c)))))
     
-    (testing "full overlap"
+    (testing "overlaps exactly"
       ;; ╔══════╗
       ;; ║      ║
       ;; ║ a  b ║
@@ -244,4 +248,8 @@
       ;; ╚══════╝
       (let [a {:pos [1 5] :w 8 :h 5}
             b {:pos [1 5] :w 8 :h 5}]
-        (is (true? (sut/w-h-rects-collide? a b)))))))
+        (is (true? (sut/w-h-rects-collide? a b)))))
+
+    (testing "fully contains"
+      ;; @TODO implement.
+      )))

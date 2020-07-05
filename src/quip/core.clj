@@ -57,7 +57,7 @@
 (def default-initial-state
   {:held-keys        #{}
    :input-enabled?   true
-   :global-frame     0
+   :global-frame     1
    :parent-update-fn update-state
    :parent-draw-fn   draw-state})
 
