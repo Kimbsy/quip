@@ -2,6 +2,7 @@
   (:require [quil.core :as q]
             [quip.core :as qp]
             [quip.scene :as qpscene]
+            [quip.sound :as qpsound]
             [quip.sprite :as qpsprite]))
 
 (defn init-menu
@@ -35,7 +36,12 @@
                                                                 (/ max)
                                                                 (* (q/width))
                                                                 int)
-                                                        (q/height))))
+                                                        (q/height)))
+                                              :init-fn (fn [state]
+                                                         (prn "STARTING LEVEL-1")
+                                                         (qpsound/stop-music)
+                                                         (qpsound/loop-music "sound/Captain Scurvy.mp3")
+                                                         state))
                           state))]
    :key-released-fns [(fn [state e]
                         (if (= :space (:key e))
@@ -48,7 +54,7 @@
                             pos
                             240
                             360
-                            "captain-big.png"
+                            "img/captain-big.png"
                             :animations {:none {:frames      1
                                                 :y-offset    0
                                                 :frame-delay 100}
@@ -67,7 +73,12 @@
   []
   {:key-pressed-fns [(fn [state e]
                        (if (= 10 (:key-code e))
-                         (qpscene/transition state :menu)
+                         (qpscene/transition state :menu
+                                             :init-fn (fn [state]
+                                                        (prn "STARTING MENU")
+                                                        (qpsound/stop-music)
+                                                        (qpsound/play-sound "sound/cannon.mp3")
+                                                        state))
                          state))]
    :sprites [(big-captain [50 0])]
    :draw-fn (fn [state]
@@ -81,10 +92,12 @@
 ;;;;;;;; Game definition
 
 (def test-game (qp/game {:title          "some title"
-                         :setup          (fn [] {:x 100 :y 300 :color [0 0 255]})
+                         :setup          (fn []
+                                           (qpsound/loop-music "sound/Captain Scurvy.mp3")
+                                           {:x 100 :y 300 :color [0 0 255]})
                          :init-scenes-fn (fn []
                                            {:menu    (init-menu)
                                             :level-1 (init-level-1)})
-                         :current-scene  :level-1}))
+                         :current-scene  :menu}))
 
 (qp/run test-game)

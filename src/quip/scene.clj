@@ -13,9 +13,11 @@
   [{:keys [parent-update-fn parent-draw-fn] :as state}
    target-scene
    & {:keys [transition-fn
-             transition-length]
+             transition-length
+             init-fn]
       :or   {transition-fn     fade-to-black
-             transition-length 20}}]
+             transition-length 20
+             init-fn           identity}}]
   (-> state
       (assoc :transition-progress 0)
       (assoc :input-enabled? false)
@@ -27,7 +29,8 @@
                                        (assoc :parent-update-fn parent-update-fn)
                                        (assoc :parent-draw-fn parent-draw-fn)
                                        (assoc :input-enabled? true)
-                                       (dissoc :transition-progress)))))
+                                       (dissoc :transition-progress)
+                                       init-fn))))
       (assoc :parent-draw-fn (fn [{:keys [transition-progress] :as state}]
                                (transition-fn state transition-progress transition-length)))))
 

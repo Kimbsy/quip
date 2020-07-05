@@ -36,7 +36,7 @@
                               rand-pos
                               240
                               360
-                              "captain-big.png"
+                              "img/captain-big.png"
                               :animations animations
                               :current-animation :jump)))
 

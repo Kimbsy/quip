@@ -2,7 +2,8 @@
   (:require [quil.core :as q]
             [quil.middleware :as m]
             [quip.input :as qpinput]
-            [quip.profiling :as qpprofiling]))
+            [quip.profiling :as qpprofiling]
+            [quip.sound :as qpsound]))
 
 (def event-identity
   (fn [state e] state))
@@ -83,7 +84,11 @@
                                                      (setup)]]
                              (-> (apply merge initial-state-maps)
                                  (assoc :scenes (init-scenes-fn))
-                                 (assoc :current-scene current-scene)))))))))
+                                 (assoc :current-scene current-scene))))))
+        (update :on-close (fn [on-close]
+                            (fn [state]
+                              (qpsound/stop-music)
+                              (on-close state)))))))
 
 (defn run
   [{:keys [title size setup update draw key-pressed key-released
