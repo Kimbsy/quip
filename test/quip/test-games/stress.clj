@@ -29,13 +29,14 @@
                            :frame-delay 3}}
         rand-pos   [(- (rand-int (q/width)) 120)
                     (- (rand-int (q/height)) 180)]]
-    (qpsprite/animated-sprite :big-captain
-                              rand-pos
-                              240
-                              360
-                              "img/captain-big.png"
-                              :animations animations
-                              :current-animation :jump)))
+    (-> (qpsprite/animated-sprite :big-captain
+                                  rand-pos
+                                  240
+                                  360
+                                  "img/captain-big.png"
+                                  :animations animations
+                                  :current-animation :jump)
+        (assoc :collisions 0))))
 
 (defn draw-box
   [{[x y] :pos}]
@@ -65,9 +66,21 @@
   [s]
   (update s :collisions inc))
 
-(defn stress-test-collider
+(defn removing-collider-fn
+  [_]
+  nil)
+
+(defn basic-collider
   []
-  (qpcollision/collider :big-captain :hit-me identity basic-collider-fn))
+  (qpcollision/collider :big-captain :hit-me basic-collider-fn basic-collider-fn))
+
+(defn remove-a-collider
+  []
+  (qpcollision/collider :big-captain :hit-me removing-collider-fn basic-collider-fn))
+
+(defn remove-ab-collider
+  []
+  (qpcollision/collider :big-captain :hit-me removing-collider-fn removing-collider-fn))
 
 
 
@@ -93,28 +106,28 @@
 
 (def stages
   [{:name      "empty"
-    :update-fn identity
+    :intensify-fn identity
     :init-fn   identity}
    {:name      "increasing-animated-sprites"
-    :update-fn increasing-animated-sprites-update
+    :intensify-fn increasing-animated-sprites-update
     :init-fn   (fn [{:keys [current-scene] :as state}]
                  (-> state
                      (assoc-in [:scenes current-scene :sprites] [])
                      (assoc-in [:scenes current-scene :colliders] [])
                      (assoc :frame-times [])))}
    {:name      "increasing-as-collide-single-b"
-    :update-fn increasing-as-collide-single-b-update
+    :intensify-fn increasing-as-collide-single-b-update
     :init-fn   (fn [{:keys [current-scene] :as state}]
                  (-> state
                      (assoc-in [:scenes current-scene :sprites] [(basic-collision-sprite)])
-                     (assoc-in [:scenes current-scene :colliders] [(stress-test-collider)])
+                     (assoc-in [:scenes current-scene :colliders] [(basic-collider)])
                      (assoc :frame-times [])))}
    {:name      "increasing-as-collide-increasing-bs"
-    :update-fn increasing-as-collide-increasing-bs-update
+    :intensify-fn increasing-as-collide-increasing-bs-update
     :init-fn   (fn [{:keys [current-scene] :as state}]
                  (-> state
                      (assoc-in [:scenes current-scene :sprites] [])
-                     (assoc-in [:scenes current-scene :colliders] [(stress-test-collider)])
+                     (assoc-in [:scenes current-scene :colliders] [(basic-collider)])
                      (assoc :frame-times [])))}])
 
 (def stage-length 5000)
@@ -132,19 +145,18 @@
                         reset-state)
                     state)]
 
-    (let [stage-idx  (:stage-idx staged)
-          stage      (get stages stage-idx)
-          update-fn  (:update-fn stage)
-          stage-name (:name stage)]
+    (let [stage-idx    (:stage-idx staged)
+          stage        (get stages stage-idx)
+          intensify-fn (:intensify-fn stage)
+          stage-name   (:name stage)]
       (if (zero? (mod global-frame 100))
         (let [results (read-string (slurp stress-test-file))]
           (spit stress-test-file
                 (conj results {:stage-frame (mod global-frame stage-length)
                                :stage-name  stage-name
                                :profiling   (qpprofiling/profiling-info frame-times)}))
-          (prn stage-name)
           (-> staged
-              update-fn
+              intensify-fn
               qpscene/update-scene-sprites
               qpcollision/update-collisions))
         (-> staged
@@ -167,8 +179,7 @@
   {:stress-test {:sprites   []
                  :draw-fn   stress-test-draw
                  :update-fn stress-test-update
-                 :colliders []
-                 }})
+                 :colliders []}})
 
 (defn setup
   []

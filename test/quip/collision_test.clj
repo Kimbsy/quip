@@ -20,19 +20,12 @@
 
 (def sprites (concat sprite-group-foo sprite-group-bar sprite-group-baz))
 
-(defn ab-collide-fn-a
-  [a]
-  (update a :collide-count inc))
-(defn ab-collide-fn-b
-  [b]
-  (update b :collide-count inc))
-
-(defn aa-collide-fn
-  [a]
-  (update a :collide-count inc))
+(defn increment-collide-count
+  [s]
+  (update s :collide-count inc))
 
 (deftest standard-collisions-ab-collider
-  (let [collider-ab (sut/collider :foo :bar ab-collide-fn-a ab-collide-fn-b
+  (let [collider-ab (sut/collider :foo :bar increment-collide-count increment-collide-count
                                   :collision-detection-fn sut/equal-pos?)]
     (testing "colliding a with group-b"
       (let [results (sut/collide-group (first sprite-group-foo)
@@ -76,7 +69,7 @@
 
 
 (deftest self-collisions-aa-collider
-  (let [collider-aa (sut/collider :foo :foo aa-collide-fn aa-collide-fn
+  (let [collider-aa (sut/collider :foo :foo increment-collide-count increment-collide-count
                                   :collision-detection-fn sut/equal-pos?)]
     (testing "colliding a with group-a"
       (let [results (sut/collide-group (second sprite-group-foo)
@@ -118,7 +111,7 @@
 
 (deftest empty-group-collider
   (testing "when group b is empty, group a should be unchanged."
-    (let [collider         (sut/collider :foo :non-existent-group ab-collide-fn-a ab-collide-fn-b)
+    (let [collider         (sut/collider :foo :non-existent-group increment-collide-count increment-collide-count)
           only-foo-sprites (filter #(#{:foo} (:sprite-group %)) sprites)
 
           state {:current-scene :test
@@ -135,50 +128,67 @@
 
 (deftest removing-sprites-collider
   (testing "sprites in group a are removed on collision"
-    (let [removing-a-collider (sut/collider :foo :bar removing-collide-fn identity
+    (let [removing-a-collider (sut/collider :foo :bar removing-collide-fn increment-collide-count
                                             :collision-detection-fn sut/equal-pos?)
 
-         state {:current-scene :test
-                :scenes        {:test {:sprites   sprites
-                                       :colliders [removing-a-collider]}}}
+          state {:current-scene :test
+                 :scenes        {:test {:sprites   sprites
+                                        :colliders [removing-a-collider]}}}
 
-         results (sut/update-collisions state)
-         result-sprites (get-in results [:scenes :test :sprites])]
+          results        (sut/update-collisions state)
+          result-sprites (get-in results [:scenes :test :sprites])]
       (is (= 9 (count result-sprites)))
       (let [foo-sprites (filter #(#{:foo} (:sprite-group %)) result-sprites)
-              bar-sprites (filter #(#{:bar} (:sprite-group %)) result-sprites)
-              baz-sprites (filter #(#{:baz} (:sprite-group %)) result-sprites)]
-          (is (= 2 (count foo-sprites)))
-          (is (= 4 (count bar-sprites)))
-          (is (= 3 (count baz-sprites)))
-          (is (= [0 0] (map :collide-count foo-sprites)))
-          (is (= [0 0 0 0] (map :collide-count bar-sprites)))
-          (is (= [0 0 0] (map :collide-count baz-sprites))))))
+            bar-sprites (filter #(#{:bar} (:sprite-group %)) result-sprites)
+            baz-sprites (filter #(#{:baz} (:sprite-group %)) result-sprites)]
+        (is (= 2 (count foo-sprites)))
+        (is (= 4 (count bar-sprites)))
+        (is (= 3 (count baz-sprites)))
+        (is (= [0 0] (map :collide-count foo-sprites)))
+        (is (= [1 0 1 0] (map :collide-count bar-sprites)))
+        (is (= [0 0 0] (map :collide-count baz-sprites))))))
 
   (testing "sprites in both groups are removed on collision"
     (let [removing-a-collider (sut/collider :foo :bar removing-collide-fn removing-collide-fn
                                             :collision-detection-fn sut/equal-pos?)
 
-         state {:current-scene :test
-                :scenes        {:test {:sprites   sprites
-                                       :colliders [removing-a-collider]}}}
+          state {:current-scene :test
+                 :scenes        {:test {:sprites   sprites
+                                        :colliders [removing-a-collider]}}}
 
-         results (sut/update-collisions state)
-         result-sprites (get-in results [:scenes :test :sprites])]
+          results        (sut/update-collisions state)
+          result-sprites (get-in results [:scenes :test :sprites])]
       (is (= 7 (count result-sprites)))
       (let [foo-sprites (filter #(#{:foo} (:sprite-group %)) result-sprites)
-              bar-sprites (filter #(#{:bar} (:sprite-group %)) result-sprites)
-              baz-sprites (filter #(#{:baz} (:sprite-group %)) result-sprites)]
-          (is (= 2 (count foo-sprites)))
-          (is (= 2 (count bar-sprites)))
-          (is (= 3 (count baz-sprites)))
-          (is (= [0 0] (map :collide-count foo-sprites)))
-          (is (= [0 0] (map :collide-count bar-sprites)))
-          (is (= [0 0 0] (map :collide-count baz-sprites))))))
+            bar-sprites (filter #(#{:bar} (:sprite-group %)) result-sprites)
+            baz-sprites (filter #(#{:baz} (:sprite-group %)) result-sprites)]
+        (is (= 2 (count foo-sprites)))
+        (is (= 2 (count bar-sprites)))
+        (is (= 3 (count baz-sprites)))
+        (is (= [0 0] (map :collide-count foo-sprites)))
+        (is (= [0 0] (map :collide-count bar-sprites)))
+        (is (= [0 0 0] (map :collide-count baz-sprites))))))
 
-  (testing "sprite in group a is removed when hitting multiple sprites in b"
-    ;; @TODO think this is broken currently?
-    ))
+  (testing "sprite in group a is removed when hitting the first of multiple sprites in b"
+    (let [removing-a-collider (sut/collider :foo :baz removing-collide-fn increment-collide-count
+                                            :collision-detection-fn sut/equal-pos?)
+
+          state {:current-scene :test
+                 :scenes        {:test {:sprites   sprites
+                                        :colliders [removing-a-collider]}}}
+
+          results        (sut/update-collisions state)
+          result-sprites (get-in results [:scenes :test :sprites])]
+      (is (= 10 (count result-sprites)))
+      (let [foo-sprites (filter #(#{:foo} (:sprite-group %)) result-sprites)
+            bar-sprites (filter #(#{:bar} (:sprite-group %)) result-sprites)
+            baz-sprites (filter #(#{:baz} (:sprite-group %)) result-sprites)]
+        (is (= 3 (count foo-sprites)))
+        (is (= 4 (count bar-sprites)))
+        (is (= 3 (count baz-sprites)))
+        (is (= [0 0 0] (map :collide-count foo-sprites)))
+        (is (= [0 0 0 0] (map :collide-count bar-sprites)))
+        (is (= [1 0 0] (map :collide-count baz-sprites)))))))
 
 (deftest provided-collision-detection-function
   (testing "equal-pos?"
@@ -186,10 +196,14 @@
           b {:pos [1 3]}
           c {:pos [4 4]}
           d {:pos []}]
-      (is (true? (sut/equal-pos? a b)))
-      (is (false? (sut/equal-pos? a c)))
-      (is (false? (sut/equal-pos? b c)))
-      (is (not (true? (sut/equal-pos? a d))))))
+      (is (and (sut/equal-pos? a b)
+               (sut/equal-pos? b a)))
+      (is (false? (and (sut/equal-pos? a c)
+                       (sut/equal-pos? c a))))
+      (is (false? (and (sut/equal-pos? b c)
+                       (sut/equal-pos? c b))))
+      (is (not (true? (sut/equal-pos? a d))))
+      (is (not (true? (sut/equal-pos? d a))))))
   
   (testing "w-h-rects-collide?"
     (testing "intersections"
@@ -208,22 +222,32 @@
             d {:pos [1 4] :w 5 :h 4}
             e {:pos [8 4] :w 5 :h 4}]
         ;; a collides with every other sprite
-        (is (true? (sut/w-h-rects-collide? a b)))
-        (is (true? (sut/w-h-rects-collide? a c)))
-        (is (true? (sut/w-h-rects-collide? a d)))
-        (is (true? (sut/w-h-rects-collide? a e)))
+        (is (and (sut/w-h-rects-collide? a b)
+                 (sut/w-h-rects-collide? b a)))
+        (is (and (sut/w-h-rects-collide? a c)
+                 (sut/w-h-rects-collide? c a)))
+        (is (and (sut/w-h-rects-collide? a d)
+                 (sut/w-h-rects-collide? d a)))
+        (is (and (sut/w-h-rects-collide? a e)
+                 (sut/w-h-rects-collide? e a)))
 
         ;; b collides with no other sprite
-        (is (false? (sut/w-h-rects-collide? b c)))
-        (is (false? (sut/w-h-rects-collide? b d)))
-        (is (false? (sut/w-h-rects-collide? b e)))
+        (is (false? (and (sut/w-h-rects-collide? b c)
+                         (sut/w-h-rects-collide? c b))))
+        (is (false? (and (sut/w-h-rects-collide? b d)
+                         (sut/w-h-rects-collide? d b))))
+        (is (false? (and (sut/w-h-rects-collide? b e)
+                         (sut/w-h-rects-collide? e b))))
 
         ;; c collides with no other sprite
-        (is (false? (sut/w-h-rects-collide? c d)))
-        (is (false? (sut/w-h-rects-collide? c e)))
+        (is (false? (and (sut/w-h-rects-collide? c d)
+                         (sut/w-h-rects-collide? d c))))
+        (is (false? (and (sut/w-h-rects-collide? c e)
+                         (sut/w-h-rects-collide? e c))))
 
         ;; d collides with no other sprite
-        (is (false? (sut/w-h-rects-collide? d e)))))
+        (is (false? (and (sut/w-h-rects-collide? d e)
+                         (sut/w-h-rects-collide? e d))))))
     
     (testing "partial overlaps"
       ;; ┌────┬─┬────┐
@@ -236,9 +260,12 @@
             b {:pos [6 6] :w 8 :h 4}
             c {:pos [1 4] :w 8 :h 4}]
         ;; all sprites collide with each other
-        (is (true? (sut/w-h-rects-collide? a b)))
-        (is (true? (sut/w-h-rects-collide? a c)))
-        (is (true? (sut/w-h-rects-collide? b c)))))
+        (is (and (sut/w-h-rects-collide? a b)
+                 (sut/w-h-rects-collide? b a)))
+        (is (and (sut/w-h-rects-collide? a c)
+                 (sut/w-h-rects-collide? c a)))
+        (is (and (sut/w-h-rects-collide? b c)
+                 (sut/w-h-rects-collide? c b)))))
     
     (testing "overlaps exactly"
       ;; ╔══════╗
@@ -248,8 +275,17 @@
       ;; ╚══════╝
       (let [a {:pos [1 5] :w 8 :h 5}
             b {:pos [1 5] :w 8 :h 5}]
-        (is (true? (sut/w-h-rects-collide? a b)))))
+        (is (and (sut/w-h-rects-collide? a b)
+                 (sut/w-h-rects-collide? b a)))))
 
     (testing "fully contains"
-      ;; @TODO implement.
-      )))
+      ;; ┌────────┐
+      ;; │   a    │
+      ;; │┌──────┐│
+      ;; ││  b   ││
+      ;; │└──────┘│
+      ;; └────────┘
+      (let [a {:pos [1 6] :w 10 :h 6}
+            b {:pos [2 4] :w 8 :h 3}]
+        (is (and (sut/w-h-rects-collide? a b)
+                 (sut/w-h-rects-collide? b a)))))))

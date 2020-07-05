@@ -1,12 +1,12 @@
 * TODO stuff to do
 
-** add collision test for a rect containing b rect
-** add collision test for a removing collider where a hits two bs
+** DONE add collision test for a rect containing b rect
+** DONE add collision test for a removing collider where a hits two bs
 
 ** TODO performance profiling (start with fps)
 *** DONE profile fps
 *** DONE create stress test
-*** TODO add something to generate graphs based on profiling results?
+*** DONE add something to generate graphs based on profiling results?
 *** TODO bash script to compare stress test results on master vs current branch?
 *** TODO try and clean up references to profiling in core
 
@@ -19,9 +19,10 @@
 *** DONE colliders should default to using w*h rect collision detection, but allow alternative collision detection function f(a,b) to be applied.
 **** TODO provide helpful defaults like equal-positions, point-in-square, point-in-poly, point-in-rotating-poly
 *** DONE implement a game that uses collision
-*** TODO analyse performance characteristics of colliders
+*** DONE analyse performance characteristics of colliders
 
 ** TODO revisit sound, room for improvement
+*** at least it's not throwing exceptions all over the place anymore
 
 ** TODO test using quip as a library from a seperate project
 *** reimplement lambdahoy?

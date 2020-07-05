@@ -11,11 +11,18 @@
 (defn w-h-rects-collide?
   "Predicate to check if the `w` by `h` rects of two sprites intersect."
   [{[ax1 ay1] :pos
-    aw      :w
-    ah      :h}
+    aw        :w
+    ah        :h}
    {[bx1 by1] :pos
-    bw      :w
-    bh      :h}]
+    bw        :w
+    bh        :h}]
+  (when-not (and ax1 ay1 aw ah bx1 by1 bw bh)
+    (clojure.pprint/pprint {:pos [ax1 ay1]
+                            :w   aw
+                            :h   ah})
+    (clojure.pprint/pprint {:pos [bx1 by1]
+                            :w   bw
+                            :h   bh}))
   ;; @TODO: should we be drawing sprites at their center? if so, this
   ;; should take it into account.
   (let [ax2 (+ ax1 aw)
@@ -24,10 +31,16 @@
         by2 (+ by1 bh)]
     (or (and (<= ax1 bx1 ax2)
              (or (<= ay1 by1 ay2)
-                 (<= ay1 by2 ay2)))
+                 (<= ay1 by2 ay2)
+                 (<= ay1 by1 by2 ay2)))
         (and (<= ax1 bx2 ax2)
              (or (<= ay1 by1 ay2)
-                 (<= ay1 by2 ay2))))))
+                 (<= ay1 by2 ay2)
+                 (<= ay1 by1 by2 ay2)))
+        (and (<= bx1 ax1 ax2 bx2)
+             (or (<= ay1 by1 ay2)
+                 (<= ay1 by2 ay2)
+                 (<= ay1 by1 by2 ay2))))))
 
 ;; @TODO: implement the following:
 
@@ -91,10 +104,10 @@
                collide-fn-a
                collide-fn-b]}]
   (let [collision-predicate (if (= group-a-key group-b-key)
-                              (and (not= (:uuid a) (:uuid b))
-                                   (collision-detection-fn a b))
-                              (collision-detection-fn a b))]
-    (if collision-predicate
+                              #(and (not= (:uuid a) (:uuid b))
+                                    (collision-detection-fn %1 %2))
+                              #(collision-detection-fn %1 %2))]
+    (if (and a b (collision-predicate a b))
       {:a (collide-fn-a a)
        :b (collide-fn-b b)}
       {:a a
@@ -136,9 +149,8 @@
   case where `group-a-key` and `group-b-key` are the same."
   [sprite-groups {:keys [group-a-key group-b-key]
                   :as   collider}]
-  (let [group-a (group-a-key sprite-groups)
-        group-b (group-b-key sprite-groups)
-
+  (let [group-a (filter some? (group-a-key sprite-groups))
+        group-b (filter some? (group-b-key sprite-groups))
         results (reduce (fn [acc a]
                           (let [group-result (collide-group a (:group-b acc) collider)]
                             (-> acc
@@ -166,7 +178,6 @@
         non-colliding-sprites (remove #(colliding-group-keys (:sprite-group %)) sprites)]
     (assoc-in state [:scenes current-scene :sprites]
               (concat non-colliding-sprites
-
                       (->> colliders
                            (reduce (fn [acc-groups {:keys [group-a-key group-b-key]
                                                     :as   collider}]
