@@ -1,5 +1,6 @@
 (ns quip.sprite
-  (:require [quil.core :as q]))
+  (:require [quil.core :as q]
+            [quip.utils :as qpu]))
 
 (defn update-pos
   [{:keys [pos vel] :as s}]
@@ -120,3 +121,81 @@
    :current-animation current-animation
    :delay-count       0
    :animation-frame   0})
+
+(defn draw-text-sprite
+  [{:keys [content pos font size color]}]
+  (let [[x y] pos]
+    (q/text-align :center)
+    (q/text-font font)
+    (qpu/fill color)
+    (q/text content x y)))
+
+(defn text-sprite
+  [content pos &
+   {:keys [sprite-group
+           font
+           size
+           color
+           draw-fn]
+    :or   {sprite-group :text
+           font         qpu/default-font
+           size         qpu/default-text-size
+           color        qpu/black
+           draw-fn      draw-text-sprite}}]
+  {:sprite-group sprite-group
+   :content      content
+   :pos          pos
+   :font         (q/create-font font size)
+   :color        color
+   :draw-fn      draw-fn})
+
+(defn draw-button-sprite
+  [{:keys [content pos size color font content-color content-pos held?]}]
+  (q/no-stroke)
+  (q/text-align :center :center)
+  (q/text-font font)
+  (let [[x y]   pos
+        [w h]   size
+        [cx cy] content-pos]
+    (if held?
+      (do (qpu/fill color)
+          (q/rect (+ 2 x) (+2 y) w h)
+          (qpu/fill content-color)
+          (q/text content (+ 2 x cx) (+ 2 y cy)))
+      (do (qpu/fill (qpu/darken color))
+          (q/rect (+ 2 x) (+ 2 y) w h)
+          (qpu/fill color)
+          (q/rect x y w h)
+          (qpu/fill content-color)
+          (q/text content (+ x cx) (+ y cy))))))
+
+(defn button-sprite
+  [content pos & {:keys [on-click
+                         size
+                         color
+                         font
+                         font-size
+                         content-color
+                         content-pos
+                         held?
+                         draw-fn]
+                  :or   {on-click      identity
+                         size          [100 70]
+                         color         qpu/grey
+                         font          qpu/default-font
+                         font-size     qpu/default-text-size
+                         content-color qpu/black
+                         content-pos   [50 35]
+                         held?         false
+                         draw-fn       draw-button-sprite}}]
+  {:sprite-group  :button
+   :content       content
+   :pos           pos
+   :on-click      on-click
+   :size          size
+   :color         color
+   :font          (q/create-font font font-size)
+   :content-color content-color
+   :content-pos   content-pos
+   :held?         held?
+   :draw-fn       draw-fn})

@@ -1,6 +1,10 @@
 (ns quip.scene
   (:require [quil.core :as q]))
 
+(defn current-scene
+  [{:keys [current-scene] :as state}]
+  (get-in state [:scenes current-scene]))
+
 (defn fade-to-black
   [state progress max]
   (q/fill 0 (int (* 255 (/ progress max))))

@@ -1,7 +1,9 @@
 * TODO stuff to do
 
-** DONE add collision test for a rect containing b rect
-** DONE add collision test for a removing collider where a hits two bs
+** DONE text sprites
+** DONE button sprites? too much?
+** DONE self-drawing sprites?
+*** they already did this
 
 ** TODO performance profiling (start with fps)
 *** DONE profile fps
@@ -25,4 +27,5 @@
 *** at least it's not throwing exceptions all over the place anymore
 
 ** TODO test using quip as a library from a seperate project
+*** in progess...
 *** reimplement lambdahoy?
