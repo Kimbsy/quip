@@ -5,9 +5,6 @@
             [quip.profiling :as qpprofiling]
             [quip.sound :as qpsound]))
 
-(def event-identity
-  (fn [state e] state))
-
 (defn default-update
   [state]
   state)
@@ -48,8 +45,8 @@
    :draw           draw-wrapper
    :key-pressed    qpinput/key-pressed
    :key-released   qpinput/key-released
-   :mouse-pressed  event-identity
-   :mouse-released event-identity
+   :mouse-pressed  qpinput/mouse-pressed
+   :mouse-released qpinput/mouse-released
    :middleware     [m/fun-mode]
    :on-close       (fn [& _] (prn "******** SHUTTING DOWN ********"))
    :frame-rate     60})

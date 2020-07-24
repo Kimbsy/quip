@@ -1,90 +1,27 @@
 (ns quip.collision
-  (:require [quil.core :as q]))
+  (:require [quil.core :as q]
+            [quip.utils :as qpu]))
 
-(defn equal-pos?
-  "Predicate to check if two sprites have the same position."
-  [a b]
-  (and (seq (:pos a))
-       (seq (:pos b))
-       (every? true? (map = (:pos a) (:pos b)))))
+;;; @TODO: Is this too specific? Is collision detection just a
+;;; concrete example of a more abstract `interaction` or
+;;; `relationship`?
+;;;
+;;; If we want sprites to do something when they get near each other
+;;; or have the same x or y coordinate we can use a collider to model
+;;; this by using a custom `collision-detection-fn`, similarly if we
+;;; want sprites to inteact with each other when their health is
+;;; equal, or their total gold is greater than an amount we can do
+;;; this in the same way.
+;;;
+;;; Should rename, probably wouldn't even need much refactoring.
 
-(defn w-h-rects-collide?
-  "Predicate to check if the `w` by `h` rects of two sprites intersect."
-  [{[ax1 ay1] :pos
-    aw        :w
-    ah        :h}
-   {[bx1 by1] :pos
-    bw        :w
-    bh        :h}]
-  (when-not (and ax1 ay1 aw ah bx1 by1 bw bh)
-    (clojure.pprint/pprint {:pos [ax1 ay1]
-                            :w   aw
-                            :h   ah})
-    (clojure.pprint/pprint {:pos [bx1 by1]
-                            :w   bw
-                            :h   bh}))
-  ;; @TODO: should we be drawing sprites at their center? if so, this
-  ;; should take it into account.
-  (let [ax2 (+ ax1 aw)
-        ay2 (+ ay1 ah)
-        bx2 (+ bx1 bw)
-        by2 (+ by1 bh)]
-    (or (and (<= ax1 bx1 ax2)
-             (or (<= ay1 by1 ay2)
-                 (<= ay1 by2 ay2)
-                 (<= ay1 by1 by2 ay2)))
-        (and (<= ax1 bx2 ax2)
-             (or (<= ay1 by1 ay2)
-                 (<= ay1 by2 ay2)
-                 (<= ay1 by1 by2 ay2)))
-        (and (<= bx1 ax1 ax2 bx2)
-             (or (<= ay1 by1 ay2)
-                 (<= ay1 by2 ay2)
-                 (<= ay1 by1 by2 ay2))))))
-
-;; @TODO: implement the following:
-
-(defn pos-in-rect?
-  "Predicate to check if the position of sprite `a` is inside the `w` by
-  `h` rect of sprite `b`."
-  [a b]
-  (throw (new Exception "Unimplemented collision detection function")))
-(defn rect-contains-pos?
-  "Predicate to check if the position of sprite `b` is inside the `w` by
-  `h` rect of sprite `a`."
-  [a b]
-  (pos-in-rect? b a))
-
-(defn pos-in-poly?
-  "Predicate to check if the position of sprite `a` is inside the
-  bounding polygon of sprite `b`."
-  [a b]
-  (throw (new Exception "Unimplemented collision detection function")))
-(defn poly-contains-pos?
-  "Predicate to check if the position of sprite `b` is inside the
-  bounding polygon of sprite `a`."
-  [a b]
-  (pos-in-poly? b a))
-
-(defn pos-in-rotating-poly?
-  "Predicate to check if the position of sprite `a` is inside the
-  bounding polygon of sprite `b`, taking into account the rotation of
-  sprite `b`."
-  [a b]
-  (throw (new Exception "Unimplemented collision detection function")))
-(defn rotating-poly-contains-pos?
-  "Predicate to check if the position of sprite `b` is inside the
-  bounding polygon of sprite `a`, taking into account the rotation of
-  sprite `a`."
-  [a b]
-  (pos-in-rotating-poly? b a))
 
 (defn collider
   "Define a check for collision between to groups of sprites with
   functions to be invoked on the sprites when collision is detected."
   [group-a-key group-b-key collide-fn-a collide-fn-b &
    {:keys [collision-detection-fn]
-    :or   {collision-detection-fn w-h-rects-collide?}}]
+    :or   {collision-detection-fn qpu/w-h-rects-collide?}}]
   {:group-a-key            group-a-key
    :group-b-key            group-b-key
    :collision-detection-fn collision-detection-fn
@@ -93,7 +30,7 @@
 
 (defn collide-sprites
   "Check two sprites for collision and update them with the appropriate
-  `collide-fn-<x>` provided by the collider.
+  `collide-fn-<a|b>` provided by the collider.
 
   In the case that we're checking a group of sprites for collisions in
   the same group we need to check the uuid on the sprites to ensure

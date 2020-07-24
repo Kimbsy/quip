@@ -1,6 +1,7 @@
 (ns quip.collision-test
-  (:require [quip.collision :as sut]
-            [clojure.test :refer :all]))
+  (:require [clojure.test :refer :all]
+            [quip.collision :as sut]
+            [quip.utils :as qpu]))
 
 (defn test-sprite
   [group pos]
@@ -26,7 +27,7 @@
 
 (deftest standard-collisions-ab-collider
   (let [collider-ab (sut/collider :foo :bar increment-collide-count increment-collide-count
-                                  :collision-detection-fn sut/equal-pos?)]
+                                  :collision-detection-fn qpu/equal-pos?)]
     (testing "colliding a with group-b"
       (let [results (sut/collide-group (first sprite-group-foo)
                                        sprite-group-bar
@@ -70,7 +71,7 @@
 
 (deftest self-collisions-aa-collider
   (let [collider-aa (sut/collider :foo :foo increment-collide-count increment-collide-count
-                                  :collision-detection-fn sut/equal-pos?)]
+                                  :collision-detection-fn qpu/equal-pos?)]
     (testing "colliding a with group-a"
       (let [results (sut/collide-group (second sprite-group-foo)
                                        sprite-group-foo
@@ -129,7 +130,7 @@
 (deftest removing-sprites-collider
   (testing "sprites in group a are removed on collision"
     (let [removing-a-collider (sut/collider :foo :bar removing-collide-fn increment-collide-count
-                                            :collision-detection-fn sut/equal-pos?)
+                                            :collision-detection-fn qpu/equal-pos?)
 
           state {:current-scene :test
                  :scenes        {:test {:sprites   sprites
@@ -150,7 +151,7 @@
 
   (testing "sprites in both groups are removed on collision"
     (let [removing-a-collider (sut/collider :foo :bar removing-collide-fn removing-collide-fn
-                                            :collision-detection-fn sut/equal-pos?)
+                                            :collision-detection-fn qpu/equal-pos?)
 
           state {:current-scene :test
                  :scenes        {:test {:sprites   sprites
@@ -171,7 +172,7 @@
 
   (testing "sprite in group a is removed when hitting the first of multiple sprites in b"
     (let [removing-a-collider (sut/collider :foo :baz removing-collide-fn increment-collide-count
-                                            :collision-detection-fn sut/equal-pos?)
+                                            :collision-detection-fn qpu/equal-pos?)
 
           state {:current-scene :test
                  :scenes        {:test {:sprites   sprites
@@ -190,20 +191,20 @@
         (is (= [0 0 0 0] (map :collide-count bar-sprites)))
         (is (= [1 0 0] (map :collide-count baz-sprites)))))))
 
-(deftest provided-collision-detection-function
+(deftest provided-collision-detection-functions
   (testing "equal-pos?"
     (let [a {:pos [1 3]}
           b {:pos [1 3]}
           c {:pos [4 4]}
           d {:pos []}]
-      (is (and (sut/equal-pos? a b)
-               (sut/equal-pos? b a)))
-      (is (false? (and (sut/equal-pos? a c)
-                       (sut/equal-pos? c a))))
-      (is (false? (and (sut/equal-pos? b c)
-                       (sut/equal-pos? c b))))
-      (is (not (true? (sut/equal-pos? a d))))
-      (is (not (true? (sut/equal-pos? d a))))))
+      (is (and (qpu/equal-pos? a b)
+               (qpu/equal-pos? b a)))
+      (is (not (and (qpu/equal-pos? a c)
+                    (qpu/equal-pos? c a))))
+      (is (not (and (qpu/equal-pos? b c)
+                    (qpu/equal-pos? c b))))
+      (is (not (qpu/equal-pos? a d)))
+      (is (not (qpu/equal-pos? d a)))))
   
   (testing "w-h-rects-collide?"
     (testing "intersections"
@@ -216,38 +217,38 @@
       ;; │ └─┼──┼─┘ │
       ;; │ d │  │ e │
       ;; └───┘  └───┘
-      (let [a {:pos [3 7] :w 7 :h 5}
-            b {:pos [1 9] :w 5 :h 4}
-            c {:pos [8 9] :w 5 :h 4}
-            d {:pos [1 4] :w 5 :h 4}
-            e {:pos [8 4] :w 5 :h 4}]
+      (let [a {:pos [2 2] :w 7 :h 4}
+            b {:pos [0 0] :w 4 :h 3}
+            c {:pos [7 0] :w 4 :h 3}
+            d {:pos [0 5] :w 4 :h 3}
+            e {:pos [7 5] :w 4 :h 3}]
         ;; a collides with every other sprite
-        (is (and (sut/w-h-rects-collide? a b)
-                 (sut/w-h-rects-collide? b a)))
-        (is (and (sut/w-h-rects-collide? a c)
-                 (sut/w-h-rects-collide? c a)))
-        (is (and (sut/w-h-rects-collide? a d)
-                 (sut/w-h-rects-collide? d a)))
-        (is (and (sut/w-h-rects-collide? a e)
-                 (sut/w-h-rects-collide? e a)))
+        (is (and (qpu/w-h-rects-collide? a b)
+                 (qpu/w-h-rects-collide? b a)))
+        (is (and (qpu/w-h-rects-collide? a c)
+                 (qpu/w-h-rects-collide? c a)))
+        (is (and (qpu/w-h-rects-collide? a d)
+                 (qpu/w-h-rects-collide? d a)))
+        (is (and (qpu/w-h-rects-collide? a e)
+                 (qpu/w-h-rects-collide? e a)))
 
         ;; b collides with no other sprite
-        (is (false? (and (sut/w-h-rects-collide? b c)
-                         (sut/w-h-rects-collide? c b))))
-        (is (false? (and (sut/w-h-rects-collide? b d)
-                         (sut/w-h-rects-collide? d b))))
-        (is (false? (and (sut/w-h-rects-collide? b e)
-                         (sut/w-h-rects-collide? e b))))
+        (is (not (and (qpu/w-h-rects-collide? b c)
+                      (qpu/w-h-rects-collide? c b))))
+        (is (not (and (qpu/w-h-rects-collide? b d)
+                      (qpu/w-h-rects-collide? d b))))
+        (is (not (and (qpu/w-h-rects-collide? b e)
+                      (qpu/w-h-rects-collide? e b))))
 
         ;; c collides with no other sprite
-        (is (false? (and (sut/w-h-rects-collide? c d)
-                         (sut/w-h-rects-collide? d c))))
-        (is (false? (and (sut/w-h-rects-collide? c e)
-                         (sut/w-h-rects-collide? e c))))
+        (is (not (and (qpu/w-h-rects-collide? c d)
+                      (qpu/w-h-rects-collide? d c))))
+        (is (not (and (qpu/w-h-rects-collide? c e)
+                      (qpu/w-h-rects-collide? e c))))
 
         ;; d collides with no other sprite
-        (is (false? (and (sut/w-h-rects-collide? d e)
-                         (sut/w-h-rects-collide? e d))))))
+        (is (not (and (qpu/w-h-rects-collide? d e)
+                      (qpu/w-h-rects-collide? e d))))))
     
     (testing "partial overlaps"
       ;; ┌────┬─┬────┐
@@ -256,16 +257,16 @@
       ;; ├────┴─┼────┘
       ;; │ c    │
       ;; └──────┘
-      (let [a {:pos [1 6] :w 8 :h 4}
-            b {:pos [6 6] :w 8 :h 4}
-            c {:pos [1 4] :w 8 :h 4}]
+      (let [a {:pos [0 0] :w 7 :h 3}
+            b {:pos [5 0] :w 7 :h 3}
+            c {:pos [0 2] :w 7 :h 3}]
         ;; all sprites collide with each other
-        (is (and (sut/w-h-rects-collide? a b)
-                 (sut/w-h-rects-collide? b a)))
-        (is (and (sut/w-h-rects-collide? a c)
-                 (sut/w-h-rects-collide? c a)))
-        (is (and (sut/w-h-rects-collide? b c)
-                 (sut/w-h-rects-collide? c b)))))
+        (is (and (qpu/w-h-rects-collide? a b)
+                 (qpu/w-h-rects-collide? b a)))
+        (is (and (qpu/w-h-rects-collide? a c)
+                 (qpu/w-h-rects-collide? c a)))
+        (is (and (qpu/w-h-rects-collide? b c)
+                 (qpu/w-h-rects-collide? c b)))))
     
     (testing "overlaps exactly"
       ;; ╔══════╗
@@ -273,10 +274,10 @@
       ;; ║ a  b ║
       ;; ║      ║
       ;; ╚══════╝
-      (let [a {:pos [1 5] :w 8 :h 5}
-            b {:pos [1 5] :w 8 :h 5}]
-        (is (and (sut/w-h-rects-collide? a b)
-                 (sut/w-h-rects-collide? b a)))))
+      (let [a {:pos [0 0] :w 7 :h 4}
+            b {:pos [0 0] :w 7 :h 4}]
+        (is (and (qpu/w-h-rects-collide? a b)
+                 (qpu/w-h-rects-collide? b a)))))
 
     (testing "fully contains"
       ;; ┌────────┐
@@ -285,7 +286,25 @@
       ;; ││  b   ││
       ;; │└──────┘│
       ;; └────────┘
-      (let [a {:pos [1 6] :w 10 :h 6}
-            b {:pos [2 4] :w 8 :h 3}]
-        (is (and (sut/w-h-rects-collide? a b)
-                 (sut/w-h-rects-collide? b a)))))))
+      (let [a {:pos [0 0] :w 9 :h 5}
+            b {:pos [1 2] :w 7 :h 2}]
+        (is (and (qpu/w-h-rects-collide? a b)
+                 (qpu/w-h-rects-collide? b a))))))
+
+  (testing "pos-in-rect? and rect-contains-pos?"
+    (testing ""
+      ;; ┌────────┐
+      ;; │ .b     │
+      ;; │   a    │
+      ;; │        │ .d
+      ;; └───.c───┘
+      (let [a {:pos [0 0] :w 9 :h 4}
+            b {:pos [2 1]}
+            c {:pos [4 4]}
+            d {:pos [11 3]}]
+        (is (and (qpu/pos-in-rect? b a)
+                 (qpu/rect-contains-pos? a b)))
+        (is (and (qpu/pos-in-rect? c a)
+                 (qpu/rect-contains-pos? a c)))
+        (is (not (and (qpu/pos-in-rect? d a)
+                      (qpu/rect-contains-pos? a d))))))))

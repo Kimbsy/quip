@@ -1,15 +1,16 @@
-(ns quip.test-games.stress
+(ns quip.test-games.stress.core
   (:require [quil.core :as q]
             [quip.collision :as qpcollision]
             [quip.core :as qp]
             [quip.profiling :as qpprofiling]
             [quip.scene :as qpscene]
             [quip.sprite :as qpsprite]
-            [oz.core :as oz]))
+            [oz.core :as oz]
+            [quip.test-games.stress.utils :as u]))
 
 (def test-id (str "stress-test_" (System/currentTimeMillis)))
-
 (def stress-test-file (str "/tmp/" test-id ".edn"))
+(def stage-length 1000)
 
 (defn stress-test-draw
   [{:keys [frame-times] :as state}]
@@ -22,85 +23,21 @@
     (when-let [fps (:average-fps (qpprofiling/profiling-info frame-times))]
       (q/text (str "fps: " (int fps)) 10 25))))
 
-(defn big-captain
-  []
-  (let [animations {:jump {:frames      7
-                           :y-offset    3
-                           :frame-delay 3}}
-        rand-pos   [(- (rand-int (q/width)) 120)
-                    (- (rand-int (q/height)) 180)]]
-    (-> (qpsprite/animated-sprite :big-captain
-                                  rand-pos
-                                  240
-                                  360
-                                  "img/captain-big.png"
-                                  :animations animations
-                                  :current-animation :jump)
-        (assoc :collisions 0))))
-
-(defn draw-box
-  [{[x y] :pos}]
-  (q/fill 255 0 0)
-  (q/rect x y 20 20))
-
-(defn basic-collision-sprite
-  []
-  {:sprite-group :hit-me
-   :pos          [(- (rand-int (q/width)) 120)
-                  (- (rand-int (q/height)) 180)]
-   :collisions   0
-   :w            20
-   :h            20
-   :update-fn    identity
-   :draw-fn      draw-box})
-
-(defn add-captain
-  [sprites]
-  (cons (big-captain) sprites))
-
-(defn add-collision-sprite
-  [sprites]
-  (cons (basic-collision-sprite) sprites))
-
-(defn basic-collider-fn
-  [s]
-  (update s :collisions inc))
-
-(defn removing-collider-fn
-  [_]
-  nil)
-
-(defn basic-collider
-  []
-  (qpcollision/collider :big-captain :hit-me basic-collider-fn basic-collider-fn))
-
-(defn remove-a-collider
-  []
-  (qpcollision/collider :big-captain :hit-me removing-collider-fn basic-collider-fn))
-
-(defn remove-ab-collider
-  []
-  (qpcollision/collider :big-captain :hit-me removing-collider-fn removing-collider-fn))
-
-
-
 ;;; Stage update functions
 
 (defn increasing-animated-sprites-update
   [{:keys [current-scene] :as state}]
-  (update-in state [:scenes current-scene :sprites] add-captain))
+  (update-in state [:scenes current-scene :sprites] u/add-captain))
 
 (defn increasing-as-collide-single-b-update
   [{:keys [current-scene] :as state}]
-  (update-in state [:scenes current-scene :sprites] add-captain))
+  (update-in state [:scenes current-scene :sprites] u/add-captain))
 
 (defn increasing-as-collide-increasing-bs-update
   [{:keys [current-scene] :as state}]
   (-> state
-      (update-in [:scenes current-scene :sprites] add-captain)
-      (update-in [:scenes current-scene :sprites] add-collision-sprite)))
-
-
+      (update-in [:scenes current-scene :sprites] u/add-captain)
+      (update-in [:scenes current-scene :sprites] u/add-collision-sprite)))
 
 ;;; Defining the stages of the stress test.
 
@@ -119,18 +56,16 @@
     :intensify-fn increasing-as-collide-single-b-update
     :init-fn   (fn [{:keys [current-scene] :as state}]
                  (-> state
-                     (assoc-in [:scenes current-scene :sprites] [(basic-collision-sprite)])
-                     (assoc-in [:scenes current-scene :colliders] [(basic-collider)])
+                     (assoc-in [:scenes current-scene :sprites] [(u/basic-collision-sprite)])
+                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider)])
                      (assoc :frame-times [])))}
    {:name      "increasing-as-collide-increasing-bs"
     :intensify-fn increasing-as-collide-increasing-bs-update
     :init-fn   (fn [{:keys [current-scene] :as state}]
                  (-> state
                      (assoc-in [:scenes current-scene :sprites] [])
-                     (assoc-in [:scenes current-scene :colliders] [(basic-collider)])
+                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider)])
                      (assoc :frame-times [])))}])
-
-(def stage-length 5000)
 
 (defn reset-state
   [{:keys [stage-idx] :as state}]
