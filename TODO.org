@@ -9,6 +9,7 @@
 *** DONE profile fps
 *** DONE create stress test
 *** DONE add something to generate graphs based on profiling results?
+*** TODO there's an issue with the stress test where the last data section for one stage is shown as the first section for the next stage
 *** TODO bash script to compare stress test results on master vs current branch?
 *** TODO try and clean up references to profiling in core
 

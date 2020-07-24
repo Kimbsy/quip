@@ -143,63 +143,9 @@
            color        qpu/black
            draw-fn      draw-text-sprite}}]
   {:sprite-group sprite-group
+   :uuid         (java.util.UUID/randomUUID)
    :content      content
    :pos          pos
    :font         (q/create-font font size)
    :color        color
    :draw-fn      draw-fn})
-
-(defn draw-button-sprite
-  [{:keys [content pos w h color font content-color content-pos held?]}]
-  (q/no-stroke)
-  (q/text-align :center :center)
-  (q/text-font font)
-  (let [[x y]   pos
-        [cx cy] content-pos]
-    (if held?
-      (do (qpu/fill color)
-          (q/rect (+ 2 x) (+2 y) w h)
-          (qpu/fill content-color)
-          (q/text content (+ 2 x cx) (+ 2 y cy)))
-      (do (qpu/fill (qpu/darken color))
-          (q/rect (+ 2 x) (+ 2 y) w h)
-          (qpu/fill color)
-          (q/rect x y w h)
-          (qpu/fill content-color)
-          (q/text content (+ x cx) (+ y cy))))))
-
-(defn button-sprite
-  [content pos & {:keys [on-click
-                         size
-                         color
-                         font
-                         font-size
-                         content-color
-                         content-pos
-                         held?
-                         draw-fn
-                         collision-detection-fn]
-                  :or   {on-click               identity
-                         size                   [100 70]
-                         color                  qpu/grey
-                         font                   qpu/default-font
-                         font-size              qpu/default-text-size
-                         content-color          qpu/black
-                         content-pos            [50 35]
-                         held?                  false
-                         draw-fn                draw-button-sprite
-                         collision-detection-fn qpu/pos-in-rect?}}]
-  (let [[w h] size]
-    {:sprite-group           :button
-     :content                content
-     :pos                    pos
-     :on-click               on-click
-     :w                      w
-     :h                      h
-     :color                  color
-     :font                   (q/create-font font font-size)
-     :content-color          content-color
-     :content-pos            content-pos
-     :held?                  held?
-     :draw-fn                draw-fn
-     :collision-detection-fn collision-detection-fn}))

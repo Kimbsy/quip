@@ -2,6 +2,7 @@
   (:require [quil.core :as q]
             [quip.scene :as qpscene]
             [quip.sprite :as qpsprite]
+            [quip.sprites.button :as qpbutton]
             [quip.utils :as qpu]))
 
 (defn draw-menu
@@ -13,37 +14,34 @@
   [state]
   state)
 
-(defn main-title
+(defn text-sprites
   []
-  (qpsprite/text-sprite "Some title" [(/ (q/width) 2) 150]
-                        :color qpu/white
-                        :size 70))
+  [(qpsprite/text-sprite "Lambda-hoy!"
+                         [(* (q/width) 1/2)
+                          (* (q/height) 1/5)]
+                         :color qpu/white
+                         :size qpu/title-text-size)
+   (qpsprite/text-sprite "functional adventures on the high seas"
+                         [(* (q/width) 1/2)
+                          (* (q/height) 5/20)]
+                         :font qpu/italic-font
+                         :color qpu/white)])
 
-(defn start-button
+(defn button-sprites
   []
-  (qpsprite/button-sprite "press" [(/ (q/width) 2)
-                                   (/ (q/height) 2)]
-                          :on-click (fn [state e] (prn "CLICK") state)))
-
-(defn handle-buttons
-  [{:keys [current-scene] :as state} {ex :x ey :y :as e}]
-  (let [sprites (get-in state [:scenes current-scene :sprites])
-        buttons (filter #(= :button (:sprite-group %)) sprites)]
-    (reduce (fn [acc-state {:keys [collision-detection-fn
-                                   on-click]
-                            :as   b}]
-              (if (collision-detection-fn {:pos [ex ey]} b)
-                (on-click acc-state e)
-                acc-state))
-            state
-            buttons)))
+  [(qpbutton/button-sprite "Play"
+                           [(* (q/width) 1/2) (* (q/height) 1/2)]
+                           :on-click (fn [state e] (prn "PLAY") state))
+   (qpbutton/button-sprite "Quit"
+                           [(* (q/width) 1/2) (* (q/height) 2/3)]
+                           :on-click (fn [state e] (prn "QUIT") state))])
 
 (defn init
   []
   {:draw-fn   draw-menu
    :update-fn update-menu
-   :sprites   [(main-title)
-               (start-button)]
-   :mouse-pressed-fns [(fn [state e]
-                         (handle-buttons state e))]})
+   :sprites   (concat (text-sprites)
+                      (button-sprites))
+   :mouse-pressed-fns [qpbutton/handle-buttons-pressed]
+   :mouse-released-fns [qpbutton/handle-buttons-released]})
 
