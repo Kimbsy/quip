@@ -44,13 +44,6 @@
    {[bx1 by1] :pos
     bw        :w
     bh        :h}]
-  (when-not (and ax1 ay1 aw ah bx1 by1 bw bh)
-    (clojure.pprint/pprint {:pos [ax1 ay1]
-                            :w   aw
-                            :h   ah})
-    (clojure.pprint/pprint {:pos [bx1 by1]
-                            :w   bw
-                            :h   bh}))
   ;; @TODO: should we be drawing sprites at their center? if so, this
   ;; should take it into account.
   (let [ax2     (+ ax1 aw)

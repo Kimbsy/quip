@@ -38,10 +38,10 @@
 
 (defn init
   []
-  {:draw-fn   draw-menu
-   :update-fn update-menu
-   :sprites   (concat (text-sprites)
-                      (button-sprites))
-   :mouse-pressed-fns [qpbutton/handle-buttons-pressed]
+  {:draw-fn            draw-menu
+   :update-fn          update-menu
+   :sprites            (concat (text-sprites)
+                               (button-sprites))
+   :mouse-pressed-fns  [qpbutton/handle-buttons-pressed]
    :mouse-released-fns [qpbutton/handle-buttons-released]})
 

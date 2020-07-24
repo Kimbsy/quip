@@ -6,11 +6,12 @@
             [quip.scene :as qpscene]
             [quip.sprite :as qpsprite]
             [oz.core :as oz]
-            [quip.test-games.stress.utils :as u]))
+            [quip.test-games.stress.utils :as u]
+            [quip.utils :as qpu]))
 
 (def test-id (str "stress-test_" (System/currentTimeMillis)))
 (def stress-test-file (str "/tmp/" test-id ".edn"))
-(def stage-length 1000)
+(def stage-length 5000)
 
 (defn stress-test-draw
   [{:keys [frame-times] :as state}]
@@ -52,19 +53,33 @@
                      (assoc-in [:scenes current-scene :sprites] [])
                      (assoc-in [:scenes current-scene :colliders] [])
                      (assoc :frame-times [])))}
-   {:name      "increasing-as-collide-single-b"
+   {:name      "increasing-as-collide-single-b-using-w-h-rects"
     :intensify-fn increasing-as-collide-single-b-update
     :init-fn   (fn [{:keys [current-scene] :as state}]
                  (-> state
                      (assoc-in [:scenes current-scene :sprites] [(u/basic-collision-sprite)])
                      (assoc-in [:scenes current-scene :colliders] [(u/basic-collider)])
                      (assoc :frame-times [])))}
-   {:name      "increasing-as-collide-increasing-bs"
+   {:name      "increasing-as-collide-increasing-bs-using-equal-pos"
+    :intensify-fn increasing-as-collide-increasing-bs-update
+    :init-fn   (fn [{:keys [current-scene] :as state}]
+                 (-> state
+                     (assoc-in [:scenes current-scene :sprites] [])
+                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider qpu/equal-pos?)])
+                     (assoc :frame-times [])))}
+   {:name      "increasing-as-collide-increasing-bs-using-w-h-rects"
     :intensify-fn increasing-as-collide-increasing-bs-update
     :init-fn   (fn [{:keys [current-scene] :as state}]
                  (-> state
                      (assoc-in [:scenes current-scene :sprites] [])
                      (assoc-in [:scenes current-scene :colliders] [(u/basic-collider)])
+                     (assoc :frame-times [])))}
+   {:name      "increasing-as-collide-increasing-bs-using-pos-in-rect"
+    :intensify-fn increasing-as-collide-increasing-bs-update
+    :init-fn   (fn [{:keys [current-scene] :as state}]
+                 (-> state
+                     (assoc-in [:scenes current-scene :sprites] [])
+                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider qpu/pos-in-rect?)])
                      (assoc :frame-times [])))}])
 
 (defn reset-state
@@ -84,7 +99,8 @@
           stage        (get stages stage-idx)
           intensify-fn (:intensify-fn stage)
           stage-name   (:name stage)]
-      (if (zero? (mod global-frame 100))
+      (if (and (zero? (mod global-frame 100))
+               (< 100 (mod global-frame stage-length)))
         (let [results (read-string (slurp stress-test-file))]
           (spit stress-test-file
                 (conj results {:stage-frame (mod global-frame stage-length)

@@ -1,7 +1,8 @@
 (ns quip.test-games.stress.utils
   (:require [quil.core :as q]
             [quip.collision :as qpcollision]
-            [quip.sprite :as qpsprite]))
+            [quip.sprite :as qpsprite]
+            [quip.utils :as qpu]))
 
 (defn big-captain
   []
@@ -52,8 +53,11 @@
   nil)
 
 (defn basic-collider
-  []
-  (qpcollision/collider :big-captain :hit-me basic-collider-fn basic-collider-fn))
+  ([]
+   (basic-collider qpu/w-h-rects-collide?))
+  ([collision-detection-fn]
+   (qpcollision/collider :big-captain :hit-me basic-collider-fn basic-collider-fn
+                         :collision-detection-fn collision-detection-fn)))
 
 (defn remove-a-collider
   []
