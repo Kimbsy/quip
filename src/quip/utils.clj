@@ -27,6 +27,7 @@
 (def fill (partial apply q/fill))
 (def stroke (partial apply q/stroke))
 
+
 ;;; Geometric collision predicates
 
 (defn equal-pos?

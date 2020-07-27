@@ -37,7 +37,12 @@
   [{:keys [parent-draw-fn] :as state}]
   (parent-draw-fn state))
 
+(defn default-on-close
+  [& _]
+  (prn "******** SHUTTING DOWN ********"))
+
 (def default-opts
+  "Default game configuration options."
   {:title          "title"
    :size           [600 400]
    :setup          (constantly {})
@@ -48,10 +53,12 @@
    :mouse-pressed  qpinput/mouse-pressed
    :mouse-released qpinput/mouse-released
    :middleware     [m/fun-mode]
-   :on-close       (fn [& _] (prn "******** SHUTTING DOWN ********"))
+   :on-close       default-on-close
    :frame-rate     60})
 
 (def default-initial-state
+  "Default initial values for the `state` map. The result of the game's
+  `:setup` function will be merged on top."
   {:held-keys        #{}
    :input-enabled?   true
    :global-frame     1
@@ -59,6 +66,13 @@
    :parent-draw-fn   draw-state})
 
 (defn game
+  "Create a quip game configuration.
+
+  Takes a single `override-opts` map argument which contains overrides
+  for `default-opts`.
+
+  Works with an empty `override-opts`, but needs a `:init-scenes-fn`
+  and a `:current-scene` to start doing anything useful."
   [{:keys [init-scenes-fn current-scene profiling?]
     :or   {init-scenes-fn (constantly {})
            current-scene  :none
@@ -67,27 +81,40 @@
   (let [opts-maps [default-opts
                    (if profiling?
                      qpprofiling/profiling-opts
-                     {})
+                     {}) ; @TODO: this is a little icky
                    override-opts]
-        opts      (apply merge opts-maps)]
+        opts (apply merge opts-maps)]
     (-> opts
-        (update :setup (fn [setup]
-                         (fn []
-                           (q/frame-rate (:frame-rate opts))
-                           (let [initial-state-maps [default-initial-state
-                                                     (if profiling?
-                                                       qpprofiling/profiling-initial-state
-                                                       {})
-                                                     (setup)]]
-                             (-> (apply merge initial-state-maps)
-                                 (assoc :scenes (init-scenes-fn))
-                                 (assoc :current-scene current-scene))))))
+
+        ;; wrap the supplied `:setup` function (which returns the
+        ;; desired initial `state` map) so we can supply defaults.
+        (update :setup
+                (fn [setup]
+                  (fn []
+                    (q/frame-rate (:frame-rate opts))
+                    (let [initial-state-maps
+                          [default-initial-state
+
+                           (if profiling?
+                             qpprofiling/profiling-initial-state
+                             {}) ; @TODO: this is a little icky
+
+                           ;; invoke the supplied `:setup` function to
+                           ;; allow overriding the initial `state` map
+                           (setup)]]
+
+                      (-> (apply merge initial-state-maps)
+                          (assoc :scenes (init-scenes-fn))
+                          (assoc :current-scene current-scene))))))
+
+        ;; wrap the existing `:on-close` to stop music playing
         (update :on-close (fn [on-close]
                             (fn [state]
                               (qpsound/stop-music)
                               (on-close state)))))))
 
 (defn run
+  "Run a quip game configuration as a quil sketch."
   [{:keys [title size setup update draw key-pressed key-released
            mouse-pressed mouse-released middleware on-close]
     :as game}]

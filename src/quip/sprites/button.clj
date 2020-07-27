@@ -67,6 +67,17 @@
     (assoc-in state [:scenes current-scene :sprites]
               (conj other-sprites (assoc b :held? true)))))
 
+
+;;; @TODO: is this the best way of doing this? Seems like we're
+;;; potentially duplicating some of the effort of our mouse event
+;;; handler reduction in input.clj?
+
+;;;  Maybe we could register buttons in the state map in our scene
+;;;  init which would construct a mouse event handler for each button
+;;;  that could check the button position and invoke it's on-click?
+
+;;; Need to put some hammock time into this.
+
 (defn handle-buttons-pressed
   "Determine if any button sprites have been clicked on. If so invoke
   their `on-click` function and set their `:held?` attribute to

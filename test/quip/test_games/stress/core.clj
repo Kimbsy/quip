@@ -100,6 +100,7 @@
           intensify-fn (:intensify-fn stage)
           stage-name   (:name stage)]
       (if (and (zero? (mod global-frame 100))
+               ;; @TODO: bit of a hack, skips the first 100 frames.
                (< 100 (mod global-frame stage-length)))
         (let [results (read-string (slurp stress-test-file))]
           (spit stress-test-file

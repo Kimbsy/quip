@@ -15,7 +15,7 @@
 
 ;;;; It would be great to support other file formats.
 
-;;;; It'll do for now.
+;;;; This is not the focus of this project, it'll do for now.
 
 (defn ->player
   [resource-name]

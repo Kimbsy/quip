@@ -1,6 +1,14 @@
 (ns quip.profiling)
 
-(def frame-group-size 10)
+;;; This ns could use a refactor, currently we use profiling in the
+;;; stress test example game, but it wanted some more specific
+;;; functionality like being able to label and group different stages
+;;; of the game.
+
+;;; We should also probably be integrating the graphing lib in here
+;;; too.
+
+(def frame-group-size 100)
 
 (defn profiling-info
   [frame-times]
@@ -35,10 +43,12 @@
                       state)))
 
 (def profiling-opts
+  "Game configuration options if running with profiling."
   {:update     profiling-update-wrapper
    :on-close   output-profiling-info
    :frame-rate 99999})
 
 (def profiling-initial-state
+  "Game initial state if running with profiling."
   {:frame-times []
    :out-file    (str "/tmp/quip-profiling_" (System/currentTimeMillis) ".out")})

@@ -17,7 +17,7 @@
    :ocean (ocean/init)
    :end   (end/init)})
 
-(def test-game
+(def game
   (quip/game
    {:title          "Lambdahoy: functional adventures on the high seas"
     :size           [1800 1200]
@@ -27,4 +27,4 @@
 
 (defn -main
   [& _]
-  (quip/run test-game))
+  (quip/run game))
