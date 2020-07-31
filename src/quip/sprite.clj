@@ -56,9 +56,25 @@
       (assoc :current-animation animation)
       (assoc :animation-frame 0)))
 
+(defn default-bounding-poly
+  "Generates a bounding polygon based off the `w` by `h` rectangle of
+  the sprite."
+  [{[x y] :pos
+    w     :w
+    h     :h}]
+  [[x       y]
+   [(+ x w) y]
+   [(+ x w) (+ y h)]
+   [x       (+ y h)]])
+
+;;; Basic Sprite types
+
 (defn static-sprite
   [sprite-group pos w h image-file &
-   {:keys [update-fn draw-fn]
+   {:keys [update-fn
+           draw-fn
+           points
+           bounds-fn]
     :or   {update-fn identity
            draw-fn   draw-image-sprite}}]
   {:sprite-group sprite-group
@@ -70,16 +86,23 @@
    :static?      true
    :update-fn    update-fn
    :draw-fn      draw-fn
+   :points       points
+   :bounds-fn    (or bounds-fn
+                     (if (seq points)
+                       :points
+                       default-bounding-poly))
    :image        (q/load-image image-file)})
 
 (defn image-sprite
   [sprite-group pos w h image-file &
    {:keys [vel
            update-fn
-           draw-fn]
-    :or   {vel           [0 0]
-           update-fn     update-image-sprite
-           draw-fn       draw-image-sprite}}]
+           draw-fn
+           points
+           bounds-fn]
+    :or   {vel       [0 0]
+           update-fn update-image-sprite
+           draw-fn   draw-image-sprite}}]
   {:sprite-group sprite-group
    :uuid         (java.util.UUID/randomUUID)
    :pos          pos
@@ -90,6 +113,11 @@
    :static?      false
    :update-fn    update-fn
    :draw-fn      draw-fn
+   :points       points
+   :bounds-fn    (or bounds-fn
+                     (if (seq points)
+                       :points
+                       default-bounding-poly))
    :image        (q/load-image image-file)})
 
 (defn animated-sprite
@@ -98,7 +126,9 @@
            update-fn
            draw-fn
            animations
-           current-animation]
+           current-animation
+           points
+           bounds-fn]
     :or   {vel               [0 0]
            update-fn         update-animated-sprite
            draw-fn           draw-animated-sprite
@@ -116,6 +146,11 @@
    :static?           false
    :update-fn         update-fn
    :draw-fn           draw-fn
+   :points            points
+   :bounds-fn         (or bounds-fn
+                          (if (seq points)
+                            :points
+                            default-bounding-poly))
    :spritesheet       (q/load-image spritesheet-file)
    :animations        animations
    :current-animation current-animation
