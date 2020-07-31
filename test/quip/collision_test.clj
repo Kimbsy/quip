@@ -312,12 +312,12 @@
 (deftest pos-in-poly?
   (testing "pos-in-poly? and poly-contains-pos?"
     (testing "coarse collision detection"
-      ;; ┌─────────/
+      ;; ┌─────────┐
       ;; │ a      /
       ;; │       /       .d
       ;; │      /
       ;; │ .b  / .c
-      ;; └────/
+      ;; └────┘
       (let [a [[0 0] [10 0] [5 5] [0 5]]
             b [2 4]
             c [8 4]
@@ -327,12 +327,12 @@
         (is (not (qpu/coarse-pos-in-poly? d a)))))
 
     (testing "fine collision detection"
-      ;; ┌─────────/
+      ;; ┌─────────┐
       ;; │ a      /
       ;; │       /       .d
       ;; │      /
       ;; │ .b  / .c
-      ;; └────/
+      ;; └────┘
       (let [a [[0 0] [10 0] [5 5] [0 5]]
             b [2 4]
             c [8 4]
@@ -359,12 +359,12 @@
                  (not (qpu/poly-contains-pos? a d))))))
 
     (testing "works on simple polygons"
-      ;; ┌─────────/
+      ;; ┌─────────┐
       ;; │ a      /
       ;; │       /       .d
       ;; │      /
       ;; │ .b  / .c
-      ;; └────/
+      ;; └────┘
       (let [points [[0 0] [10 0] [5 5] [0 5]]
             a      {:pos [0 0] :bounds-fn :points :points points}
             b      {:pos [2 4]}
@@ -383,7 +383,7 @@
       ;; │      / \    │ .d
       ;; │     /   \   │
       ;; │ .b /  .c \  │
-      ;; └───/       \─┘
+      ;; └───┘       └─┘
       (let [points [[0 0] [14 0] [14 5] [12 5] [8 1] [4 5] [0 5]]
             a      {:pos [0 0] :bounds-fn :points :points points}
             b      {:pos [2 4]}
@@ -398,7 +398,7 @@
 
     (testing "works on very complex polygons"
       ;; ┌─────────────┐
-      ;; │    \──────/ │
+      ;; │    ┌──────┐ │
       ;; │ a   \ .e /  │
       ;; │      \  /   │
       ;; │       \/    │
@@ -406,7 +406,7 @@
       ;; │      / \    │ .d
       ;; │     /   \   │
       ;; │ .b /  .c \  │
-      ;; └───/       \─┘
+      ;; └───┘       └─┘
       (let [points [[0 0] [14 0] [14 9] [12 9] [5 1] [12 1] [4 9] [0 9]]
             a      {:pos [0 0] :bounds-fn :points :points points}
             b      {:pos [2 8]}
@@ -508,4 +508,34 @@
         (is (and (qpu/polys-collide? a b)
                  (qpu/polys-collide? b a))))))
 
-  (testing "simple polygons"))
+  (testing "simple polygons"
+    ;; ┌──────┐
+    ;;  \  a  │
+    ;;   \    │
+    ;;    \   │
+    ;;     \  │
+    ;; ┌────┼─┼───┐
+    ;; │     \│   │
+    ;; │  b   │   │
+    ;; │          │
+    ;; └──────────┘
+    (let [a-points [[0 0] [7 0] [7 7]]
+          b-points [[0 5] [11 5] [11 9] [9 0]]
+          a        {:pos [0 0] :points a-points :bounds-fn :points}
+          b        {:pos [0 5] :points b-points :bounds-fn :points}]
+      (is (and (qpu/polys-collide? a b)
+               (qpu/polys-collide? b a)))))
+  (testing "irregular polygons"
+    ;; ┌──────┐  ┌─────┐
+    ;; │      └──┼─┐   │
+    ;; │  a      │ │ b │
+    ;; │         └─┼─┐ │
+    ;; │      ┌────┘ │ │
+    ;; └──────┘ ┌────┘ │
+    ;;          └──────┘
+    (let [a-points [[0 0] [7 0] [7 1] [12 1] [12 4] [7 4] [7 5] [0 5]]
+          b-points [[10 0] [16 0] [16 6] [9 6] [9 5] [14 5] [14 3] [10 3]]
+          a        {:pos [0 0] :points a-points :bounds-fn :points}
+          b        {:pos [10 0] :points b-points :bounds-fn :points}]
+      (is (and (qpu/polys-collide? a b)
+               (qpu/polys-collide? b a))))))
