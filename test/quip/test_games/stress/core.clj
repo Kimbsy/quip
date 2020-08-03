@@ -1,17 +1,15 @@
 (ns quip.test-games.stress.core
-  (:require [quil.core :as q]
+  (:require [oz.core :as oz]
+            [quil.core :as q]
             [quip.collision :as qpcollision]
             [quip.core :as qp]
             [quip.profiling :as qpprofiling]
             [quip.scene :as qpscene]
-            [quip.sprite :as qpsprite]
-            [oz.core :as oz]
-            [quip.test-games.stress.utils :as u]
-            [quip.utils :as qpu]))
+            [quip.test-games.stress.utils :as u]))
 
 (def test-id (str "stress-test_" (System/currentTimeMillis)))
 (def stress-test-file (str "/tmp/" test-id ".edn"))
-(def stage-length 5000)
+(def stage-length 1000)
 
 ;;; Stage update functions
 
@@ -66,14 +64,14 @@
     :init-fn   (fn [{:keys [current-scene] :as state}]
                  (-> state
                      (assoc-in [:scenes current-scene :sprites] [])
-                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider qpu/equal-pos?)])
+                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider qpcollision/equal-pos?)])
                      (assoc :frame-times [])))}
    {:name      "+as-+bs_pos-in-rect"
     :intensify-fn increasing-as-collide-increasing-bs-update
     :init-fn   (fn [{:keys [current-scene] :as state}]
                  (-> state
                      (assoc-in [:scenes current-scene :sprites] [])
-                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider qpu/pos-in-rect?)])
+                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider qpcollision/pos-in-rect?)])
                      (assoc :frame-times [])))}
    {:name      "+as-+bs_w-h-rects"
     :intensify-fn increasing-as-collide-increasing-bs-update
@@ -87,21 +85,21 @@
     :init-fn   (fn [{:keys [current-scene] :as state}]
                  (-> state
                      (assoc-in [:scenes current-scene :sprites] [])
-                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider qpu/poly-contains-pos?)])
+                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider qpcollision/poly-contains-pos?)])
                      (assoc :frame-times [])))}
    {:name      "+cmplx-as-+bs_poly-contains-pos"
     :intensify-fn increasing-complex-as-collide-increasing-bs-update
     :init-fn   (fn [{:keys [current-scene] :as state}]
                  (-> state
                      (assoc-in [:scenes current-scene :sprites] [])
-                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider qpu/poly-contains-pos?)])
+                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider qpcollision/poly-contains-pos?)])
                      (assoc :frame-times [])))}
    {:name      "+cmplx-as-+cmplx-bs_polys-collide"
     :intensify-fn increasing-complex-as-collide-increasing-complex-bs-update
     :init-fn   (fn [{:keys [current-scene] :as state}]
                  (-> state
                      (assoc-in [:scenes current-scene :sprites] [])
-                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider qpu/poly-contains-pos?)])
+                     (assoc-in [:scenes current-scene :colliders] [(u/basic-collider qpcollision/poly-contains-pos?)])
                      (assoc :frame-times [])))}])
 
 (defn reset-state

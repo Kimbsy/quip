@@ -2,6 +2,91 @@
   (:require [quil.core :as q]
             [quip.utils :as qpu]))
 
+;;; Geometric collision detection predicates
+
+(defn equal-pos?
+  "Predicate to check if two sprites have the same position."
+  [{pos-a :pos} {pos-b :pos}]
+  (qpu/equal-pos? pos-a pos-b))
+
+(defn w-h-rects-collide?
+  "Predicate to check if the `w` by `h` rects of two sprites overlap."
+  [{[ax1 ay1] :pos
+    aw        :w
+    ah        :h}
+   {[bx1 by1] :pos
+    bw        :w
+    bh        :h}]
+  (let [ax2     (+ ax1 aw)
+        ay2     (+ ay1 ah)
+        bx2     (+ bx1 bw)
+        by2     (+ by1 bh)]
+    (qpu/rects-overlap? [ax1 ay1 ax2 ay2]
+                        [bx1 by1 bx2 by2])))
+
+(defn pos-in-rect?
+  "Predicate to check if the position of sprite `a` is inside the `w` by
+  `h` rect of sprite `b`."
+  [{pos-a :pos}
+   {[bx by] :pos
+    bw      :w
+    bh      :h}]
+  (let [rect-b [bx by (+ bx bw) (+ by bh)]]
+    (qpu/pos-in-rect? pos-a rect-b)))
+
+(defn rect-contains-pos?
+  "Predicate to check if the position of sprite `b` is inside the `w` by
+  `h` rect of sprite `a`."
+  [a b]
+  (pos-in-rect? b a))
+
+(defn pos-in-poly?
+  "Predicate to check if the position of sprite `a` is inside the
+  bounding polygon of sprite `b`."
+  [{:keys [pos] :as a} {:keys [bounds-fn] :as b}]
+  (let [bounding-poly (bounds-fn b)]
+    (qpu/pos-in-poly? pos bounding-poly)))
+
+(defn poly-contains-pos?
+  "Predicate to check if the position of sprite `b` is inside the
+  bounding polygon of sprite `a`."
+  [a b]
+  (pos-in-poly? b a))
+
+(defn polys-collide?
+  "Predicate to check if the bounding polygons of sprites `a` and `b`
+  overlap."
+  [{bounds-fn-a :bounds-fn :as a} {bounds-fn-b :bounds-fn :as b}]
+  (let [poly-a (bounds-fn-a a)
+        poly-b (bounds-fn-b b)]
+    (qpu/polys-collide? poly-a poly-b)))
+
+;; @TODO: implement these:
+
+(defn pos-in-rotating-poly?
+  "Predicate to check if the position of sprite `a` is inside the
+  bounding polygon of sprite `b`, taking into account the rotation of
+  sprite `b`."
+  [a b]
+  (throw (new Exception "Unimplemented collision detection function")))
+
+(defn rotating-poly-contains-pos?
+  "Predicate to check if the position of sprite `b` is inside the
+  bounding polygon of sprite `a`, taking into account the rotation of
+  sprite `a`."
+  [a b]
+  (pos-in-rotating-poly? b a))
+
+(defn rotating-polys-collide?
+  "Predicate to check if the bounding polys of sprites `a` and `b`
+  intersect, taking into account the rotation of both sprites."
+  [a b]
+  (throw (new Exception "Unimplemented collision detection function")))
+
+
+
+;;; Applying colliders across sprites in current scene
+
 ;;; @TODO: Is this too specific? Is collision detection just a
 ;;; concrete example of a more abstract `interaction` or
 ;;; `relationship`?
@@ -21,7 +106,7 @@
   functions to be invoked on the sprites when collision is detected."
   [group-a-key group-b-key collide-fn-a collide-fn-b &
    {:keys [collision-detection-fn]
-    :or   {collision-detection-fn qpu/w-h-rects-collide?}}]
+    :or   {collision-detection-fn w-h-rects-collide?}}]
   {:group-a-key            group-a-key
    :group-b-key            group-b-key
    :collision-detection-fn collision-detection-fn

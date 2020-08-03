@@ -33,11 +33,11 @@
 ;;; Geometric collision predicates
 
 (defn equal-pos?
-  "Predicate to check if two sprites have the same position."
-  [a b]
-  (and (seq (:pos a))
-       (seq (:pos b))
-       (every? true? (map = (:pos a) (:pos b)))))
+  "Predicate to check if two positions are equal."
+  [pos-a pos-b]
+  (and (seq pos-a)
+       (seq pos-b)
+       (every? true? (map = pos-a pos-b))))
 
 ;; @TODO: should we be drawing sprites at their center? if so, this
 ;; should take it into account.
@@ -55,36 +55,12 @@
     (and (some true? x-preds)
          (some true? y-preds))))
 
-(defn w-h-rects-collide?
-  "Predicate to check if the `w` by `h` rects of two sprites overlap."
-  [{[ax1 ay1] :pos
-    aw        :w
-    ah        :h}
-   {[bx1 by1] :pos
-    bw        :w
-    bh        :h}]
-  (let [ax2     (+ ax1 aw)
-        ay2     (+ ay1 ah)
-        bx2     (+ bx1 bw)
-        by2     (+ by1 bh)]
-    (rects-overlap? [ax1 ay1 ax2 ay2]
-                    [bx1 by1 bx2 by2])))
-
 (defn pos-in-rect?
-  "Predicate to check if the position of sprite `a` is inside the `w` by
-  `h` rect of sprite `b`."
-  [{[ax ay] :pos}
-   {[bx by] :pos
-    bw      :w
-    bh      :h}]
-  (and (<= bx ax (+ bx bw))
-       (<= by ay (+ by bh))))
-
-(defn rect-contains-pos?
-  "Predicate to check if the position of sprite `b` is inside the `w` by
-  `h` rect of sprite `a`."
-  [a b]
-  (pos-in-rect? b a))
+  "Predicate to check if a position is inside a rectangle."
+  [[ax ay]
+   [bx1 by1 bx2 by2]]
+  (and (<= bx1 ax bx2)
+       (<= by1 ay by2)))
 
 (defn coarse-pos-in-poly?
   "Predicate to determine if a point is possibly inside a polygon.
@@ -160,27 +136,16 @@
          count
          odd?)))
 
-(defn pos-in-poly?*
-  "The `fine-pos-in-poly?` predicate is expensive so we only do it if
+(defn pos-in-poly?
+  "Predicate to check if a pos is inside a polygon.
+
+  The `fine-pos-in-poly?` predicate is expensive so we only do it if
   the cheaper `coarse-pos-in-poly?` says this is a possible
   collision."
   [pos poly]
   (when (and (seq poly)
              (coarse-pos-in-poly? pos poly))
     (fine-pos-in-poly? pos poly)))
-
-(defn pos-in-poly?
-  "Predicate to check if the position of sprite `a` is inside the
-  bounding polygon of sprite `b`."
-  [{:keys [pos] :as a} {:keys [bounds-fn] :as b}]
-  (let [bounding-poly (bounds-fn b)]
-    (pos-in-poly?* pos bounding-poly)))
-
-(defn poly-contains-pos?
-  "Predicate to check if the position of sprite `b` is inside the
-  bounding polygon of sprite `a`."
-  [a b]
-  (pos-in-poly? b a))
 
 (defn poly-w-h
   [poly]
@@ -217,46 +182,18 @@
          (combo/cartesian-product (poly-lines poly-a)
                                   (poly-lines poly-b)))
    ;; either fully contains the other
-   (or (pos-in-poly?* (first poly-a) poly-b)
-       (pos-in-poly?* (first poly-b) poly-a))))
+   (or (pos-in-poly? (first poly-a) poly-b)
+       (pos-in-poly? (first poly-b) poly-a))))
 
 (defn polys-collide?
-  "Predicate to check if the bounding polygons of sprites `a` and `b`
-  overlap.
+  "Predicate to check if two polygons overlap.
   
   The `fine-polys-collide?` predicate is expensive so we only do it if
   the cheaper `coarse-polys-collide?` says this is a possible
   collision."
-  [{bounds-fn-a :bounds-fn :as a} {bounds-fn-b :bounds-fn :as b}]
-  (let [poly-a (bounds-fn-a a)
-        poly-b (bounds-fn-b b)]
-    (when (coarse-polys-collide? poly-a poly-b)
-      (fine-polys-collide? poly-a poly-b))))
-
-;; @TODO: implement these:
-
-(defn pos-in-rotating-poly?
-  "Predicate to check if the position of sprite `a` is inside the
-  bounding polygon of sprite `b`, taking into account the rotation of
-  sprite `b`."
-  [a b]
-  (throw (new Exception "Unimplemented collision detection function")))
-
-(defn rotating-poly-contains-pos?
-  "Predicate to check if the position of sprite `b` is inside the
-  bounding polygon of sprite `a`, taking into account the rotation of
-  sprite `a`."
-  [a b]
-  (pos-in-rotating-poly? b a))
-
-(defn rotating-polys-collide?
-  "Predicate to check if the bounding polys of sprites `a` and `b`
-  intersect, taking into account the rotation of both sprites."
-  [a b]
-  (throw (new Exception "Unimplemented collision detection function")))
-
-
-
+  [poly-a poly-b]
+  (when (coarse-polys-collide? poly-a poly-b)
+    (fine-polys-collide? poly-a poly-b)))
 
 
 

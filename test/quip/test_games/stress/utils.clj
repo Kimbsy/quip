@@ -94,7 +94,7 @@
 
 (defn basic-collider
   ([]
-   (basic-collider qpu/w-h-rects-collide?))
+   (basic-collider qpcollision/w-h-rects-collide?))
   ([collision-detection-fn]
    (qpcollision/collider :big-captain :hit-me basic-collider-fn basic-collider-fn
                          :collision-detection-fn collision-detection-fn)))

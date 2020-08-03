@@ -28,7 +28,7 @@
 
 (deftest standard-collisions-ab-collider
   (let [collider-ab (sut/collider :foo :bar increment-collide-count increment-collide-count
-                                  :collision-detection-fn qpu/equal-pos?)]
+                                  :collision-detection-fn sut/equal-pos?)]
     (testing "colliding a with group-b"
       (let [results (sut/collide-group (first sprite-group-foo)
                                        sprite-group-bar
@@ -72,7 +72,7 @@
 
 (deftest self-collisions-aa-collider
   (let [collider-aa (sut/collider :foo :foo increment-collide-count increment-collide-count
-                                  :collision-detection-fn qpu/equal-pos?)]
+                                  :collision-detection-fn sut/equal-pos?)]
     (testing "colliding a with group-a"
       (let [results (sut/collide-group (second sprite-group-foo)
                                        sprite-group-foo
@@ -131,7 +131,7 @@
 (deftest removing-sprites-collider
   (testing "sprites in group a are removed on collision"
     (let [removing-a-collider (sut/collider :foo :bar removing-collide-fn increment-collide-count
-                                            :collision-detection-fn qpu/equal-pos?)
+                                            :collision-detection-fn sut/equal-pos?)
 
           state {:current-scene :test
                  :scenes        {:test {:sprites   sprites
@@ -152,7 +152,7 @@
 
   (testing "sprites in both groups are removed on collision"
     (let [removing-a-collider (sut/collider :foo :bar removing-collide-fn removing-collide-fn
-                                            :collision-detection-fn qpu/equal-pos?)
+                                            :collision-detection-fn sut/equal-pos?)
 
           state {:current-scene :test
                  :scenes        {:test {:sprites   sprites
@@ -173,7 +173,7 @@
 
   (testing "sprite in group a is removed when hitting the first of multiple sprites in b"
     (let [removing-a-collider (sut/collider :foo :baz removing-collide-fn increment-collide-count
-                                            :collision-detection-fn qpu/equal-pos?)
+                                            :collision-detection-fn sut/equal-pos?)
 
           state {:current-scene :test
                  :scenes        {:test {:sprites   sprites
@@ -197,14 +197,14 @@
         b {:pos [1 3]}
         c {:pos [4 4]}
         d {:pos []}]
-    (is (and (qpu/equal-pos? a b)
-             (qpu/equal-pos? b a)))
-    (is (and (not (qpu/equal-pos? a c))
-             (not (qpu/equal-pos? c a))))
-    (is (and (not (qpu/equal-pos? b c))
-             (not (qpu/equal-pos? c b))))
-    (is (not (qpu/equal-pos? a d)))
-    (is (not (qpu/equal-pos? d a)))))
+    (is (and (sut/equal-pos? a b)
+             (sut/equal-pos? b a)))
+    (is (and (not (sut/equal-pos? a c))
+             (not (sut/equal-pos? c a))))
+    (is (and (not (sut/equal-pos? b c))
+             (not (sut/equal-pos? c b))))
+    (is (not (sut/equal-pos? a d)))
+    (is (not (sut/equal-pos? d a)))))
 
 (deftest w-h-rects-collide?
   (testing "intersections"
@@ -223,32 +223,32 @@
           d {:pos [0 5] :w 4 :h 3}
           e {:pos [7 5] :w 4 :h 3}]
       ;; a collides with every other sprite
-      (is (and (qpu/w-h-rects-collide? a b)
-               (qpu/w-h-rects-collide? b a)))
-      (is (and (qpu/w-h-rects-collide? a c)
-               (qpu/w-h-rects-collide? c a)))
-      (is (and (qpu/w-h-rects-collide? a d)
-               (qpu/w-h-rects-collide? d a)))
-      (is (and (qpu/w-h-rects-collide? a e)
-               (qpu/w-h-rects-collide? e a)))
+      (is (and (sut/w-h-rects-collide? a b)
+               (sut/w-h-rects-collide? b a)))
+      (is (and (sut/w-h-rects-collide? a c)
+               (sut/w-h-rects-collide? c a)))
+      (is (and (sut/w-h-rects-collide? a d)
+               (sut/w-h-rects-collide? d a)))
+      (is (and (sut/w-h-rects-collide? a e)
+               (sut/w-h-rects-collide? e a)))
 
       ;; b collides with no other sprite
-      (is (and (not (qpu/w-h-rects-collide? b c))
-               (not (qpu/w-h-rects-collide? c b))))
-      (is (and (not (qpu/w-h-rects-collide? b d))
-               (not (qpu/w-h-rects-collide? d b))))
-      (is (and (not (qpu/w-h-rects-collide? b e))
-               (not (qpu/w-h-rects-collide? e b))))
+      (is (and (not (sut/w-h-rects-collide? b c))
+               (not (sut/w-h-rects-collide? c b))))
+      (is (and (not (sut/w-h-rects-collide? b d))
+               (not (sut/w-h-rects-collide? d b))))
+      (is (and (not (sut/w-h-rects-collide? b e))
+               (not (sut/w-h-rects-collide? e b))))
 
       ;; c collides with no other sprite
-      (is (and (not (qpu/w-h-rects-collide? c d))
-               (not (qpu/w-h-rects-collide? d c))))
-      (is (and (not (qpu/w-h-rects-collide? c e))
-               (not (qpu/w-h-rects-collide? e c))))
+      (is (and (not (sut/w-h-rects-collide? c d))
+               (not (sut/w-h-rects-collide? d c))))
+      (is (and (not (sut/w-h-rects-collide? c e))
+               (not (sut/w-h-rects-collide? e c))))
 
       ;; d collides with no other sprite
-      (is (and (not (qpu/w-h-rects-collide? d e))
-               (not (qpu/w-h-rects-collide? e d))))))
+      (is (and (not (sut/w-h-rects-collide? d e))
+               (not (sut/w-h-rects-collide? e d))))))
   
   (testing "partial overlaps"
     ;; ┌────┬─┬────┐
@@ -261,12 +261,12 @@
           b {:pos [5 0] :w 7 :h 3}
           c {:pos [0 2] :w 7 :h 3}]
       ;; all sprites collide with each other
-      (is (and (qpu/w-h-rects-collide? a b)
-               (qpu/w-h-rects-collide? b a)))
-      (is (and (qpu/w-h-rects-collide? a c)
-               (qpu/w-h-rects-collide? c a)))
-      (is (and (qpu/w-h-rects-collide? b c)
-               (qpu/w-h-rects-collide? c b)))))
+      (is (and (sut/w-h-rects-collide? a b)
+               (sut/w-h-rects-collide? b a)))
+      (is (and (sut/w-h-rects-collide? a c)
+               (sut/w-h-rects-collide? c a)))
+      (is (and (sut/w-h-rects-collide? b c)
+               (sut/w-h-rects-collide? c b)))))
   
   (testing "overlaps exactly"
     ;; ╔══════╗
@@ -276,8 +276,8 @@
     ;; ╚══════╝
     (let [a {:pos [0 0] :w 7 :h 4}
           b {:pos [0 0] :w 7 :h 4}]
-      (is (and (qpu/w-h-rects-collide? a b)
-               (qpu/w-h-rects-collide? b a)))))
+      (is (and (sut/w-h-rects-collide? a b)
+               (sut/w-h-rects-collide? b a)))))
 
   (testing "fully contains"
     ;; ┌────────┐
@@ -288,8 +288,8 @@
     ;; └────────┘
     (let [a {:pos [0 0] :w 9 :h 5}
           b {:pos [1 2] :w 7 :h 2}]
-      (is (and (qpu/w-h-rects-collide? a b)
-               (qpu/w-h-rects-collide? b a))))))
+      (is (and (sut/w-h-rects-collide? a b)
+               (sut/w-h-rects-collide? b a))))))
 
 (deftest pos-in-rect?
   (testing "pos-in-rect? and rect-contains-pos?"
@@ -302,12 +302,12 @@
           b {:pos [2 1]}
           c {:pos [4 4]}
           d {:pos [11 3]}]
-      (is (and (qpu/pos-in-rect? b a)
-               (qpu/rect-contains-pos? a b)))
-      (is (and (qpu/pos-in-rect? c a)
-               (qpu/rect-contains-pos? a c)))
-      (is (and (not (qpu/pos-in-rect? d a))
-               (not (qpu/rect-contains-pos? a d)))))))
+      (is (and (sut/pos-in-rect? b a)
+               (sut/rect-contains-pos? a b)))
+      (is (and (sut/pos-in-rect? c a)
+               (sut/rect-contains-pos? a c)))
+      (is (and (not (sut/pos-in-rect? d a))
+               (not (sut/rect-contains-pos? a d)))))))
 
 (deftest pos-in-poly?
   (testing "pos-in-poly? and poly-contains-pos?"
@@ -351,12 +351,12 @@
             b {:pos [2 1]}
             c {:pos [4 4]}
             d {:pos [11 3]}]
-        (is (and (qpu/pos-in-poly? b a)
-                 (qpu/poly-contains-pos? a b)))
-        (is (and (qpu/pos-in-poly? c a)
-                 (qpu/poly-contains-pos? a c)))
-        (is (and (not (qpu/pos-in-poly? d a))
-                 (not (qpu/poly-contains-pos? a d))))))
+        (is (and (sut/pos-in-poly? b a)
+                 (sut/poly-contains-pos? a b)))
+        (is (and (sut/pos-in-poly? c a)
+                 (sut/poly-contains-pos? a c)))
+        (is (and (not (sut/pos-in-poly? d a))
+                 (not (sut/poly-contains-pos? a d))))))
 
     (testing "works on simple polygons"
       ;; ┌─────────┐
@@ -370,12 +370,12 @@
             b      {:pos [2 4]}
             c      {:pos [8 4]}
             d      {:pos [16 2]}]
-        (is (and (qpu/pos-in-poly? b a)
-                 (qpu/poly-contains-pos? a b)))
-        (is (and (not (qpu/pos-in-poly? c a))
-                 (not (qpu/poly-contains-pos? a c))))
-        (is (and (not (qpu/pos-in-poly? d a))
-                 (not (qpu/poly-contains-pos? a d))))))
+        (is (and (sut/pos-in-poly? b a)
+                 (sut/poly-contains-pos? a b)))
+        (is (and (not (sut/pos-in-poly? c a))
+                 (not (sut/poly-contains-pos? a c))))
+        (is (and (not (sut/pos-in-poly? d a))
+                 (not (sut/poly-contains-pos? a d))))))
 
     (testing "works on complex polygons"
       ;; ┌─────────────┐
@@ -389,12 +389,12 @@
             b      {:pos [2 4]}
             c      {:pos [8 4]}
             d      {:pos [16 2]}]
-        (is (and (qpu/pos-in-poly? b a)
-                 (qpu/poly-contains-pos? a b)))
-        (is (and (not (qpu/pos-in-poly? c a))
-                 (not (qpu/poly-contains-pos? a c))))
-        (is (and (not (qpu/pos-in-poly? d a))
-                 (not (qpu/poly-contains-pos? a d))))))
+        (is (and (sut/pos-in-poly? b a)
+                 (sut/poly-contains-pos? a b)))
+        (is (and (not (sut/pos-in-poly? c a))
+                 (not (sut/poly-contains-pos? a c))))
+        (is (and (not (sut/pos-in-poly? d a))
+                 (not (sut/poly-contains-pos? a d))))))
 
     (testing "works on very complex polygons"
       ;; ┌─────────────┐
@@ -413,14 +413,14 @@
             c      {:pos [8 8]}
             d      {:pos [16 6]}
             e      {:pos [8 2]}]
-        (is (and (qpu/pos-in-poly? b a)
-                 (qpu/poly-contains-pos? a b)))
-        (is (and (not (qpu/pos-in-poly? c a))
-                 (not (qpu/poly-contains-pos? a c))))
-        (is (and (not (qpu/pos-in-poly? d a))
-                 (not (qpu/poly-contains-pos? a d))))
-        (is (and (not (qpu/pos-in-poly? e a))
-                 (not (qpu/poly-contains-pos? a e))))))))
+        (is (and (sut/pos-in-poly? b a)
+                 (sut/poly-contains-pos? a b)))
+        (is (and (not (sut/pos-in-poly? c a))
+                 (not (sut/poly-contains-pos? a c))))
+        (is (and (not (sut/pos-in-poly? d a))
+                 (not (sut/poly-contains-pos? a d))))
+        (is (and (not (sut/pos-in-poly? e a))
+                 (not (sut/poly-contains-pos? a e))))))))
 
 (deftest polys-collide
   (testing "rectangular polygons"
@@ -440,32 +440,32 @@
             d {:pos [0 5] :w 4 :h 3 :bounds-fn qpsprite/default-bounding-poly}
             e {:pos [7 5] :w 4 :h 3 :bounds-fn qpsprite/default-bounding-poly}]
         ;; a collides with every other sprite
-        (is (and (qpu/polys-collide? a b)
-                 (qpu/polys-collide? b a)))
-        (is (and (qpu/polys-collide? a c)
-                 (qpu/polys-collide? c a)))
-        (is (and (qpu/polys-collide? a d)
-                 (qpu/polys-collide? d a)))
-        (is (and (qpu/polys-collide? a e)
-                 (qpu/polys-collide? e a)))
+        (is (and (sut/polys-collide? a b)
+                 (sut/polys-collide? b a)))
+        (is (and (sut/polys-collide? a c)
+                 (sut/polys-collide? c a)))
+        (is (and (sut/polys-collide? a d)
+                 (sut/polys-collide? d a)))
+        (is (and (sut/polys-collide? a e)
+                 (sut/polys-collide? e a)))
 
         ;; b collides with no other sprite
-        (is (and (not (qpu/polys-collide? b c))
-                 (not (qpu/polys-collide? c b))))
-        (is (and (not (qpu/polys-collide? b d))
-                 (not (qpu/polys-collide? d b))))
-        (is (and (not (qpu/polys-collide? b e))
-                 (not (qpu/polys-collide? e b))))
+        (is (and (not (sut/polys-collide? b c))
+                 (not (sut/polys-collide? c b))))
+        (is (and (not (sut/polys-collide? b d))
+                 (not (sut/polys-collide? d b))))
+        (is (and (not (sut/polys-collide? b e))
+                 (not (sut/polys-collide? e b))))
 
         ;; c collides with no other sprite
-        (is (and (not (qpu/polys-collide? c d))
-                 (not (qpu/polys-collide? d c))))
-        (is (and (not (qpu/polys-collide? c e))
-                 (not (qpu/polys-collide? e c))))
+        (is (and (not (sut/polys-collide? c d))
+                 (not (sut/polys-collide? d c))))
+        (is (and (not (sut/polys-collide? c e))
+                 (not (sut/polys-collide? e c))))
 
         ;; d collides with no other sprite
-        (is (and (not (qpu/polys-collide? d e))
-                 (not (qpu/polys-collide? e d))))))
+        (is (and (not (sut/polys-collide? d e))
+                 (not (sut/polys-collide? e d))))))
     
     (testing "partial overlaps"
       ;; ┌────┬─┬────┐
@@ -478,12 +478,12 @@
             b {:pos [5 0] :w 7 :h 3 :bounds-fn qpsprite/default-bounding-poly}
             c {:pos [0 2] :w 7 :h 3 :bounds-fn qpsprite/default-bounding-poly}]
         ;; all sprites collide with each other
-        (is (and (qpu/polys-collide? a b)
-                 (qpu/polys-collide? b a)))
-        (is (and (qpu/polys-collide? a c)
-                 (qpu/polys-collide? c a)))
-        (is (and (qpu/polys-collide? b c)
-                 (qpu/polys-collide? c b)))))
+        (is (and (sut/polys-collide? a b)
+                 (sut/polys-collide? b a)))
+        (is (and (sut/polys-collide? a c)
+                 (sut/polys-collide? c a)))
+        (is (and (sut/polys-collide? b c)
+                 (sut/polys-collide? c b)))))
     
     (testing "overlaps exactly"
       ;; ╔══════╗
@@ -493,8 +493,8 @@
       ;; ╚══════╝
       (let [a {:pos [0 0] :w 7 :h 4 :bounds-fn qpsprite/default-bounding-poly}
             b {:pos [0 0] :w 7 :h 4 :bounds-fn qpsprite/default-bounding-poly}]
-        (is (and (qpu/polys-collide? a b)
-                 (qpu/polys-collide? b a)))))
+        (is (and (sut/polys-collide? a b)
+                 (sut/polys-collide? b a)))))
 
     (testing "fully contains"
       ;; ┌────────┐
@@ -505,8 +505,8 @@
       ;; └────────┘
       (let [a {:pos [0 0] :w 9 :h 5 :bounds-fn qpsprite/default-bounding-poly}
             b {:pos [1 2] :w 7 :h 2 :bounds-fn qpsprite/default-bounding-poly}]
-        (is (and (qpu/polys-collide? a b)
-                 (qpu/polys-collide? b a))))))
+        (is (and (sut/polys-collide? a b)
+                 (sut/polys-collide? b a))))))
 
   (testing "simple polygons"
     ;; ┌──────┐
@@ -523,8 +523,8 @@
           b-points [[0 5] [11 5] [11 9] [9 0]]
           a        {:pos [0 0] :points a-points :bounds-fn :points}
           b        {:pos [0 5] :points b-points :bounds-fn :points}]
-      (is (and (qpu/polys-collide? a b)
-               (qpu/polys-collide? b a)))))
+      (is (and (sut/polys-collide? a b)
+               (sut/polys-collide? b a)))))
   (testing "irregular polygons"
     ;; ┌──────┐  ┌─────┐
     ;; │      └──┼─┐   │
@@ -537,5 +537,5 @@
           b-points [[10 0] [16 0] [16 6] [9 6] [9 5] [14 5] [14 3] [10 3]]
           a        {:pos [0 0] :points a-points :bounds-fn :points}
           b        {:pos [10 0] :points b-points :bounds-fn :points}]
-      (is (and (qpu/polys-collide? a b)
-               (qpu/polys-collide? b a))))))
+      (is (and (sut/polys-collide? a b)
+               (sut/polys-collide? b a))))))
