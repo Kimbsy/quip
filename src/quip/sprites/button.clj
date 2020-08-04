@@ -1,6 +1,8 @@
 (ns quip.sprites.button
   (:require [quil.core :as q]
-            [quip.utils :as qpu]))
+            [quip.utils :as qpu]
+            [quip.sprite :as qpsprite]
+            [quip.collision :as qpcollision]))
 
 (defn draw-button-sprite
   [{:keys [content pos w h color font content-color content-pos held?]}]
@@ -22,7 +24,8 @@
           (q/text content (+ x cx) (+ y cy))))))
 
 (defn button-sprite
-  [content pos & {:keys [on-click
+  [content pos & {:keys [offsets
+                         on-click
                          size
                          color
                          font
@@ -32,21 +35,23 @@
                          held?
                          draw-fn
                          collision-detection-fn]
-                  :or   {on-click               identity
+                  :or   {offsets                [:center :center]
+                         on-click               identity
                          size                   [200 100]
                          color                  qpu/grey
                          font                   qpu/default-font
                          font-size              qpu/large-text-size
                          content-color          qpu/black
-                         content-pos            [50 35]
+                         content-pos            [100 50]
                          held?                  false
                          draw-fn                draw-button-sprite
-                         collision-detection-fn qpu/pos-in-rect?}}]
+                         collision-detection-fn qpcollision/pos-in-rect?}}]
   (let [[w h] size]
     {:sprite-group           :button
      :uuid                   (java.util.UUID/randomUUID)
      :content                content
-     :pos                    pos
+     :pos                    (qpsprite/offset-pos pos w h offsets)
+     :offsets                offsets
      :on-click               on-click
      :w                      w
      :h                      h

@@ -31,10 +31,15 @@
   []
   [(qpbutton/button-sprite "Play"
                            [(* (q/width) 1/2) (* (q/height) 1/2)]
-                           :on-click (fn [state e] (prn "PLAY") state))
-   (qpbutton/button-sprite "Quit"
+                           :on-click (fn [state e] (prn "PLAY") state)
+                           :offsets [:right :center])
+   (qpbutton/button-sprite "Don't"
                            [(* (q/width) 1/2) (* (q/height) 2/3)]
-                           :on-click (fn [state e] (prn "QUIT") state))])
+                           :on-click (fn [state e] (prn "DONT") state))
+   (qpbutton/button-sprite "Quit"
+                           [(* (q/width) 1/2) (* (q/height) 5/6)]
+                           :on-click (fn [state e] (prn "QUIT") state)
+                           :offsets [:left :center])])
 
 (defn init
   []
