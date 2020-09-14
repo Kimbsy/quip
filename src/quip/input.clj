@@ -1,4 +1,5 @@
-(ns quip.input)
+(ns quip.input
+  (:require [quil.core :as q]))
 
 ;;; Default handlers for key events.
 
@@ -7,10 +8,15 @@
 ;;; for character control etc.
 
 (defn default-key-pressed
+  "Prevent the default behaviour of esc closing the sketch and add the
+  pressed key to the list of currently held keys."
   [state e]
+  (if (= 27 (q/key-code))
+    (set! (.key (quil.applet/current-applet)) (char 0)))
   (update state :held-keys #(conj % (:key e))))
 
 (defn default-key-released
+  "Remove the released key from the list of currently held keys."
   [state e]
   (update state :held-keys #(disj % (:key e))))
 
