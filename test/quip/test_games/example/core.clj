@@ -82,7 +82,7 @@
    :draw-fn (fn [state]
               (q/background 0 153 255)
               (qpscene/draw-scene-sprites state))
-   :update-fn (fn [{:keys [current-scene] :as state}]
+   :update-fn (fn [state]
                 (qpscene/update-scene-sprites state))})
 
 
@@ -98,4 +98,5 @@
                                             :level-1 (init-level-1)})
                          :current-scene  :menu}))
 
-(qp/run test-game)
+(comment
+  (qp/run test-game))

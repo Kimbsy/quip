@@ -7,6 +7,9 @@
 (def white [255])
 (def grey [122])
 (def gray grey)
+(def red [255 0 0])
+(def green [0 255 0])
+(def blue [0 0 255])
 
 (defn darken
   [color]
@@ -30,6 +33,65 @@
 (def stroke (partial apply q/stroke))
 
 
+(defn wrap-trans-rot
+  "Perform a translation, a rotation, invoke the supplied
+  function (probably drawing a sprite, then reset the transform matrix
+  to the identity."
+  [[x y] r f]
+  (q/push-matrix)
+  (q/translate x y)
+  (q/rotate (q/radians r))
+  (f)
+  (q/pop-matrix))
+
+;;; Vector utils
+
+(defn zero-vector?
+  "Predicate to check if a vector has length 0."
+  [v]
+  (every? zero? v))
+
+(defn magnitude
+  "Calculate the length of a vector."
+  [v]
+  (Math/sqrt (reduce + (map #(Math/pow % 2)
+                            v))))
+
+(defn unit-vector
+  "Calculate the unit vector of a given 2D vector."
+  [v]
+  (when-not (zero-vector? v)
+    (map #(/ % (magnitude v)) v)))
+
+(defn rotate-vector
+  "Rotate a vector about the origin by `r` degreees."
+  [[x y] r]
+  (let [radians (q/radians r)]
+    [(- (* x (q/cos radians))
+        (* y (q/sin radians)))
+     (+ (* x (q/sin radians))
+        (* y (q/cos radians)))]))
+
+(defn orthogonals
+  "Calculate the two orthogonal vectors to a given 2D vector.
+
+  Y axis is inverted so this returns [90-degrees-right-vector
+                                      90-degrees-left-vector]"
+  [[x y]]
+  [[(- y) x]
+   [y (- x)]])
+
+(defn direction-vector
+  "Calculate the unit direction vector based on the rotation angle."
+  [r]
+  [(q/sin (q/radians r))
+   (- (q/cos (q/radians r)))])
+
+(defn rotation-angle
+  "Calculate the rotation angle of a vector."
+  [[x y]]
+  (q/degrees (q/atan2 x y)))
+
 ;;; Geometric collision predicates
 
 (defn equal-pos?
@@ -38,9 +100,6 @@
   (and (seq pos-a)
        (seq pos-b)
        (every? true? (map = pos-a pos-b))))
-
-;; @TODO: should we be drawing sprites at their center? if so, this
-;; should take it into account.
 
 (defn rects-overlap?
   "Predicate to determine if two rectangles overlap."
@@ -104,7 +163,6 @@
   ;; intersection we'll likely get it on the next frame.
   (let [denom-a (- (* (- y4 y3) (- x2 x1))
                    (* (- x4 x3) (- y2 y1)))
-
         denom-b (- (* (- y4 y3) (- x2 x1))
                    (* (- x4 x3) (- y2 y1)))]
     (when-not (or (zero? denom-a)
@@ -194,8 +252,6 @@
   [poly-a poly-b]
   (when (coarse-polys-collide? poly-a poly-b)
     (fine-polys-collide? poly-a poly-b)))
-
-
 
 
 

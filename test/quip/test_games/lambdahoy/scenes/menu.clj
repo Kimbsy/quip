@@ -27,11 +27,28 @@
                          :font qpu/italic-font
                          :color qpu/white)])
 
+(defn on-click-play
+  [state e]
+  (qpscene/transition state :ocean
+                      :transition-length 30
+                      :transition-fn
+                      (fn [state progress max]
+                        (q/fill 0)
+                        (q/rect 0 0 (-> progress
+                                        (/ max)
+                                        (* (q/width))
+                                        int)
+                                (q/height)))
+                      :init-fn (fn [state]
+                                 (prn "PLAY")
+                                 (prn "STARTING OCEAN")
+                                 state)))
+
 (defn button-sprites
   []
   [(qpbutton/button-sprite "Play"
                            [(* (q/width) 1/2) (* (q/height) 1/2)]
-                           :on-click (fn [state e] (prn "PLAY") state)
+                           :on-click on-click-play
                            :offsets [:right :center])
    (qpbutton/button-sprite "Don't"
                            [(* (q/width) 1/2) (* (q/height) 2/3)]

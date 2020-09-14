@@ -3,7 +3,8 @@
             [quil.middleware :as m]
             [quip.input :as qpinput]
             [quip.profiling :as qpprofiling]
-            [quip.sound :as qpsound]))
+            [quip.sound :as qpsound]
+            [quip.utils :as qpu]))
 
 (defn default-update
   [state]
@@ -13,6 +14,8 @@
   [{:keys [scenes current-scene] :as state}]
   (q/background 0)
   (q/fill 255)
+  (q/text-align :left :baseline)
+  (q/text-font (q/create-font qpu/default-font qpu/default-text-size))
   (q/text (str "No draw-fn found for current scene " (str current-scene)) 200 200))
 
 (defn update-state

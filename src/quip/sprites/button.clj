@@ -5,11 +5,11 @@
             [quip.collision :as qpcollision]))
 
 (defn draw-button-sprite
-  [{:keys [content pos w h color font content-color content-pos held?]}]
+  [{:keys [content pos w h offsets color font content-color content-pos held?]}]
   (q/no-stroke)
   (q/text-align :center :center)
   (q/text-font font)
-  (let [[x y]   pos
+  (let [[x y]   (qpsprite/offset-pos pos w h)
         [cx cy] content-pos]
     (if held?
       (do (qpu/fill color)
@@ -50,8 +50,7 @@
     {:sprite-group           :button
      :uuid                   (java.util.UUID/randomUUID)
      :content                content
-     :pos                    (qpsprite/offset-pos pos w h offsets)
-     :offsets                offsets
+     :pos                    pos
      :on-click               on-click
      :w                      w
      :h                      h
