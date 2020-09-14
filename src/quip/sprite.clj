@@ -1,19 +1,13 @@
 (ns quip.sprite
   (:require [quil.core :as q]
-            [quip.utils :as qpu]))
+            [quip.utils :as qpu]
+            [quip.utils :as u]
+            [quip.sprite :as qpsprite]))
 
 (defn offset-pos
-  [[x y] w h [offset-x offset-y]]
-  [(case offset-x
-     :left   x
-     :center (- x (/ w 2))
-     :right  (- x w)
-     x)
-   (case offset-y
-     :top y
-     :center (- y (/ h 2))
-     :bottom (- y h)
-     y)])
+  [[x y] w h]
+  [(- x (/ w 2))
+   (- y (/ h 2))])
 
 (defn update-pos
   [{:keys [pos vel] :as s}]
@@ -46,22 +40,23 @@
           update-pos))
 
 (defn draw-image-sprite
-  [{[x y] :pos image :image}]
-  (q/image image x y))
+  [{:keys [pos w h image]}]
+  (let [[x y] (offset-pos pos w h)]
+    (q/image image x y)))
 
 (def memo-graphics (memoize (fn [w h] (q/create-graphics w h))))
 
 (defn draw-animated-sprite
-  [{:keys [pos w h spritesheet current-animation animation-frame] :as s}]
-  (let [[x y]     pos
-        animation (current-animation (:animations s))
+  [{:keys [pos rotation w h spritesheet current-animation animation-frame] :as s}]
+  (let [animation (current-animation (:animations s))
         x-offset  (* animation-frame w)
         y-offset  (* (:y-offset animation) h)
         g         (memo-graphics w h)]
     (q/with-graphics g
       (.clear g)
       (q/image spritesheet (- x-offset) (- y-offset)))
-    (q/image g x y)))
+    (qpu/wrap-trans-rot pos rotation
+                       #(q/image g (- (/ w 2)) (- (/ h 2))))))
 
 (defn set-animation
   [s animation]
@@ -72,30 +67,28 @@
 (defn default-bounding-poly
   "Generates a bounding polygon based off the `w` by `h` rectangle of
   the sprite."
-  [{[x y] :pos
-    w     :w
-    h     :h}]
-  [[x       y]
-   [(+ x w) y]
-   [(+ x w) (+ y h)]
-   [x       (+ y h)]])
+  [{:keys [w h]}]
+  [[0 0]
+   [w 0]
+   [w h]
+   [0 h]])
 
 ;;; Basic Sprite types
 
 (defn static-sprite
   [sprite-group pos w h image-file &
-   {:keys [offsets
+   {:keys [rotation
            update-fn
            draw-fn
            points
            bounds-fn]
-    :or   {offsets   [:left :top]
+    :or   {rotation  0
            update-fn identity
            draw-fn   draw-image-sprite}}]
   {:sprite-group sprite-group
    :uuid         (java.util.UUID/randomUUID)
-   :pos          (offset-pos pos w h offsets)
-   :offsets      offsets
+   :pos          pos
+   :rotation     rotation
    :w            w
    :h            h
    :animated?    false
@@ -111,20 +104,20 @@
 
 (defn image-sprite
   [sprite-group pos w h image-file &
-   {:keys [offsets
+   {:keys [rotation
            vel
            update-fn
            draw-fn
            points
            bounds-fn]
-    :or   {offsets   [:left :top]
+    :or   {rotation  0
            vel       [0 0]
            update-fn update-image-sprite
            draw-fn   draw-image-sprite}}]
   {:sprite-group sprite-group
    :uuid         (java.util.UUID/randomUUID)
-   :pos          (offset-pos pos w h offsets)
-   :offsets      offsets
+   :pos          pos
+   :rotation     rotation
    :vel          vel
    :w            w
    :h            h
@@ -141,7 +134,7 @@
 
 (defn animated-sprite
   [sprite-group pos w h spritesheet-file &
-   {:keys [offsets
+   {:keys [rotation
            vel
            update-fn
            draw-fn
@@ -149,7 +142,7 @@
            current-animation
            points
            bounds-fn]
-    :or   {offsets           [:left :top]
+    :or   {rotation          0
            vel               [0 0]
            update-fn         update-animated-sprite
            draw-fn           draw-animated-sprite
@@ -159,8 +152,8 @@
            current-animation :none}}]
   {:sprite-group      sprite-group
    :uuid              (java.util.UUID/randomUUID)
-   :pos               (offset-pos pos w h offsets)
-   :offsets           offsets
+   :pos               pos
+   :rotation          rotation
    :vel               vel
    :w                 w
    :h                 h

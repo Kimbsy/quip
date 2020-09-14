@@ -10,78 +10,117 @@
   (qpu/equal-pos? pos-a pos-b))
 
 (defn w-h-rects-collide?
-  "Predicate to check if the `w` by `h` rects of two sprites overlap."
-  [{[ax1 ay1] :pos
-    aw        :w
-    ah        :h}
-   {[bx1 by1] :pos
-    bw        :w
-    bh        :h}]
-  (let [ax2     (+ ax1 aw)
-        ay2     (+ ay1 ah)
-        bx2     (+ bx1 bw)
-        by2     (+ by1 bh)]
+  "Predicate to check for overlap of the `w` by `h` rects of two sprites
+  centered on their positions."
+  [{[ax ay] :pos
+    aw      :w
+    ah      :h}
+   {[bx by] :pos
+    bw      :w
+    bh      :h}]
+  (let [ax1 (+ ax (- (/ aw 2)))
+        ay1 (+ ay (- (/ ah 2)))
+        ax2 (+ ax aw (- (/ aw 2)))
+        ay2 (+ ay ah (- (/ ah 2)))
+        bx1 (+ bx (- (/ bw 2)))
+        by1 (+ by (- (/ bh 2)))
+        bx2 (+ bx bw (- (/ bw 2)))
+        by2 (+ by bh (- (/ bh 2)))]
     (qpu/rects-overlap? [ax1 ay1 ax2 ay2]
                         [bx1 by1 bx2 by2])))
 
 (defn pos-in-rect?
   "Predicate to check if the position of sprite `a` is inside the `w` by
-  `h` rect of sprite `b`."
-  [{pos-a :pos}
+  `h` rect of sprite `b` centered on its position."
+  [{pos-a :pos :as a}
    {[bx by] :pos
     bw      :w
-    bh      :h}]
-  (let [rect-b [bx by (+ bx bw) (+ by bh)]]
+    bh      :h
+    :as     b}]
+  (let [rect-b [(+ bx (- (/ bw 2)))
+                (+ by (- (/ bh 2)))
+                (+ bx bw (- (/ bw 2)))
+                (+ by bh (- (/ bh 2)))]]
     (qpu/pos-in-rect? pos-a rect-b)))
 
 (defn rect-contains-pos?
   "Predicate to check if the position of sprite `b` is inside the `w` by
-  `h` rect of sprite `a`."
+  `h` rect of sprite `a` centered on its position."
   [a b]
   (pos-in-rect? b a))
 
 (defn pos-in-poly?
   "Predicate to check if the position of sprite `a` is inside the
-  bounding polygon of sprite `b`."
-  [{:keys [pos] :as a} {:keys [bounds-fn] :as b}]
-  (let [bounding-poly (bounds-fn b)]
-    (qpu/pos-in-poly? pos bounding-poly)))
+  bounding polygon of sprite `b` centered on its position."
+  [{pos-a :pos :as a}
+   {bounds-fn :bounds-fn pos-b :pos w :w h :h :as b}]
+  (let [bounding-poly (->> (bounds-fn b)
+                           (map (fn [p] (map - p [(/ w 2) (/ h 2)])))
+                           (map (fn [p] (map + p pos-b))))]
+    (qpu/pos-in-poly? pos-a bounding-poly)))
 
 (defn poly-contains-pos?
   "Predicate to check if the position of sprite `b` is inside the
-  bounding polygon of sprite `a`."
+  bounding polygon of sprite `a` centered on its position."
   [a b]
   (pos-in-poly? b a))
 
 (defn polys-collide?
-  "Predicate to check if the bounding polygons of sprites `a` and `b`
-  overlap."
-  [{bounds-fn-a :bounds-fn :as a} {bounds-fn-b :bounds-fn :as b}]
-  (let [poly-a (bounds-fn-a a)
-        poly-b (bounds-fn-b b)]
+  "Predicate to check an intersection of the bounding polygons of
+  sprites `a` and `b` centered on their positions."
+  [{bounds-fn-a :bounds-fn pos-a :pos wa :w ha :h :as a}
+   {bounds-fn-b :bounds-fn pos-b :pos wb :w hb :h :as b}]
+  (let [poly-a (->> (bounds-fn-a a)
+                    (map (fn [p] (map - p [(/ wa 2) (/ ha 2)])))
+                    (map (fn [p] (map + p pos-a))))
+        poly-b (->> (bounds-fn-b b)
+                    (map (fn [p] (map - p [(/ wb 2) (/ hb 2)])))
+                    (map (fn [p] (map + p pos-b))))]
     (qpu/polys-collide? poly-a poly-b)))
 
-;; @TODO: implement these:
+(defn- maybe-rotate
+  "Rotate a non-zero vector by an angle unless this represents an integer number
+  of rotations."
+  [v rotation]
+  (if (or (zero? (mod (or rotation 0) 360))
+          (qpu/zero-vector? v))
+    v
+    (qpu/rotate-vector v rotation)))
 
 (defn pos-in-rotating-poly?
   "Predicate to check if the position of sprite `a` is inside the
-  bounding polygon of sprite `b`, taking into account the rotation of
-  sprite `b`."
-  [a b]
-  (throw (new Exception "Unimplemented collision detection function")))
+  bounding polygon of sprite `b` centered on its position, taking into
+  account its rotation."
+  [{pos-a :pos :as a}
+   {bounds-fn :bounds-fn pos-b :pos rotation :rotation w :w h :h :as b}]
+  (let [bounding-poly (->> (bounds-fn b)
+                           (map (fn [p] (map - p [(/ w 2) (/ h 2)])))
+                           (map #(maybe-rotate % rotation))
+                           (map (fn [p] (map + p pos-b))))]
+    (qpu/pos-in-poly? pos-a bounding-poly)))
 
 (defn rotating-poly-contains-pos?
   "Predicate to check if the position of sprite `b` is inside the
-  bounding polygon of sprite `a`, taking into account the rotation of
-  sprite `a`."
+  bounding polygon of sprite `a` centered on its position, taking into
+  account its rotation."
   [a b]
   (pos-in-rotating-poly? b a))
 
 (defn rotating-polys-collide?
-  "Predicate to check if the bounding polys of sprites `a` and `b`
-  intersect, taking into account the rotation of both sprites."
-  [a b]
-  (throw (new Exception "Unimplemented collision detection function")))
+  "Predicate to check for an intersection of the bounding polys of
+  sprites `a` and `b` centered on their positions, taking into account
+  the rotation of both sprites."
+  [{bounds-fn-a :bounds-fn pos-a :pos rotation-a :rotation wa :w ha :h :as a}
+   {bounds-fn-b :bounds-fn pos-b :pos rotation-b :rotation wb :w hb :h :as b}]
+  (let [poly-a (->> (bounds-fn-a a)
+                    (map (fn [p] (map - p [(/ wa 2) (/ ha 2)])))
+                    (map #(maybe-rotate % rotation-a))
+                    (map (fn [p] (map + p pos-a))))
+        poly-b (->> (bounds-fn-b b)
+                    (map (fn [p] (map - p [(/ wb 2) (/ hb 2)])))
+                    (map #(maybe-rotate % rotation-b))
+                    (map (fn [p] (map + p pos-b))))]
+    (qpu/polys-collide? poly-a poly-b)))
 
 
 
@@ -94,7 +133,7 @@
 ;;; If we want sprites to do something when they get near each other
 ;;; or have the same x or y coordinate we can use a collider to model
 ;;; this by using a custom `collision-detection-fn`, similarly if we
-;;; want sprites to inteact with each other when their health is
+;;; want sprites to interact with each other when their health is
 ;;; equal, or their total gold is greater than an amount we can do
 ;;; this in the same way.
 ;;;
@@ -183,7 +222,6 @@
                         {:group-a []
                          :group-b group-b}
                         group-a)]
-
     (-> {}
         (assoc group-b-key (:group-b results))
         (assoc group-a-key (:group-a results)))))

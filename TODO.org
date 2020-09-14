@@ -1,9 +1,11 @@
 * TODO stuff to do
 
-** DONE text sprites
-** DONE button sprites? too much?
-** DONE self-drawing sprites?
-*** they already did this
+** DONE rotatable sprites
+
+** TODO an easier way of making things clickable, the way buttons works repeats collision detection too much
+
+** TODO BUG - clicking a button which starts a scene transition stops the mouse-released handler from being invoked, when you next visit the original scene the button is still pressed.
+*** TODO the transition update should process at least mouse and keyboard release events
 
 ** TODO performance profiling (start with fps)
 *** DONE profile fps

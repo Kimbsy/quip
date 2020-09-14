@@ -9,7 +9,7 @@
 
 (def test-id (str "stress-test_" (System/currentTimeMillis)))
 (def stress-test-file (str "/tmp/" test-id ".edn"))
-(def stage-length 1000)
+(def stage-length 5000)
 
 ;;; Stage update functions
 
