@@ -144,13 +144,19 @@
   "Define a check for collision between to groups of sprites with
   functions to be invoked on the sprites when collision is detected."
   [group-a-key group-b-key collide-fn-a collide-fn-b &
-   {:keys [collision-detection-fn]
-    :or   {collision-detection-fn w-h-rects-collide?}}]
+   {:keys [collision-detection-fn
+           non-collide-fn-a
+           non-collide-fn-b]
+    :or   {collision-detection-fn w-h-rects-collide?
+           non-collide-fn-a       identity
+           non-collide-fn-b       identity}}]
   {:group-a-key            group-a-key
    :group-b-key            group-b-key
    :collision-detection-fn collision-detection-fn
    :collide-fn-a           collide-fn-a
-   :collide-fn-b           collide-fn-b})
+   :collide-fn-b           collide-fn-b
+   :non-collide-fn-a       non-collide-fn-a
+   :non-collide-fn-b       non-collide-fn-b})
 
 (defn collide-sprites
   "Check two sprites for collision and update them with the appropriate
@@ -163,7 +169,9 @@
                group-b-key
                collision-detection-fn
                collide-fn-a
-               collide-fn-b]}]
+               collide-fn-b
+               non-collide-fn-a
+               non-collide-fn-b]}]
   (let [collision-predicate (if (= group-a-key group-b-key)
                               #(and (not= (:uuid a) (:uuid b))
                                     (collision-detection-fn %1 %2))
@@ -171,8 +179,8 @@
     (if (and a b (collision-predicate a b))
       {:a (collide-fn-a a)
        :b (collide-fn-b b)}
-      {:a a
-       :b b})))
+      {:a (non-collide-fn-a a)
+       :b (non-collide-fn-b b)})))
 
 (defn collide-group
   "Check a sprite from one group for collisions with all sprites from

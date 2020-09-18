@@ -1,6 +1,9 @@
 * TODO stuff to do
 
-** DONE rotatable sprites
+** DONE Deploy to Clojars
+
+** TODO rulers for borders, dev debug overlay?
+*** TODO would be nice to be able to draw sprites hitboxes
 
 ** TODO an easier way of making things clickable, the way buttons works repeats collision detection too much
 
@@ -32,3 +35,6 @@
 ** TODO test using quip as a library from a seperate project
 *** in progess...
 *** reimplement lambdahoy?
+
+
+** DONE rotatable sprites
