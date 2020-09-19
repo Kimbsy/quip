@@ -85,7 +85,7 @@
   (cons (complex-collision-sprite) sprites))
 
 (defn basic-collider-fn
-  [s]
+  [s _]
   (update s :collisions inc))
 
 (defn removing-collider-fn

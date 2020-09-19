@@ -139,6 +139,10 @@
 ;;;
 ;;; Should rename, probably wouldn't even need much refactoring.
 
+(defn identity-collide-fn
+  "Collide functions should return an optionally modified `a` sprite."
+  [a b]
+  a)
 
 (defn collider
   "Define a check for collision between to groups of sprites with
@@ -148,8 +152,8 @@
            non-collide-fn-a
            non-collide-fn-b]
     :or   {collision-detection-fn w-h-rects-collide?
-           non-collide-fn-a       identity
-           non-collide-fn-b       identity}}]
+           non-collide-fn-a       identity-collide-fn
+           non-collide-fn-b       identity-collide-fn}}]
   {:group-a-key            group-a-key
    :group-b-key            group-b-key
    :collision-detection-fn collision-detection-fn
@@ -160,7 +164,9 @@
 
 (defn collide-sprites
   "Check two sprites for collision and update them with the appropriate
-  `collide-fn-<a|b>` provided by the collider.
+  `collide-fn-<a|b>` provided by the collider. These functions should
+  return an optionally modified version of their first argument, the
+  second is passed in only as a reference.
 
   In the case that we're checking a group of sprites for collisions in
   the same group we need to check the uuid on the sprites to ensure
@@ -177,10 +183,10 @@
                                     (collision-detection-fn %1 %2))
                               #(collision-detection-fn %1 %2))]
     (if (and a b (collision-predicate a b))
-      {:a (collide-fn-a a)
-       :b (collide-fn-b b)}
-      {:a (non-collide-fn-a a)
-       :b (non-collide-fn-b b)})))
+      {:a (collide-fn-a a b)
+       :b (collide-fn-b b a)}
+      {:a (non-collide-fn-a a b)
+       :b (non-collide-fn-b b a)})))
 
 (defn collide-group
   "Check a sprite from one group for collisions with all sprites from

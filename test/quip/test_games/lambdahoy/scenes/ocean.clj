@@ -75,8 +75,8 @@
                        (if (#{:left :right} (:key e))
                          (update-in state [:scenes current-scene :sprites] #(rotate-player % held-keys))
                          state))]
-   :colliders [(qpcollision/collider :player :other (fn [{:keys [rotation] :as s}]
+   :colliders [(qpcollision/collider :player :other (fn [{:keys [rotation] :as s} _]
                                                       (prn rotation)
                                                       s)
-                                     identity
+                                     qpcollision/identity-collide-fn
                                      :collision-detection-fn qpcollision/rotating-polys-collide?)]})

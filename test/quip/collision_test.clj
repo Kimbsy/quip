@@ -23,7 +23,7 @@
 (def sprites (concat sprite-group-foo sprite-group-bar sprite-group-baz))
 
 (defn increment-collide-count
-  [s]
+  [s _]
   (update s :collide-count inc))
 
 ;;; Testing application of colliders
@@ -127,7 +127,7 @@
       (is (= result-sprites only-foo-sprites)))))
 
 (defn removing-collide-fn
-  [x]
+  [x _]
   nil)
 
 (deftest removing-sprites-collider
