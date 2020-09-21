@@ -187,12 +187,14 @@
            font
            size
            color
+           update-fn
            draw-fn]
     :or   {offsets      [:center]
            sprite-group :text
            font         qpu/default-font
            size         qpu/default-text-size
            color        qpu/black
+           update-fn    identity
            draw-fn      draw-text-sprite}}]
   {:sprite-group sprite-group
    :uuid         (java.util.UUID/randomUUID)
@@ -201,4 +203,5 @@
    :offsets      offsets
    :font         (q/create-font font size)
    :color        color
+   :update-fn    update-fn
    :draw-fn      draw-fn})

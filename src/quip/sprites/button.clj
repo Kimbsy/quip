@@ -33,6 +33,7 @@
                          content-color
                          content-pos
                          held?
+                         update-fn
                          draw-fn
                          collision-detection-fn]
                   :or   {offsets                [:center :center]
@@ -44,6 +45,7 @@
                          content-color          qpu/black
                          content-pos            [100 50]
                          held?                  false
+                         update-fn              identity
                          draw-fn                draw-button-sprite
                          collision-detection-fn qpcollision/pos-in-rect?}}]
   (let [[w h] size]
@@ -54,6 +56,7 @@
      :on-click               on-click
      :w                      w
      :h                      h
+     :update-fn              update-fn
      :color                  color
      :font                   (q/create-font font font-size)
      :content-color          content-color
