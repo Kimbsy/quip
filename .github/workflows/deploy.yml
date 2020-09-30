@@ -1,4 +1,4 @@
-name: Clojure CI
+name: Clojure deploy to Clojars
 
 on:
   workflow_dispatch:
@@ -9,9 +9,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
