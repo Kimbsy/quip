@@ -1,4 +1,4 @@
-(defproject quip "1.0.0-SNAPSHOT"
+(defproject quip "1.0.0"
   :description "A 2D game library based on Quil"
   :url "https://github.com/Kimbsy/quip"
   :license {:name "Eclipse Public License"
@@ -6,4 +6,8 @@
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [quil "3.1.0"]
                  [metasoarous/oz "1.6.0-alpha6"]
-                 [org.clojure/math.combinatorics "0.1.6"]])
+                 [org.clojure/math.combinatorics "0.1.6"]]
+  :deploy-repositories [["clojars" {:url           "https://clojars.org/quip"
+                                    :username      :env/clojars_user
+                                    :password      :env/clojars_pass
+                                    :sign-releases false}]])
