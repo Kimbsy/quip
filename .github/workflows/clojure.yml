@@ -18,16 +18,16 @@ jobs:
       run: lein deps
     - name: Run tests
       run: lein test
-    - name: Generate pom
-      run: lein pom
 
   clojars:
 
     runs-on: ubuntu-latest
 
     steps:
-      # This step checks out a copy of your repository.
       - uses: actions/checkout@v2
+
+      - name: Generate pom
+      run: lein pom
 
       - uses: jlesquembre/clojars-publish-action@0.3
         env:
