@@ -18,16 +18,8 @@ jobs:
       run: lein deps
     - name: Run tests
       run: lein test
-
-  clojars:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Deploy to Clojars
+    - name: Publish
       env:
-        CLOJARS_USERNAME: ${{ secrets.CLOJARS_USERNAME }}
-        CLOJARS_PASSWORD: ${{ secrets.CLOJARS_PASSWORD }}
+        CLOJARS_USER: ${{ secrets.CLOJARS_USERNAME }}
+        CLOJARS_PASS: ${{ secrets.CLOJARS_PASSWORD }}
       run: lein deploy clojars
