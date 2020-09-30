@@ -1,4 +1,4 @@
-name: Clojure deploy to Clojars
+name: deploy to Clojars
 
 on:
   workflow_dispatch:
