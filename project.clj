@@ -7,6 +7,7 @@
                  [quil "3.1.0"]
                  [metasoarous/oz "1.6.0-alpha6"]
                  [org.clojure/math.combinatorics "0.1.6"]]
-  :deploy-repositories [["clojars" {:username      :env/clojars_user
+  :deploy-repositories [["clojars" {:url           "https://clojars.org/repo/"
+                                    :username      :env/clojars_user
                                     :password      :env/clojars_pass
                                     :sign-releases false}]])
