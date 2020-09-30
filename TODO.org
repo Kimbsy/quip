@@ -1,6 +1,13 @@
 * TODO stuff to do
 
-** DONE Deploy to Clojars
+** TODO revisit sound, room for improvement
+*** use the solution from dynamically-typed
+
+** TODO add start/stoppable tweens to sprites
+
+** TODO Are we doing buttons wrong?
+
+** TODO A base platform sprite and collider?
 
 ** TODO rulers for borders, dev debug overlay?
 *** TODO would be nice to be able to draw sprites hitboxes
@@ -22,19 +29,17 @@
 *** maybe add in some defaults like top-to-bottom?
 
 ** TODO efficient and generic collision detection
+*** TODO allow colliders to update the state as well as each colliding sprite?
 *** performance is one thing, but we also want to try and solve being able to handle updating both entities involved in the collision
 *** DONE create the structure required to check arbitrary sprite groups for collisions defined by collider maps on the scene.
 *** DONE colliders should default to using w*h rect collision detection, but allow alternative collision detection function f(a,b) to be applied.
-**** TODO provide helpful defaults like equal-positions, point-in-square, point-in-poly, point-in-rotating-poly
+**** DONE provide helpful defaults like equal-positions, point-in-square, point-in-poly, point-in-rotating-poly
 *** DONE implement a game that uses collision
 *** DONE analyse performance characteristics of colliders
 
-** TODO revisit sound, room for improvement
-*** at least it's not throwing exceptions all over the place anymore
+** DONE Deploy to Clojars
 
-** TODO test using quip as a library from a seperate project
-*** in progess...
-*** reimplement lambdahoy?
-
+** DONE test using quip as a library from a seperate project
+*** used it for dynamically-typed for the Autumn Lisp Game Jam 2020
 
 ** DONE rotatable sprites

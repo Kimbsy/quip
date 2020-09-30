@@ -39,7 +39,7 @@
                                                         (q/height)))
                                               :init-fn (fn [state]
                                                          (prn "STARTING LEVEL-1")
-                                                         (qpsound/loop-music "sound/Captain Scurvy.mp3")
+                                                         (qpsound/loop-music "Captain Scurvy.wav")
                                                          state))
                           state))]
    :key-released-fns [(fn [state e]
@@ -75,7 +75,7 @@
                          (qpscene/transition state :menu
                                              :init-fn (fn [state]
                                                         (prn "STARTING MENU")
-                                                        (qpsound/play-sound "sound/cannon.mp3")
+                                                        (qpsound/play "cannon.wav")
                                                         state))
                          state))]
    :sprites [(big-captain [50 0])]
@@ -91,7 +91,7 @@
 
 (def test-game (qp/game {:title          "some title"
                          :setup          (fn []
-                                           (qpsound/loop-music "sound/Captain Scurvy.mp3")
+                                           (qpsound/loop-music "Captain Scurvy.wav")
                                            {:x 100 :y 300 :color [0 0 255]})
                          :init-scenes-fn (fn []
                                            {:menu    (init-menu)
