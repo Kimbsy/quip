@@ -1,6 +1,6 @@
 * TODO stuff to do
 
-** TODO Set up CI
+** DONE Set up CI
 
 ** TODO add start/stoppable tweens to sprites
 
