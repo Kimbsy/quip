@@ -1,13 +1,13 @@
 * TODO stuff to do
 
-** TODO revisit sound, room for improvement
-*** use the solution from dynamically-typed
-
 ** TODO add start/stoppable tweens to sprites
 
-** TODO Are we doing buttons wrong?
-
 ** TODO A base platform sprite and collider?
+
+** TODO supply ubuntu mono font as it's the one we're using by default
+
+** TODO resolution-based scaling
+*** This is a lot of work, we want a neat way of specifying dimensions and coordinates as well as a way of rescaling images being used so we don't have to perform this in real time.
 
 ** TODO rulers for borders, dev debug overlay?
 *** TODO would be nice to be able to draw sprites hitboxes
@@ -36,6 +36,9 @@
 **** DONE provide helpful defaults like equal-positions, point-in-square, point-in-poly, point-in-rotating-poly
 *** DONE implement a game that uses collision
 *** DONE analyse performance characteristics of colliders
+
+** DONE revisit sound, room for improvement
+*** use the solution from dynamically-typed
 
 ** DONE Deploy to Clojars
 

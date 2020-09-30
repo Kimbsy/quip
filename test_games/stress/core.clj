@@ -187,4 +187,5 @@
                            :init-scenes-fn init-scenes
                            :setup          setup}))
 
-(qp/run stress-test)
+(comment
+  (qp/run stress-test))
