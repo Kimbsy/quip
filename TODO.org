@@ -1,5 +1,7 @@
 * TODO stuff to do
 
+** TODO Set up CI
+
 ** TODO add start/stoppable tweens to sprites
 
 ** TODO A base platform sprite and collider?
