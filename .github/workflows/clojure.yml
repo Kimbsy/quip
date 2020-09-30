@@ -26,10 +26,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Generate pom
-      run: lein pom
-
-    - uses: jlesquembre/clojars-publish-action@0.3
+    - name: Deploy to Clojars
       env:
         CLOJARS_USERNAME: ${{ secrets.CLOJARS_USERNAME }}
         CLOJARS_PASSWORD: ${{ secrets.CLOJARS_PASSWORD }}
+      run: lein deploy clojars
