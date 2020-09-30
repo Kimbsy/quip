@@ -18,6 +18,8 @@ jobs:
       run: lein deps
     - name: Run tests
       run: lein test
+    - name: Generate pom
+      run: lein pom
 
   clojars:
 
