@@ -1,6 +1,17 @@
-* TODO stuff to do
+* stuff to do
 
-** TODO add start/stoppable tweens to sprites
+** DONE add start/stoppable tweens to sprites
+*** DONE yoyo?
+*** DONE supply useful default easing functions
+*** DONE specify number of repetitions, option for continuous repeat
+*** DONE specify how long tween takes
+**** specifying step-count will do
+*** DONE on-complete-fn?
+*** DONE on-yoyo-fn?
+*** DONE example game
+**** in progress
+
+** TODO Simple geometric sprites?
 
 ** TODO A base platform sprite and collider?
 
