@@ -38,6 +38,8 @@
       (assoc :parent-draw-fn (fn [{:keys [transition-progress] :as state}]
                                (transition-fn state transition-progress transition-length)))))
 
+;; @TODO: do these functins live here? Why not in sprite.clj?
+
 (defn update-scene-sprites
   "Update each sprite in the current scene using its `:update-fn`."
   [{:keys [current-scene] :as state}]
