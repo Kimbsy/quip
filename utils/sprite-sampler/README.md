@@ -35,4 +35,4 @@ You can change the background colour of the scene with `up` and `down`, you can 
                      :y-offset    3
                      :frame-delay 8}}}
 ```
-![]("captain.png")
+![example spritesheet](captain.png)
