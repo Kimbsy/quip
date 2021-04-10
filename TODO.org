@@ -1,15 +1,8 @@
 * stuff to do
 
-** DONE add start/stoppable tweens to sprites
-*** DONE yoyo?
-*** DONE supply useful default easing functions
-*** DONE specify number of repetitions, option for continuous repeat
-*** DONE specify how long tween takes
-**** specifying step-count will do
-*** DONE on-complete-fn?
-*** DONE on-yoyo-fn?
-*** DONE example game
-**** in progress
+** TODO add quit-on-esc and print-state key pressed handlers to input ns
+
+** TODO Scrap current profiling, instead use benchmarking for individual example games
 
 ** TODO Simple geometric sprites?
 
@@ -28,19 +21,22 @@
 ** TODO BUG - clicking a button which starts a scene transition stops the mouse-released handler from being invoked, when you next visit the original scene the button is still pressed.
 *** TODO the transition update should process at least mouse and keyboard release events
 
-** TODO performance profiling (start with fps)
-*** DONE profile fps
-*** DONE create stress test
-*** DONE add something to generate graphs based on profiling results?
-*** TODO there's an issue with the stress test where the last data section for one stage is shown as the first section for the next stage
-*** TODO bash script to compare stress test results on master vs current branch?
-*** TODO try and clean up references to profiling in core
-
 ** TODO be able to specify a function for determining the order sprites should be drawn
 *** maybe add in some defaults like top-to-bottom?
 
-** TODO efficient and generic collision detection
-*** TODO allow colliders to update the state as well as each colliding sprite?
+** DONE add start/stoppable tweens to sprites
+*** DONE yoyo?
+*** DONE supply useful default easing functions
+*** DONE specify number of repetitions, option for continuous repeat
+*** DONE specify how long tween takes
+**** specifying step-count will do
+*** DONE on-complete-fn?
+*** DONE on-yoyo-fn?
+*** DONE example game
+
+** DONE efficient and generic collision detection
+*** DONE allow colliders to update the state as well as each colliding sprite?
+**** as with tweens it's best to just make the sprites look weird and search for these in the state update
 *** performance is one thing, but we also want to try and solve being able to handle updating both entities involved in the collision
 *** DONE create the structure required to check arbitrary sprite groups for collisions defined by collider maps on the scene.
 *** DONE colliders should default to using w*h rect collision detection, but allow alternative collision detection function f(a,b) to be applied.
