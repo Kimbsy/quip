@@ -7,15 +7,19 @@
 (defonce ^:dynamic *music* (atom nil))
 
 (defn play
-  [sound]
-  (let [input-stream (io/input-stream (io/resource (str "sound/" sound)))
-        audio-stream (AudioSystem/getAudioInputStream input-stream)
-        audio-format (.getFormat audio-stream)
-        audio-info (DataLine$Info. Clip audio-format)
-        audio-clip (cast Clip (AudioSystem/getLine audio-info))]
-    (.open audio-clip audio-stream)
-    (.start audio-clip)
-    audio-clip))
+  ([sound]
+   (play sound false))
+  ([sound loop?]
+   (let [input-stream (io/input-stream (io/resource (str "sound/" sound)))
+         audio-stream (AudioSystem/getAudioInputStream input-stream)
+         audio-format (.getFormat audio-stream)
+         audio-info (DataLine$Info. Clip audio-format)
+         audio-clip (cast Clip (AudioSystem/getLine audio-info))]
+     (.open audio-clip audio-stream)
+     (when loop?
+       (.loop audio-clip Clip/LOOP_CONTINUOUSLY))
+     (.start audio-clip)
+     audio-clip)))
 
 (defn stop
   [clip]
@@ -29,4 +33,4 @@
   [track]
   (when @*music*
     (stop-music))
-  (reset! *music* (play track)))
+  (reset! *music* (play track true)))
