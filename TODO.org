@@ -2,7 +2,8 @@
 
 ** TODO add quit-on-esc and print-state key pressed handlers to input ns
 
-** TODO Scrap current profiling, instead use benchmarking for individual example games
+** TODO record region of sketch into spritesheet?
+*** it would be super awesome to be able to program some kind of animation (like particle effects) and then be able to record the sketch at a specific framerate and output to images to be stitched together
 
 ** TODO Simple geometric sprites?
 
@@ -23,6 +24,12 @@
 
 ** TODO be able to specify a function for determining the order sprites should be drawn
 *** maybe add in some defaults like top-to-bottom?
+
+** DONE Add delays
+*** DONE clean up delays solution and reimplement
+*** DONE create example game
+
+** DONE Scrap current profiling, instead use benchmarking for individual example games
 
 ** DONE add start/stoppable tweens to sprites
 *** DONE yoyo?
