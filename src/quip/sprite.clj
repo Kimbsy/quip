@@ -1,8 +1,6 @@
 (ns quip.sprite
   (:require [quil.core :as q]
-            [quip.utils :as qpu]
-            [quip.utils :as u]
-            [quip.sprite :as qpsprite]))
+            [quip.utils :as qpu]))
 
 (defn offset-pos
   [[x y] w h]

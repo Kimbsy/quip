@@ -2,7 +2,6 @@
   (:require [quil.core :as q]
             [quil.middleware :as m]
             [quip.input :as qpinput]
-            [quip.profiling :as qpprofiling]
             [quip.sound :as qpsound]
             [quip.utils :as qpu]))
 
@@ -76,17 +75,11 @@
 
   Works with an empty `override-opts`, but needs a `:init-scenes-fn`
   and a `:current-scene` to start doing anything useful."
-  [{:keys [init-scenes-fn current-scene profiling?]
+  [{:keys [init-scenes-fn current-scene]
     :or   {init-scenes-fn (constantly {})
-           current-scene  :none
-           profiling?     false}
+           current-scene  :none}
     :as   override-opts}]
-  (let [opts-maps [default-opts
-                   (if profiling?
-                     qpprofiling/profiling-opts
-                     {}) ; @TODO: this is a little icky
-                   override-opts]
-        opts (apply merge opts-maps)]
+  (let [opts (merge default-opts override-opts)]
     (-> opts
 
         ;; wrap the supplied `:setup` function (which returns the
@@ -97,11 +90,6 @@
                     (q/frame-rate (:frame-rate opts))
                     (let [initial-state-maps
                           [default-initial-state
-
-                           (if profiling?
-                             qpprofiling/profiling-initial-state
-                             {}) ; @TODO: this is a little icky
-
                            ;; invoke the supplied `:setup` function to
                            ;; allow overriding the initial `state` map
                            (setup)]]

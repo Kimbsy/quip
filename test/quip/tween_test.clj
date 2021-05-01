@@ -288,7 +288,9 @@
       (is (zero? (-> state3 (get-in [:scenes :test :sprites]) first :counter)))
       (is (= 1 (-> state5 (get-in [:scenes :test :sprites]) first :counter)))
       (is (= 2 (-> state10 (get-in [:scenes :test :sprites]) first :counter)))
-      (is (= 3 (-> state15 (get-in [:scenes :test :sprites]) first :counter)))))
+
+      ;; we call the `:on-complete-fn` instead.
+      (is (= 2 (-> state15 (get-in [:scenes :test :sprites]) first :counter)))))
 
   (testing "on-complete-fn is called"
     (let [t       (sut/->tween :foo 20

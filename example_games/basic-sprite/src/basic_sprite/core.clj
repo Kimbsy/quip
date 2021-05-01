@@ -7,24 +7,25 @@
 
 (defn captain
   [pos current-animation]
-  (qpsprite/animated-sprite :captain
-                            pos
-                            240    ; <- width and
-                            360    ; <- height of each animation frame
-                            "img/captain.png"
-                            :animations {:none {:frames      1
-                                                :y-offset    0
-                                                :frame-delay 100}
-                                         :idle {:frames      4
-                                                :y-offset    1
-                                                :frame-delay 15}
-                                         :run  {:frames      4
-                                                :y-offset    2
-                                                :frame-delay 8}
-                                         :jump {:frames      7
-                                                :y-offset    3
-                                                :frame-delay 8}}
-                            :current-animation current-animation))
+  (qpsprite/animated-sprite
+   :captain   ; sprite-group, used for group collision detection
+   pos
+   240   ; <- width and
+   360   ; <- height of each animation frame
+   "img/captain.png"   ; spritesheet location in `resources` directory
+   :animations {:none {:frames      1
+                       :y-offset    0
+                       :frame-delay 100}
+                :idle {:frames      4
+                       :y-offset    1
+                       :frame-delay 15}
+                :run  {:frames      4
+                       :y-offset    2
+                       :frame-delay 8}
+                :jump {:frames      7
+                       :y-offset    3
+                       :frame-delay 8}}
+   :current-animation current-animation))
 
 (defn update-level-01
   "Update each sprite in the scene using its own `:update-fn`."
@@ -45,7 +46,6 @@
               :update-fn update-level-01
               :draw-fn   draw-level-01}})
 
-;; Game definition
 (def basic-sprite-game
   (qp/game {:title          "Basic Sprite Example"
             :init-scenes-fn init-scenes
