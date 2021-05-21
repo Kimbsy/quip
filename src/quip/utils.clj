@@ -152,6 +152,10 @@
   (partition 2 1 (conj poly
                        (first poly))))
 
+;; @TODO: This we can determine if there's an intersection without
+;; doing the divisions, just comapring the num/demon, we'll be between
+;; 0 and 1 if the denominator is bigger than the numerator. Need to
+;; test this properly before replacing.
 (defn lines-intersect?
   "Predicate to determine if two lines intersect.
 
@@ -245,7 +249,7 @@
 
 (defn polys-collide?
   "Predicate to check if two polygons overlap.
-  
+
   The `fine-polys-collide?` predicate is expensive so we only do it if
   the cheaper `coarse-polys-collide?` says this is a possible
   collision."

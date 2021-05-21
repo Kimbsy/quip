@@ -1,5 +1,7 @@
 * stuff to do
 
+** TODO try calculating faster line intersections using num/denom comparison instead of division, test performance
+
 ** TODO add quit-on-esc and print-state key pressed handlers to input ns
 
 ** TODO record region of sketch into spritesheet?
