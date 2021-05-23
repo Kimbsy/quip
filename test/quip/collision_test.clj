@@ -78,7 +78,7 @@
     (testing "colliding a with group-a"
       (let [results (sut/collide-group (second sprite-group-foo)
                                        sprite-group-foo
-                                       collider-aa)]        
+                                       collider-aa)]
         (is (= 1 (-> results
                      :a
                      :collide-count)))
@@ -121,7 +121,7 @@
           state {:current-scene :test
                  :scenes        {:test {:sprites   only-foo-sprites
                                         :colliders [collider]}}}
-          
+
           results        (sut/update-collisions state)
           result-sprites (get-in results [:scenes :test :sprites])]
       (is (= result-sprites only-foo-sprites)))))
@@ -253,7 +253,7 @@
       ;; d collides with no other sprite
       (is (and (not (sut/w-h-rects-collide? d e))
                (not (sut/w-h-rects-collide? e d))))))
-  
+
   (testing "partial overlaps"
     ;; ┌────┬─┬────┐
     ;; │ a  │ │ b  │
@@ -271,7 +271,7 @@
                (sut/w-h-rects-collide? c a)))
       (is (and (sut/w-h-rects-collide? b c)
                (sut/w-h-rects-collide? c b)))))
-  
+
   (testing "overlaps exactly"
     ;; ╔══════╗
     ;; ║      ║
@@ -471,7 +471,7 @@
         ;; d collides with no other sprite
         (is (and (not (sut/polys-collide? d e))
                  (not (sut/polys-collide? e d))))))
-    
+
     (testing "partial overlaps"
       ;; ┌────┬─┬────┐
       ;; │ a  │ │ b  │
@@ -489,7 +489,7 @@
                  (sut/polys-collide? c a)))
         (is (and (sut/polys-collide? b c)
                  (sut/polys-collide? c b)))))
-    
+
     (testing "overlaps exactly"
       ;; ╔══════╗
       ;; ║      ║

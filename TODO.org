@@ -1,7 +1,5 @@
 * stuff to do
 
-** TODO try calculating faster line intersections using num/denom comparison instead of division, test performance
-
 ** TODO add quit-on-esc and print-state key pressed handlers to input ns
 
 ** TODO record region of sketch into spritesheet?
@@ -26,6 +24,8 @@
 
 ** TODO be able to specify a function for determining the order sprites should be drawn
 *** maybe add in some defaults like top-to-bottom?
+
+** DONE try calculating faster line intersections using num/denom comparison instead of division, test performance
 
 ** DONE Add delays
 *** DONE clean up delays solution and reimplement

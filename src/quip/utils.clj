@@ -149,38 +149,40 @@
 (defn poly-lines
   "Construct the lines that make up a polygon from its points."
   [poly]
-  (partition 2 1 (conj poly
-                       (first poly))))
+  (partition 2 1 (take (inc (count poly))
+                       (cycle poly))))
 
-;; @TODO: This we can determine if there's an intersection without
-;; doing the divisions, just comapring the num/demon, we'll be between
-;; 0 and 1 if the denominator is bigger than the numerator. Need to
-;; test this properly before replacing.
 (defn lines-intersect?
   "Predicate to determine if two lines intersect.
 
-  line a: (x1, y1) -> (x2, y2)
-  line b: (x3, y3) -> (x4, y4)"
-  [[[x1 y1] [x2 y2]] [[x3 y3] [x4 y4]]]
+  We have decided that zero-length lines do not intersect as the
+  complexity in determining their intersection is not worth the
+  performance hit.
 
-  ;; Division by zero protection, if this should have been an
-  ;; intersection we'll likely get it on the next frame.
-  (let [denom-a (- (* (- y4 y3) (- x2 x1))
-                   (* (- x4 x3) (- y2 y1)))
-        denom-b (- (* (- y4 y3) (- x2 x1))
-                   (* (- x4 x3) (- y2 y1)))]
-    (when-not (or (zero? denom-a)
-                  (zero? denom-b))
-      (let [intersection-a (/ (- (* (- x4 x3) (- y1 y3))
-                                 (* (- y4 y3) (- x1 x3)))
-                              denom-a)
-            intersection-b (/ (- (* (- x2 x1) (- y1 y3))
-                                 (* (- y2 y1) (- x1 x3)))
-                              denom-b)]
-        (and (<= 0 intersection-a)
-             (< intersection-a 1)
-             (<= 0 intersection-b)
-             (< intersection-b 1))))))
+  line a: (x1, y1) -> (x2, y2)
+  line b: (x3, y3) -> (x4, y4)
+
+  lines intersect iff:
+       0.0 <= num-t/den-t <= 1.0
+  and  0.0 <= num-u/den-u <= 1.0
+
+  We can just assert that the fraction is bottom-heavy."
+  [[[x1 y1 :as p1] [x2 y2 :as p2] :as l1]
+   [[x3 y3 :as p3] [x4 y4 :as p4] :as l2]]
+  ;; We ignore zero-length lines
+  (when-not (or (= p1 p2) (= p3 p4))
+    (let [num-t (- (* (- x1 x3) (- y3 y4))
+                   (* (- y1 y3) (- x3 x4)))
+          den-t (- (* (- x1 x2) (- y3 y4))
+                   (* (- y1 y2) (- x3 x4)))
+          num-u (- (* (- x2 x1) (- y1 y3))
+                   (* (- y2 y1) (- x1 x3)))
+          den-u (- (* (- x1 x2) (- y3 y4))
+                   (* (- y1 y2) (- x3 x4)))]
+      (and (or (<= 0 num-t den-t)
+               (<= den-t num-t 0))
+           (or (<= 0 num-u den-u)
+               (<= den-u num-u 0))))))
 
 (defn fine-pos-in-poly?
   "Uses ray casting to check if a polygon encloses a pos.
