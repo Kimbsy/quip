@@ -19,6 +19,13 @@
   [color]
   (map #(min 255 (+ % 30)) color))
 
+(defn hex->rgb
+  [hex-string]
+  (->> hex-string
+       (partition 2)
+       (map (partial apply str "0x"))
+       (map read-string)))
+
 (def title-text-size 120)
 (def large-text-size 50)
 (def default-text-size 25)
