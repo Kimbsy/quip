@@ -18,6 +18,18 @@
   [x]
   (Math/sqrt x))
 
+(defn tween-x-fn
+  [[x y] d]
+  [(+ x d) y])
+(defn tween-y-fn
+  [[x y] d]
+  [x (+ y d)])
+(defn tween-x-yoyo-fn
+  [[x y] d]
+  [(- x d) y])
+(defn tween-y-yoyo-fn
+  [[x y] d]
+  [x (- y d)])
 
 (defn normalized-deltas
   [easing-fn step-count]
