@@ -15,7 +15,7 @@
 (deftest deltas-are-normalized
   (testing "the linear-easing-fn deltas are normalized"
     (let [step-count 4
-          deltas (sut/normalized-deltas sut/linear-easing-fn step-count)]
+          deltas (sut/normalized-deltas sut/ease-linear step-count)]
       (is (= step-count (count deltas)))
       (is (equiv 1 (reduce + deltas))))))
 
@@ -244,19 +244,19 @@
   (testing "sigmoidal easing"
     (dotimes [_ 100]
       (let [n  (inc (rand-int 1000))
-            ds (sut/normalized-deltas sut/sigmoidal-easing-fn n)]
+            ds (sut/normalized-deltas sut/ease-sigmoid n)]
         (is (equiv 1 (reduce + ds))))))
 
-  (testing "exponential easing"
+  (testing "quintic easing"
     (dotimes [_ 100]
       (let [n  (inc (rand-int 1000))
-            ds (sut/normalized-deltas sut/exponential-easing-fn n)]
+            ds (sut/normalized-deltas sut/ease-in-out-quint n)]
         (is (equiv 1 (reduce + ds))))))
 
-  (testing "asymptotic easing"
+  (testing "bouncing easing"
     (dotimes [_ 100]
       (let [n  (inc (rand-int 1000))
-            ds (sut/normalized-deltas sut/asymptotic-easing-fn n)]
+            ds (sut/normalized-deltas sut/ease-in-out-bounce n)]
         (is (equiv 1 (reduce + ds)))))))
 
 (deftest on-x-fns

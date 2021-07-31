@@ -59,7 +59,7 @@
                    300
                    :update-fn (fn [[x y] d]
                                 [(+ x d) y])
-                   :easing-fn qptween/exponential-easing-fn
+                   :easing-fn qptween/ease-in-out-quart
                    :repeat-times 3
                    :on-repeat-fn (fn [s]
                                    (prn "REPEAT!")

@@ -2,22 +2,204 @@
 
 ;; @TODO: do we want to only store the normalized deltas? why not the scaled ones?
 
-(def linear-easing-fn identity)
+(def ease-linear identity)
 
-(defn sigmoidal-easing-fn
+(defn ease-sigmoid
   [x]
   (if (<= x 0.5)
     0
     1))
 
-(defn exponential-easing-fn
-  [x]
-  (Math/pow x 2))
+;;; Sinusoidal easing functions
 
-(defn asymptotic-easing-fn
+(defn ease-in-sine
   [x]
-  (Math/sqrt x))
+  (- 1 (Math/cos (* x Math/PI 1/2))))
 
+(defn ease-out-sine
+  [x]
+  (Math/sin (* x Math/PI 1/2)))
+
+(defn ease-in-out-sine
+  [x]
+  (* (- (Math/cos (* x Math/PI)) 1) -1/2))
+
+;;; Quadratic easing functions
+
+(defn ease-in-quad
+  [x]
+  (* x x))
+
+(defn ease-out-quad
+  [x]
+  (- 1 (* (- 1 x) (- 1 x))))
+
+(defn ease-in-out-quad
+  [x]
+  (cond
+    (< x 0.5) (* 2 x x)
+    :else (- 1 (/ (Math/pow (+ (* x -2) 2) 2) 2))))
+
+;;; Cubic easing functions
+
+(defn ease-in-cubic
+  [x]
+  (* x x x))
+
+(defn ease-out-cubic
+  [x]
+  (- 1 (Math/pow (- 1 x) 3)))
+
+(defn ease-in-out-cubic
+  [x]
+  (cond
+    (< x 0.5) (* 4 x x x)
+    :else (- 1 (/ (Math/pow (+ (* x -2) 2) 3) 2))))
+
+;;; Quartic easing functions
+
+(defn ease-in-quart
+  [x]
+  (* x x x x))
+
+(defn ease-out-quart
+  [x]
+  (- 1 (Math/pow (- 1 x) 4)))
+
+(defn ease-in-out-quart
+  [x]
+  (cond
+    (< x 0.5) (* 8 x x x x)
+    :else (- 1 (/ (Math/pow (+ (* x -2) 2) 4) 2))))
+
+;;; Quintic easing functions
+
+(defn ease-in-quint
+  [x]
+  (* x x x x x))
+
+(defn ease-out-quint
+  [x]
+  (- 1 (Math/pow (- 1 x) 5)))
+
+(defn ease-in-out-quint
+  [x]
+  (cond
+    (< x 0.5) (* 16 x x x x x)
+    :else (- 1 (/ (Math/pow (+ (* x -2) 2) 5) 2))))
+
+;;; Exponential easing functions
+
+(defn ease-in-expo
+  [x]
+  (cond
+    (zero? x) 0
+    :else (Math/pow 2 (- (* x 10) 10))))
+
+(defn ease-out-expo
+  [x]
+  (cond
+    (= 1 x) 1
+    :else (- 1 (Math/pow 2, (* x -10)))))
+
+(defn ease-in-out-expo
+  [x]
+  (cond
+    (zero? x) 0
+    (= 1 x) 1
+    (< x 0.5) (/ (Math/pow 2 (- (* x 20) 10)) 2)
+    :else (/ (- 2 (Math/pow 2 (+ (* x -20) 10))) 2)))
+
+;;; Circular easing functions
+
+(defn ease-in-circ
+  [x]
+  (- 1 (Math/sqrt (- 1 (Math/pow x 2)))))
+
+(defn ease-out-circ
+  [x]
+  (Math/sqrt (- 1 (Math/pow (- x 1) 2))))
+
+(defn ease-in-out-circ
+  [x]
+  (cond
+    (< x 0.5) (/ (- 1 (Math/sqrt (- 1 (Math/pow (* x 2) 2)))) 2)
+    :else (/ (+ (Math/sqrt (- 1 (Math/pow (+ (* x -2) 2) 2))) 1) 2)))
+
+;;; Back easing functions
+
+(defn ease-in-back
+  [x]
+  (let [c1 1.70158
+        c2 (+ c1 1)]
+    (- (* c2 x x x)
+       (* c1 x x))))
+
+(defn ease-out-back
+  [x]
+  (let [c1 1.70158
+        c2 (+ c1 1)]
+    (+ 1
+       (* c2 (Math/pow (- x 1) 3))
+       (* c1 (Math/pow (- x 1) 2)))))
+
+(defn ease-in-out-back
+  [x]
+  (let [c1 1.70158
+        c2 (+ c1 1.525)]
+    (cond
+      (< x 0.5) (/ (* (Math/pow (* x 2) 2) (- (* (+ c2 1) x 2) c2)) 2)
+      :else (/ (+ (* (Math/pow (- (* x 2) 2) 2) (+ (* (+ c2 1) (- (* x 2) 2)) c2)) 2) 2))))
+
+;;; Elastic easing functions
+
+(defn ease-in-elastic
+  [x]
+  (cond
+    (zero? x) 0
+    (= 1 x) 1
+    :else (* (- (Math/pow 2 (- (* x 10) 10))) (Math/sin (* (- (* x 10) 10.75) (* 2 Math/PI 1/3))))))
+
+(defn ease-out-elastic
+  [x]
+  (cond
+    (zero? x) 0
+    (= 1 x) 1
+    :else (+ (* (Math/pow 2 (* x -10)) (Math/sin (* (- (* x 10) 0.75) (* 2 Math/PI 1/3)))) 1)))
+
+(defn ease-in-out-elastic
+  [x]
+  (cond
+    (zero? x) 0
+    (= 1 x) 1
+    (< x 0.5) (/ (- (* (Math/pow 2 (- (* x 20) 10)) (Math/sin (* (- (* x 10) 11.125) (* 2 Math/PI 5/4))))) 2)
+    :else (+ (/ (* (Math/pow 2 (+ (* x -20) 10)) (Math/sin (* (- (* x 10) 11.125) (* 2 Math/PI 5/4)))) 2) 1)))
+
+;;; Bouncing easing functions
+
+(declare ease-out-bounce)
+
+(defn ease-in-bounce
+  [x]
+  (- 1 (ease-out-bounce (- 1 x))))
+
+(defn ease-out-bounce
+  [x]
+  (let [n 7.5625
+        d 2.75]
+    (cond
+      (< x (/ 1 d)) (* n x x)
+      (< x (/ 2 d)) (+ (* n (- x (/ 1.5 d)) (- x (/ 1.5 d))) 0.75)
+      (< x (/ 2.5 d)) (+ (* n (- x (/ 2.25 d)) (- x (/ 2.25 d))) 0.9375)
+      :else (+ (* n (- x (/ 2.625 d)) (- x (/ 2.625 d))) 0.984375))))
+
+(defn ease-in-out-bounce
+  [x]
+  (cond
+    (< x 0.5) (/ (- 1 (ease-out-bounce (- 1 (* x 2)))) 2)
+    :else (/ (+ 1 (ease-out-bounce (- (* x 2) 1))) 2)))
+
+;; Utility functions for tweening [x y] tuples
 (defn tween-x-fn
   [[x y] d]
   [(+ x d) y])
@@ -58,7 +240,7 @@
              on-repeat-fn
              on-complete-fn]
       :or   {from-value     0
-             easing-fn      linear-easing-fn
+             easing-fn      ease-linear
              update-fn      +
              step-count     100
              yoyo?          false
