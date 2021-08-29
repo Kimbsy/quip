@@ -1,9 +1,14 @@
 * stuff to do
 
+** TODO Add palettes as example game
+
+** TODO loading scene so we can start music when everything has had a second to settle down
+
 ** TODO add quit-on-esc and print-state key pressed handlers to input ns
 
 ** TODO record region of sketch into spritesheet?
 *** it would be super awesome to be able to program some kind of animation (like particle effects) and then be able to record the sketch at a specific framerate and output to images to be stitched together
+*** this should be doable, see `save-frame`
 
 ** TODO Simple geometric sprites?
 
