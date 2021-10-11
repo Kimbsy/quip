@@ -7,9 +7,10 @@
 (defn ->delay
   "Create a delay which will execute a function in a specified number of
   frames."
-  [remaining f]
-  {:remaining remaining
-   :on-complete-fn f})
+  [remaining f & {:keys [tag] :or {tag :none}}]
+  {:remaining      remaining
+   :on-complete-fn f
+   :tag            tag})
 
 (defn add-delay
   "Add a delay into the current scene."
@@ -48,6 +49,20 @@
             (assoc-in path unfinished)
             (apply-all finished)))
       state)))
+
+(defn sequential-delays
+  "Creates a sequence of delays from a given list of [time
+  on-complete-fn] tuples where each time is relative to the ending of
+  the previous delay."
+  [delays & {:keys [initial-delay] :or {initial-delay 0}}]
+  (:ds (reduce (fn [{:keys [ds curr] :as acc}
+                    [d f]]
+                 (-> acc
+                     (update :ds conj (->delay (+ curr d) f))
+                     (update :curr + d)))
+               {:ds   []
+                :curr initial-delay}
+               delays)))
 
 ;;; Useful utility delays.
 
