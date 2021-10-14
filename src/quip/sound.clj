@@ -25,10 +25,10 @@
          mixer        (AudioSystem/getMixer (first mixer-info))
          line         (.getLine mixer audio-info)
          audio-clip   (cast Clip line)]
-     (.addLineListener line close-line-on-end-listener)
      (.open audio-clip audio-stream)
-     (when loop?
-       (.loop audio-clip Clip/LOOP_CONTINUOUSLY))
+     (if loop?
+       (.loop audio-clip Clip/LOOP_CONTINUOUSLY)
+       (.addLineListener line close-line-on-end-listener))
      (.start audio-clip)
      audio-clip)))
 
