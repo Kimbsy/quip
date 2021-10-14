@@ -2,9 +2,16 @@
   (:require [clojure.java.io :as io])
   (:import javax.sound.sampled.AudioSystem
            javax.sound.sampled.Clip
-           javax.sound.sampled.DataLine$Info))
+           javax.sound.sampled.DataLine$Info
+           javax.sound.sampled.LineListener))
 
 (defonce ^:dynamic *music* (atom nil))
+
+(def close-line-on-end-listener
+  (reify LineListener
+    (update [this line-event]
+      (when (= "Stop" (.toString (.getType line-event)))
+        (future (.close (.getLine line-event)))))))
 
 (defn play
   ([sound]
@@ -14,7 +21,11 @@
          audio-stream (AudioSystem/getAudioInputStream input-stream)
          audio-format (.getFormat audio-stream)
          audio-info (DataLine$Info. Clip audio-format)
-         audio-clip (cast Clip (AudioSystem/getLine audio-info))]
+         mixer-info   (AudioSystem/getMixerInfo)
+         mixer        (AudioSystem/getMixer (first mixer-info))
+         line         (.getLine mixer audio-info)
+         audio-clip   (cast Clip line)]
+     (.addLineListener line close-line-on-end-listener)
      (.open audio-clip audio-stream)
      (when loop?
        (.loop audio-clip Clip/LOOP_CONTINUOUSLY))
