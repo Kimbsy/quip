@@ -1,7 +1,6 @@
 (ns tweens.core
   (:gen-class)
   (:require [quip.core :as qp]
-            [quip.scene :as qpscene]
             [quip.sprite :as qpsprite]
             [quip.tween :as qptween]
             [quip.utils :as qpu]))
@@ -109,14 +108,14 @@
   "Update each sprite in the scene using its own `:update-fn`."
   [state]
   (-> state
-      qpscene/update-scene-sprites
+      qpsprite/update-scene-sprites
       qptween/update-sprite-tweens))
 
 (defn draw-level-01
   "Draw each sprite in the scene using its own `:draw-fn`."
   [state]
   (qpu/background [0 153 255])
-  (qpscene/draw-scene-sprites state))
+  (qpsprite/draw-scene-sprites state))
 
 (defn quit-on-esc
   [state e]

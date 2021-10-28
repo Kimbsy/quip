@@ -203,3 +203,21 @@
    :color        color
    :update-fn    update-fn
    :draw-fn      draw-fn})
+
+(defn update-scene-sprites
+  "Update each sprite in the current scene using its `:update-fn`."
+  [{:keys [current-scene] :as state}]
+  (update-in state [:scenes current-scene :sprites]
+             (fn [sprites]
+               (map (fn [s]
+                      ((:update-fn s) s))
+                    sprites))))
+
+(defn draw-scene-sprites
+  "Draw each sprite in the current scene using its `:draw-fn`."
+  [{:keys [current-scene] :as state}]
+  (let [sprites (get-in state [:scenes current-scene :sprites])]
+    (doall
+     (map (fn [s]
+            ((:draw-fn s) s))
+          sprites))))

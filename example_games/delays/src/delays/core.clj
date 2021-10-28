@@ -3,7 +3,6 @@
   (:require [quil.core :as q]
             [quip.core :as qp]
             [quip.delay :as qpdelay]
-            [quip.scene :as qpscene]
             [quip.sprite :as qpsprite]
             [quip.tween :as qptween]
             [quip.utils :as qpu]))
@@ -39,7 +38,7 @@
   "Update each sprite in the scene using its own `:update-fn`."
   [state]
   (-> state
-      qpscene/update-scene-sprites
+      qpsprite/update-scene-sprites
       qptween/update-sprite-tweens
       qpdelay/update-delays))
 
@@ -47,7 +46,7 @@
   "Draw each sprite in the scene using its own `:draw-fn`."
   [state]
   (qpu/background [0 153 255])
-  (qpscene/draw-scene-sprites state))
+  (qpsprite/draw-scene-sprites state))
 
 (defn print-current-frame
   "All delayed functions should take the game state and return an

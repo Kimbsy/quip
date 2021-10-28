@@ -2,7 +2,7 @@
   (:gen-class)
   (:require [quil.core :as q]
             [quip.core :as qp]
-            [quip.scene :as qpscene]
+            [quip.sprite :as qpsprite]
             [quip.tween :as qptween]
             [quip.utils :as qpu]))
 
@@ -46,7 +46,7 @@
 (defn draw-level-01
   [state]
   (qpu/background gunmetal)
-  (qpscene/draw-scene-sprites state))
+  (qpsprite/draw-scene-sprites state))
 
 (defn add-squish-tween
   [state offset-key]

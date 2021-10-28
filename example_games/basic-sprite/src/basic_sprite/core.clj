@@ -1,7 +1,6 @@
 (ns basic-sprite.core
   (:gen-class)
   (:require [quip.core :as qp]
-            [quip.scene :as qpscene]
             [quip.sprite :as qpsprite]
             [quip.utils :as qpu]))
 
@@ -30,13 +29,13 @@
 (defn update-level-01
   "Update each sprite in the scene using its own `:update-fn`."
   [state]
-  (qpscene/update-scene-sprites state))
+  (qpsprite/update-scene-sprites state))
 
 (defn draw-level-01
   "Draw each sprite in the scene using its own `:draw-fn`."
   [state]
   (qpu/background [0 153 255])
-  (qpscene/draw-scene-sprites state))
+  (qpsprite/draw-scene-sprites state))
 
 (defn init-scenes
   "Returns a map of scenes in the game."

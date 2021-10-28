@@ -13,6 +13,16 @@
       (when (= "Stop" (.toString (.getType line-event)))
         (future (.close (.getLine line-event)))))))
 
+(defn get-line
+  [line-info mixer-info]
+  (or (->> (map (fn [mi]
+                  (try (.getLine (AudioSystem/getMixer mi) line-info)
+                       (catch Exception e)))
+                mixer-info)
+           (remove nil?)
+           first)
+      (AudioSystem/getLine line-info)))
+
 (defn play
   ([sound]
    (play sound false))
@@ -20,10 +30,9 @@
    (let [input-stream (io/input-stream (io/resource (str "sound/" sound)))
          audio-stream (AudioSystem/getAudioInputStream input-stream)
          audio-format (.getFormat audio-stream)
-         audio-info (DataLine$Info. Clip audio-format)
+         line-info    (DataLine$Info. Clip audio-format)
          mixer-info   (AudioSystem/getMixerInfo)
-         mixer        (AudioSystem/getMixer (first mixer-info))
-         line         (.getLine mixer audio-info)
+         line         (get-line line-info mixer-info)
          audio-clip   (cast Clip line)]
      (.open audio-clip audio-stream)
      (if loop?
@@ -38,10 +47,10 @@
 
 (defn stop-music
   []
-  (stop @*music*))
+  (when @*music*
+    (stop @*music*)))
 
 (defn loop-music
   [track]
-  (when @*music*
-    (stop-music))
+  (stop-music)
   (reset! *music* (play track true)))
