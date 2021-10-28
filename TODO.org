@@ -4,10 +4,6 @@
 
 ** TODO Simplify base sprite into something more useful
 
-** TODO Utility function to update a sprite in a scene based on a predicate
-
-** TODO Improve sound engine to reuse resources
-
 ** TODO Add palettes as example game
 
 ** TODO loading scene so we can start music when everything has had a second to settle down
@@ -30,9 +26,6 @@
 
 ** TODO BUG - clicking a button which starts a scene transition stops the mouse-released handler from being invoked, when you next visit the original scene the button is still pressed.
 *** TODO the transition update should process at least mouse and keyboard release events
-
-** TODO be able to specify a function for determining the order sprites should be drawn
-*** maybe add in some defaults like top-to-bottom?
 
 ** DONE try calculating faster line intersections using num/denom comparison instead of division, test performance
 
@@ -73,3 +66,10 @@
 *** used it for dynamically-typed for the Autumn Lisp Game Jam 2020
 
 ** DONE rotatable sprites
+
+** DONE Utility function to update a sprite in a scene based on a predicate
+
+** DONE Improve sound engine to reuse resources
+
+** DONE be able to specify a function for determining the order sprites should be drawn
+*** maybe add in some defaults like top-to-bottom?
