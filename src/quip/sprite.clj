@@ -205,19 +205,82 @@
    :draw-fn      draw-fn})
 
 (defn update-scene-sprites
-  "Update each sprite in the current scene using its `:update-fn`."
-  [{:keys [current-scene] :as state}]
-  (update-in state [:scenes current-scene :sprites]
+  "Update each sprite in the current scene using its `:update-fn`.
+
+  Optionally accepts a key specifying the name of the sprite
+  collection on the scene."
+  [{:keys [current-scene] :as state} &
+   {:keys [sprite-key] :or {sprite-key :sprites}}]
+  (update-in state [:scenes current-scene sprite-key]
              (fn [sprites]
                (map (fn [s]
                       ((:update-fn s) s))
                     sprites))))
 
 (defn draw-scene-sprites
-  "Draw each sprite in the current scene using its `:draw-fn`."
-  [{:keys [current-scene] :as state}]
-  (let [sprites (get-in state [:scenes current-scene :sprites])]
+  "Draw each sprite in the current scene using its `:draw-fn`.
+
+  Optionally accepts a key specifying the name of the sprite
+  collection on the scene."
+  [{:keys [current-scene] :as state} &
+   {:keys [sprite-key] :or {sprite-key :sprites}}]
+  (let [sprites (get-in state [:scenes current-scene sprite-key])]
     (doall
      (map (fn [s]
             ((:draw-fn s) s))
           sprites))))
+
+(defn draw-scene-sprites-by-layers
+  "Draw each sprite in the current scene using its `:draw-fn` in the
+  order their `:sprite-group` appears in the `layers` list.
+
+  Any sprites with groups not found in `layers` will be drawn last.
+
+  Optionally accepts a key specifying the name of the sprite
+  collection on the scene."
+  [{:keys [current-scene] :as state} layers &
+   {:keys [sprite-key] :or {sprite-key :sprites}}]
+  (let [sprites     (get-in state [:scenes current-scene sprite-key])
+        unspecified (filter #(not ((set layers) (:sprite-group %))) sprites)]
+    (doall
+     (map (fn [group]
+            (doall
+             (map (fn [s]
+                    ((:draw-fn s) s))
+                  (filter #(= group (:sprite-group %))
+                          sprites))))
+          layers))
+    (doall
+     (map (fn [s]
+            ((:draw-fn s) s))
+          unspecified))))
+
+(defn update-sprites-by-pred
+  "Update sprites in the current scene with the update function `f`
+  filtering by a predicate function `pred`.
+
+  Optionally accepts a key specifying the name of the sprite
+  collection on the scene."
+  [{:keys [current-scene] :as state} pred f &
+   {:keys [sprite-key] :or {sprite-key :sprites}}]
+  (update-in state [:scenes current-scene sprite-key]
+             (fn [sprites]
+               (pmap (fn [s]
+                       (if (pred s)
+                         (f s)
+                         s))
+                     sprites))))
+
+(defn group-pred
+  "Defines a predicate that filters sprites based on their
+  sprite-group.
+
+  Commonly used alongside `update-sprites-by-pred`:
+
+  (qpsprite/update-sprites-by-pred
+    state
+    (qpsprite/group-pred :asteroids)
+    sprite-update-fn)"
+  [sprite-group]
+  (fn [s]
+    (= sprite-group (:sprite-group s))))
