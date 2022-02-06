@@ -3,6 +3,7 @@
   (:require [quil.core :as q]
             [quip.core :as qp]
             [quip.sprite :as qpsprite]
+            [quip.tween :as qptween]
             [quip.utils :as qpu]
             [mouse-controls.common :as common]))
 
@@ -52,7 +53,12 @@
   [state]
   (-> state
       update-selected-sprites
-      qpsprite/update-scene-sprites))
+      qpsprite/update-scene-sprites
+      qptween/update-sprite-tweens))
+
+(defn selected?
+  [sprite]
+  (= :selected (:current-animation sprite)))
 
 (defn draw-level-01
   "Draw each sprite in the scene using its own `:draw-fn`."
@@ -60,21 +66,67 @@
   (qpu/background common/grey)
   (qpsprite/draw-scene-sprites state)
 
-  ;; draw the selection box
-  (when selecting?
-    (qpu/stroke common/white)
-    (q/no-fill)
-    (let [x (first selection-start)
-          y (second selection-start)
-          w (- (q/mouse-x) x)
-          h (- (q/mouse-y) y)]
-      (q/rect x y w h))))
+  (if selecting?
+    ;; draw the selection box
+    (do
+      (qpu/stroke common/white)
+      (q/no-fill)
+      (let [x (first selection-start)
+            y (second selection-start)
+            w (- (q/mouse-x) x)
+            h (- (q/mouse-y) y)]
+        (q/rect x y w h)))
+
+    ;; draw the target area
+    (when (some selected? (get-in state [:scenes :level-01 :sprites]))
+      (q/no-stroke)
+      (qpu/fill common/alpha-green)
+      (q/ellipse (q/mouse-x) (q/mouse-y) 30 30))))
+
+(defn move-to-target
+  [state [tx ty]]
+  (update-in state [:scenes :level-01 :sprites]
+             (fn [sprites]
+               (let [selected (filter selected? sprites)
+                     other (remove selected? sprites)]
+                 (concat other
+                         (map (fn [{[sx sy] :pos :as sprite}]
+                                (-> sprite
+                                    (qptween/add-tween
+                                     (qptween/->tween
+                                      :pos
+                                      (- tx sx)
+                                      :update-fn qptween/tween-x-fn))
+                                    (qptween/add-tween
+                                     (qptween/->tween
+                                      :pos
+                                      (- ty sy)
+                                      :update-fn qptween/tween-y-fn))))
+                              selected))))))
+
+(defn deselect-all
+  [state]
+  (qpsprite/update-sprites-by-pred
+   state
+   (qpsprite/group-pred :heart)
+   (fn [s]
+     (qpsprite/set-animation s :none))))
 
 (defn handle-mouse-pressed
   [state e]
-  (-> state
-      (assoc :selecting? true)
-      (assoc :selection-start [(:x e) (:y e)])))
+  (case (q/mouse-button)
+    :left
+    (-> state
+        deselect-all
+        (assoc :selecting? true)
+        (assoc :selection-start [(:x e) (:y e)]))
+    :right
+    (if (some selected? (get-in state [:scenes :level-01 :sprites]))
+      (-> state
+          deselect-all
+          (move-to-target [(:x e) (:y e)]))
+      state)
+    state))
 
 (defn handle-mouse-released
   [state e]
