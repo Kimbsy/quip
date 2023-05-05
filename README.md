@@ -4,9 +4,13 @@
 
 A Clojure game engine using Quil.
 
-## License
+## Usage
 
-Copyright © 2016 FIXME
+``` bash
+lein new com.github.kimbsy/quip <project-name>
+```
+
+## License
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
