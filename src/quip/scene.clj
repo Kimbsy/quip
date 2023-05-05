@@ -12,7 +12,7 @@
 
 (defn transition
   "Temporarily replace `parent-update-fn` and `parent-draw-fn` with
-  transition handdling versions which will set themselves back to the
+  transition handling versions which will set themselves back to the
   originals on completion."
   [{:keys [parent-update-fn parent-draw-fn] :as state}
    target-scene

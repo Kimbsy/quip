@@ -39,7 +39,6 @@
 (def fill (partial apply q/fill))
 (def stroke (partial apply q/stroke))
 
-
 (defn wrap-trans-rot
   "Perform a translation, a rotation, invoke the supplied
   function (probably drawing a sprite, then reset the transform matrix
@@ -71,7 +70,7 @@
     (map #(/ % (magnitude v)) v)))
 
 (defn rotate-vector
-  "Rotate a vector about the origin by `r` degreees."
+  "Rotate a vector about the origin by `r` degrees."
   [[x y] r]
   (let [radians (q/radians r)]
     [(- (* x (q/cos radians))
@@ -133,7 +132,7 @@
 
   Checks if the point is contanied by the minimum rectangle containing
   the polygon. If the point is inside this rectangle we should use
-  `fine-poly-encloses` to check properly."
+  `fine-pos-in-poly?` to check properly."
   [[x y] poly]
   (let [xs (map first poly)
         ys (map second poly)]
@@ -170,26 +169,26 @@
   line b: (x3, y3) -> (x4, y4)
 
   lines intersect iff:
-       0.0 <= num-t/den-t <= 1.0
-  and  0.0 <= num-u/den-u <= 1.0
+       0.0 <= numerator-t/denominator-t <= 1.0
+  and  0.0 <= numerator-u/denominator-u <= 1.0
 
   We can just assert that the fraction is bottom-heavy."
   [[[x1 y1 :as p1] [x2 y2 :as p2] :as l1]
    [[x3 y3 :as p3] [x4 y4 :as p4] :as l2]]
   ;; We ignore zero-length lines
   (when-not (or (= p1 p2) (= p3 p4))
-    (let [num-t (- (* (- x1 x3) (- y3 y4))
+    (let [numerator-t (- (* (- x1 x3) (- y3 y4))
                    (* (- y1 y3) (- x3 x4)))
-          den-t (- (* (- x1 x2) (- y3 y4))
+          denominator-t (- (* (- x1 x2) (- y3 y4))
                    (* (- y1 y2) (- x3 x4)))
-          num-u (- (* (- x2 x1) (- y1 y3))
+          numerator-u (- (* (- x2 x1) (- y1 y3))
                    (* (- y2 y1) (- x1 x3)))
-          den-u (- (* (- x1 x2) (- y3 y4))
+          denominator-u (- (* (- x1 x2) (- y3 y4))
                    (* (- y1 y2) (- x3 x4)))]
-      (and (or (<= 0 num-t den-t)
-               (<= den-t num-t 0))
-           (or (<= 0 num-u den-u)
-               (<= den-u num-u 0))))))
+      (and (or (<= 0 numerator-t denominator-t)
+               (<= denominator-t numerator-t 0))
+           (or (<= 0 numerator-u denominator-u)
+               (<= denominator-u numerator-u 0))))))
 
 (defn fine-pos-in-poly?
   "Uses ray casting to check if a polygon encloses a pos.
@@ -226,6 +225,10 @@
      (- (max ys) (min ys))]))
 
 (defn coarse-polys-collide?
+  "Predicate to determine if two polygons possibly collide.
+
+  Checks if the minimum rectangles containing the polygons overlap. If
+  they do we should use `fine-polys-collide?` to check properly."
   [poly-a poly-b]
   (let [a-xs (map first poly-a)
         a-ys (map second poly-a)
