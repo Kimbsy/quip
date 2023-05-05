@@ -123,8 +123,8 @@
     :right
     (if (some selected? (get-in state [:scenes :level-01 :sprites]))
       (-> state
-          deselect-all
-          (move-to-target [(:x e) (:y e)]))
+          (move-to-target [(:x e) (:y e)])
+          deselect-all)
       state)
     state))
 
