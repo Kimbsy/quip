@@ -1,4 +1,5 @@
 (ns quip.scene
+  "Transitioning between game scenes."
   (:require [quil.core :as q]))
 
 (defn current-scene

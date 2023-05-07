@@ -1,4 +1,8 @@
 (ns quip.sound
+  "Music and sound effects.
+
+  There's no support for audio in Quil, so we're relying on interop
+  with `javax.sound.sampled`."
   (:require [clojure.java.io :as io])
   (:import javax.sound.sampled.AudioSystem
            javax.sound.sampled.Clip

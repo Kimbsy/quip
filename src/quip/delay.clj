@@ -1,4 +1,6 @@
 (ns quip.delay
+  "Frame-based delays for executing arbitrary code, useful for cutscenes
+  and complex animations."
   (:require [quip.tween :as qptween]))
 
 ;;;; @TODO: Should delays be flagged for removeal/persistence across

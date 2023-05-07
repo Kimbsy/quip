@@ -1,4 +1,6 @@
 (ns quip.core
+  "Creating and running a game, along with management of update and draw
+  functions."
   (:require [quil.core :as q]
             [quil.middleware :as m]
             [quip.input :as qpinput]
@@ -36,6 +38,7 @@
   (parent-update-fn state))
 
 (defn draw-wrapper
+  "Allow us to change our draw function."
   [{:keys [parent-draw-fn] :as state}]
   (parent-draw-fn state))
 

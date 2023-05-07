@@ -1,4 +1,5 @@
 (ns quip.input
+  "Keyboard and mouse input handling."
   (:require [quil.core :as q]))
 
 ;;; Default handlers for key events.
@@ -33,7 +34,6 @@
 (defn default-mouse-released
   [state e]
   state)
-
 
 ;;; We allow scenes to define a collection of their own handlers for
 ;;; each event type.

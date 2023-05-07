@@ -1,4 +1,8 @@
-(ns quip.tween)
+(ns quip.tween
+  "Tween library for interpolating game object properties between
+  absolute or relative values.
+
+  Comprehensive easing functions for different interpolation curves.")
 
 ;; @TODO: do we want to only store the normalized deltas? why not the scaled ones?
 

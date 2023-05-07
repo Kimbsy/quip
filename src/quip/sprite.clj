@@ -1,4 +1,8 @@
 (ns quip.sprite
+  "Sprites, for drawing and animating game objects.
+
+  The basic sprites provided are useful if simple, feel free to
+  implement your own."
   (:require [quil.core :as q]
             [quip.utils :as qpu]))
 

@@ -1,4 +1,9 @@
 (ns quip.utils
+  "Miscellaneous utility functions.
+
+  Vector math functions for position/rotation/velocity calculations.
+
+  Geometric collision detection predicates."
   (:require [quil.core :as q]
             [clojure.math.combinatorics :as combo]
             [clojure.set :as s]))
