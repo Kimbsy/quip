@@ -38,6 +38,8 @@ java -jar target/uberjar/<project>-<version>-standalone.jar
 
 ----
 
+## Slower start
+
 For a guide to the basics check out the [Wiki](https://github.com/Kimbsy/quip/wiki)
 
 Taking a look at the [example games](example_games) gives a few simple demonstrations of how to use animated sprites, basic music and sound effects, and others.
