@@ -6,13 +6,16 @@
 ;;;; @TODO: Should delays be flagged for removeal/persistence across
 ;;;; scene transitions?
 
-(defn ->delay
+(defn delay
   "Create a delay which will execute a function in a specified number of
   frames."
   [remaining f & {:keys [tag] :or {tag :none}}]
   {:remaining      remaining
    :on-complete-fn f
    :tag            tag})
+
+;; @NOTE: deprecated name
+(def ->delay delay)
 
 (defn add-delay
   "Add a delay into the current scene."
