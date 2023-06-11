@@ -230,7 +230,7 @@
               (easing-fn s-min)))
          steps)))
 
-(defn ->tween
+(defn tween
   "Create a new tween for modifying a field on a sprite over time."
   [field to-value
    & {:keys [from-value
@@ -268,6 +268,9 @@
    :on-repeat-fn      on-repeat-fn
    :completed?        false
    :on-complete-fn    on-complete-fn})
+
+;; @NOTE: deprecated name
+(def ->tween tween)
 
 (defn add-tween
   [{:keys [tweens] :as sprite} tween]
