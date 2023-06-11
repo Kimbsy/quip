@@ -1,4 +1,11 @@
 (ns tweens.benchmarking
+  "This namespace does some brute force benchmarking of tween performance.
+
+  The `benchmarking` function runs a criterium bechmark on update the
+  state of a game which contains a set number of sprites each with a
+  set number of tweens. This gets output to `bench-results.csv`. You
+  can generate a visualiosation of the results withe the
+  `bench-graph.py` python script."
   (:require [criterium.core :as c]))
 
 (def deltas
@@ -31,7 +38,7 @@
    :total-change 300,
    :yoyoing? true,
    :field :pos,
-   :easing-fn quip.tween/exponential-easing-fn,
+   :easing-fn quip.tween/ease-in-out-quad
    :update-fn (fn [[x y] d] [(+ x d) y]),
    :on-repeat-fn identity,
    :repeat-times 2,
@@ -75,11 +82,8 @@
    :scenes
    {:level-01
     {:sprites []
-     :update-fn tweens.core/update-level-01,
-     :draw-fn tweens.core/draw-level-01,
-     :key-pressed-fns
-     [tweens.core/quit-on-esc
-      tweens.core/print-state]}},
+     :update-fn tweens.scenes.level-01/update-level-01,
+     :draw-fn tweens.scenes.level-01/draw-level-01}},
    :current-scene :level-01})
 
 (defn construct-state
