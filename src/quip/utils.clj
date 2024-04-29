@@ -26,10 +26,14 @@
 
 (defn hex->rgb
   [hex-string]
-  (->> hex-string
-       (partition 2)
-       (map (partial apply str "0x"))
-       (map read-string)))
+  (let [s (if (= \# (first hex-string))
+            (apply str (rest hex-string))
+            hex-string)]
+    (->> s
+         (partition 2)
+         (map (partial apply str "0x"))
+         (map read-string)
+         vec)))
 
 (def title-text-size 120)
 (def large-text-size 50)
