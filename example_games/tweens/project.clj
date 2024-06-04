@@ -1,6 +1,6 @@
 (defproject tweens "0.1.0"
-  :dependencies [[org.clojure/clojure "1.11.1"]
-                 [quip "2.0.6"]
+  :dependencies [[org.clojure/clojure "1.11.3"]
+                 [quip "2.0.7"]
                  [criterium "0.4.6"]]
   :main ^:skip-aot tweens.core
   :target-path "target/%s"
