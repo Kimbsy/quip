@@ -1,0 +1,35 @@
+name: Dependency check
+
+on:
+  schedule:
+    - cron: '0 0 */14 * *'  # Runs every two weeks
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  check-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - name: Check for outdated dependencies
+        run: lein ancient
+
+      - name: Determine if there are outdated dependencies
+        id: check_ancient_output
+        run: |
+          if lein ancient | grep -q "[^|]-[A-Za-z0-9]*"; then
+            echo "outdated=true" >> $GITHUB_OUTPUT
+          else
+            echo "outdated=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fail if there are outdated dependencies
+        if: env.outdated == 'true'
+        run: exit 1

@@ -6,7 +6,8 @@
   :dependencies [[org.clojure/clojure "1.11.3"]
                  [quil "4.3.1563"]
                  [org.clojure/math.combinatorics "0.3.0"]]
-  :plugins [[lein-codox "0.10.8"]]
+  :plugins [[lein-codox "0.10.8"]
+            [lein-ancient "1.0.0-RC3"]]
   :deploy-repositories [["clojars" {:url           "https://clojars.org/repo/"
                                     :username      :env/clojars_user
                                     :password      :env/clojars_pass
