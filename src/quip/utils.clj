@@ -17,12 +17,18 @@
 (def blue [0 0 255])
 
 (defn darken
-  [color]
-  (map #(max 0 (- % 30)) color))
+  "Darken a colour by 30, preserving alpha component if present."
+  [[_r _g _b a :as color]]
+  (if a
+    (assoc (mapv #(max 0 (- % 30)) color) 3 a)
+    (mapv #(max 0 (- % 30)) color)))
 
 (defn lighten
-  [color]
-  (map #(min 255 (+ % 30)) color))
+  "Lighten a colour by 30, preserving alpha component if present."
+  [[_r _g _b a :as color]]
+  (if a
+    (assoc (mapv #(min 255 (+ % 30)) color) 3 a)
+    (mapv #(min 255 (+ % 30)) color)))
 
 (defn hex->rgb
   [hex-string]
