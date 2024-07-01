@@ -390,3 +390,30 @@
         cleaned-sprites (remove-completed-tweens updated-sprites)]
     (assoc-in state [:scenes current-scene :sprites]
               cleaned-sprites)))
+
+(defn tween-to-color
+  "Add appropriate tweens to a sprite with 3 or 4 length `:color` vector
+  to morph it to a desired colour.
+
+  The optional `opts` argument can contain any of the standard tween
+  options."
+  ([s c]
+   (tween-to-color s c {}))
+  ([{sprite-color :color :as sprite} target-color opts]
+   (let [component-deltas (map - target-color sprite-color)]
+     (first
+      (reduce (fn [[s i] cd]
+                (let [update-fn (fn [c d] (update c i + d))
+                      yoyo-update-fn (fn [c d] (update c i - d))]
+                  [(add-tween
+                    s
+                    (tween
+                     :color
+                     cd
+                     :update-fn (fn [c d] (update c i + d))
+                     (if (:yoyo? opts)
+                       (assoc opts :yoyo-update-fn yoyo-update-fn)
+                       opts)))
+                   (inc i)]))
+              [sprite 0]
+              component-deltas)))))
