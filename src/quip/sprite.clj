@@ -279,12 +279,23 @@
   "Defines a predicate that filters sprites based on their
   sprite-group.
 
+  Takes either a single `:sprite-group` keyword, or a collection of
+  them.
+
   Commonly used alongside `update-sprites-by-pred`:
 
   (qpsprite/update-sprites-by-pred
     state
     (qpsprite/group-pred :asteroids)
+    sprite-update-fn)
+
+  (qpsprite/update-sprites-by-pred
+    state
+    (qpsprite/group-pred [:asteroids :ships])
     sprite-update-fn)"
   [sprite-group]
-  (fn [s]
-    (= sprite-group (:sprite-group s))))
+  (if (coll? sprite-group)
+    (fn [s]
+      ((set sprite-group) (:sprite-group s)))
+    (fn [s]
+      (= sprite-group (:sprite-group s)))))
