@@ -1,0 +1,10 @@
+name: Test pull requests to `develop`
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  test:
+    uses: ./.github/workflows/_test.yml

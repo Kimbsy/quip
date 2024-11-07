@@ -1,0 +1,13 @@
+name: Test feature branches
+
+on:
+  push:
+    branches-ignore:
+      - 'release/*'
+      - 'hotfix/*'
+      - 'main'
+      - 'develop'
+
+jobs:
+  test:
+    uses: ./.github/workflows/_test.yml
