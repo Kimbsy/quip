@@ -1,0 +1,14 @@
+name: Deploy when tagging `main`
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    uses: ./.github/workflows/_test.yml
+
+  deploy:
+    needs: test
+    uses: ./.github/workflows/_deploy.yml

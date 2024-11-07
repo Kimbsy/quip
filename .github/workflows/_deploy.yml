@@ -1,6 +1,7 @@
-name: Build and test
+name: Deploy to Clojars
 
-on: [workflow_dispatch, pull_request]
+on:
+  workflow_call:
 
 jobs:
   build:
@@ -20,3 +21,9 @@ jobs:
 
     - name: Run tests
       run: lein test
+
+    - name: Publish
+      env:
+        CLOJARS_USER: ${{ secrets.CLOJARS_USERNAME }}
+        CLOJARS_PASS: ${{ secrets.CLOJARS_PASSWORD }}
+      run: lein deploy clojars
