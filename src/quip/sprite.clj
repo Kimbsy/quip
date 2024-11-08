@@ -83,26 +83,30 @@
            update-fn
            draw-fn
            points
-           bounds-fn]
+           bounds-fn
+           extra]
     :or   {rotation  0
            update-fn identity
-           draw-fn   draw-image-sprite}}]
-  {:sprite-group sprite-group
-   :uuid         (java.util.UUID/randomUUID)
-   :pos          pos
-   :rotation     rotation
-   :w            w
-   :h            h
-   :animated?    false
-   :static?      true
-   :update-fn    update-fn
-   :draw-fn      draw-fn
-   :points       points
-   :bounds-fn    (or bounds-fn
-                     (if (seq points)
-                       :points
-                       default-bounding-poly))
-   :image        (q/load-image image-file)})
+           draw-fn   draw-image-sprite
+           extra     {}}}]
+  (merge
+   {:sprite-group sprite-group
+    :uuid         (java.util.UUID/randomUUID)
+    :pos          pos
+    :rotation     rotation
+    :w            w
+    :h            h
+    :animated?    false
+    :static?      true
+    :update-fn    update-fn
+    :draw-fn      draw-fn
+    :points       points
+    :bounds-fn    (or bounds-fn
+                      (if (seq points)
+                        :points
+                        default-bounding-poly))
+    :image        (q/load-image image-file)}
+   extra))
 
 (defn image-sprite
   [sprite-group pos w h image-file &
@@ -111,28 +115,32 @@
            update-fn
            draw-fn
            points
-           bounds-fn]
+           bounds-fn
+           extra]
     :or   {rotation  0
            vel       [0 0]
            update-fn update-image-sprite
-           draw-fn   draw-image-sprite}}]
-  {:sprite-group sprite-group
-   :uuid         (java.util.UUID/randomUUID)
-   :pos          pos
-   :rotation     rotation
-   :vel          vel
-   :w            w
-   :h            h
-   :animated?    false
-   :static?      false
-   :update-fn    update-fn
-   :draw-fn      draw-fn
-   :points       points
-   :bounds-fn    (or bounds-fn
-                     (if (seq points)
-                       :points
-                       default-bounding-poly))
-   :image        (q/load-image image-file)})
+           draw-fn   draw-image-sprite
+           extra     {}}}]
+  (merge
+   {:sprite-group sprite-group
+    :uuid         (java.util.UUID/randomUUID)
+    :pos          pos
+    :rotation     rotation
+    :vel          vel
+    :w            w
+    :h            h
+    :animated?    false
+    :static?      false
+    :update-fn    update-fn
+    :draw-fn      draw-fn
+    :points       points
+    :bounds-fn    (or bounds-fn
+                      (if (seq points)
+                        :points
+                        default-bounding-poly))
+    :image        (q/load-image image-file)}
+   extra))
 
 (defn animated-sprite
   [sprite-group pos w h spritesheet-file &
@@ -143,7 +151,8 @@
            animations
            current-animation
            points
-           bounds-fn]
+           bounds-fn
+           extra]
     :or   {rotation          0
            vel               [0 0]
            update-fn         update-animated-sprite
@@ -151,28 +160,31 @@
            animations        {:none {:frames      1
                                      :y-offset    0
                                      :frame-delay 100}}
-           current-animation :none}}]
-  {:sprite-group      sprite-group
-   :uuid              (java.util.UUID/randomUUID)
-   :pos               pos
-   :rotation          rotation
-   :vel               vel
-   :w                 w
-   :h                 h
-   :animated?         true
-   :static?           false
-   :update-fn         update-fn
-   :draw-fn           draw-fn
-   :points            points
-   :bounds-fn         (or bounds-fn
-                          (if (seq points)
-                            :points
-                            default-bounding-poly))
-   :spritesheet       (q/load-image spritesheet-file)
-   :animations        animations
-   :current-animation current-animation
-   :delay-count       0
-   :animation-frame   0})
+           current-animation :none
+           extra             {}}}]
+  (merge
+   {:sprite-group      sprite-group
+    :uuid              (java.util.UUID/randomUUID)
+    :pos               pos
+    :rotation          rotation
+    :vel               vel
+    :w                 w
+    :h                 h
+    :animated?         true
+    :static?           false
+    :update-fn         update-fn
+    :draw-fn           draw-fn
+    :points            points
+    :bounds-fn         (or bounds-fn
+                           (if (seq points)
+                             :points
+                             default-bounding-poly))
+    :spritesheet       (q/load-image spritesheet-file)
+    :animations        animations
+    :current-animation current-animation
+    :delay-count       0
+    :animation-frame   0}
+   extra))
 
 (defn draw-text-sprite
   [{:keys [content pos offsets font size color]}]
@@ -190,23 +202,27 @@
            size
            color
            update-fn
-           draw-fn]
+           draw-fn
+           extra]
     :or   {offsets      [:center]
            sprite-group :text
            font         qpu/default-font
            size         qpu/default-text-size
            color        qpu/black
            update-fn    identity
-           draw-fn      draw-text-sprite}}]
-  {:sprite-group sprite-group
-   :uuid         (java.util.UUID/randomUUID)
-   :content      content
-   :pos          pos
-   :offsets      offsets
-   :font         (q/create-font font size)
-   :color        color
-   :update-fn    update-fn
-   :draw-fn      draw-fn})
+           draw-fn      draw-text-sprite
+           extra        {}}}]
+  (merge
+   {:sprite-group sprite-group
+    :uuid         (java.util.UUID/randomUUID)
+    :content      content
+    :pos          pos
+    :offsets      offsets
+    :font         (q/create-font font size)
+    :color        color
+    :update-fn    update-fn
+    :draw-fn      draw-fn}
+   extra))
 
 (defn update-scene-sprites
   "Update each sprite in the current scene using its `:update-fn`.
