@@ -19,18 +19,56 @@
   (q/text-font (q/create-font qpu/default-font qpu/default-text-size))
   (q/text (str "No draw-fn found for current scene " (str current-scene)) 200 200))
 
+(defn update-framerate
+  "Keep track of the current average framerate."
+  [{:keys [display-fps? previous-frame-time dt-window] :as state}]
+  (if display-fps?
+    (let [current-time (System/currentTimeMillis)
+          dt (- current-time previous-frame-time)
+          dt-n (count dt-window)]
+      ;; record the delta-time of 30 frames and then average them
+      (if (< dt-n 30)
+        (-> state
+            (update :dt-window conj dt)
+            (assoc :previous-frame-time current-time))
+        (-> state
+            (assoc :dt-window [])
+            (assoc :average-fps (/ 1000 (/ (apply + dt-window) dt-n)))
+            (assoc :previous-frame-time current-time))))
+    state))
+
 (defn update-state
   [{:keys [scenes current-scene] :as state}]
-  (let [new-frame (update state :global-frame inc)]
+  ;; quip updates
+  (let [new-frame (-> state
+                      (update :global-frame inc)
+                      update-framerate)]
+    ;; scene updates
     (if-let [scene-update (get-in scenes [current-scene :update-fn])]
       (scene-update new-frame)
       new-frame)))
 
+(defn draw-fps-counter
+  [{:keys [average-fps] :as state}]
+  (let [text-h qpu/default-text-size
+        text-w (/ qpu/default-text-size 2)]
+    ;; draw black box
+    (q/fill 0)
+    (q/rect 0 0 (* text-w 10) (* text-h 1))
+
+    ;; draw white fps text (rounded to 2dp)
+    (q/text-align :left :center)
+    (q/fill 255)
+    (q/text-font (q/create-font qpu/default-font text-h))
+    (q/text (str "FPS: " (format "%.2f" (float average-fps))) 0 (/ text-h 2))))
+
 (defn draw-state
-  [{:keys [scenes current-scene] :as state}]
+  [{:keys [display-fps? scenes current-scene] :as state}]
   (if-let [scene-draw (get-in scenes [current-scene :draw-fn])]
     (scene-draw state)
-    (default-draw state)))
+    (default-draw state))
+  (when display-fps?
+    (draw-fps-counter state)))
 
 (defn update-wrapper
   "Allow us to change our update function."
@@ -64,11 +102,15 @@
 (def default-initial-state
   "Default initial values for the `state` map. The result of the game's
   `:setup` function will be merged on top."
-  {:held-keys        #{}
-   :input-enabled?   true
-   :global-frame     1
-   :parent-update-fn update-state
-   :parent-draw-fn   draw-state})
+  {:held-keys           #{}
+   :input-enabled?      true
+   :global-frame        1
+   :display-fps?        false ;; @TODO: should this be part of a broader `debug` mode?
+   :previous-frame-time (System/currentTimeMillis)
+   :average-fps         0
+   :dt-window           []
+   :parent-update-fn    update-state
+   :parent-draw-fn      draw-state})
 
 (defn game
   "Create a quip game configuration.
