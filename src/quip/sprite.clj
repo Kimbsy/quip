@@ -71,10 +71,14 @@
    [0 h]])
 
 (defn default-draw-fn
-  [{[x y] :pos :keys [w h] :as sprite}]
-  ;; @TODO: implement something better
-  (q/fill 255)
-  (q/rect x y w h))
+  [{[x y] :pos :keys [w h]}]
+  (q/stroke-weight 2)
+  (q/stroke 0 255 0)
+  (q/fill 0)
+  (q/rect x y w h)
+  (q/no-fill)
+  (q/line x y (+ x w) (+ y h))
+  (q/line (+ x w) y x (+ y h)))
 
 ;;; Basic Sprite types
 
