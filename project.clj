@@ -1,4 +1,4 @@
-(defproject quip "3.0.1"
+(defproject quip "4.0.0"
   :description "A 2D game library based on Quil"
   :url "https://github.com/Kimbsy/quip"
   :license {:name "Eclipse Public License"

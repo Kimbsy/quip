@@ -29,11 +29,6 @@
       (update s :animation-frame #(mod (inc %) max-frame)))
     s))
 
-(defn update-image-sprite
-  [s]
-  (some-> s
-          update-pos))
-
 (defn update-animated-sprite
   [s]
   (some-> s
@@ -58,7 +53,7 @@
       (.clear g)
       (q/image spritesheet (- x-offset) (- y-offset)))
     (qpu/wrap-trans-rot pos rotation
-                       #(q/image g (- (/ w 2)) (- (/ h 2))))))
+                        #(q/image g (- (/ w 2)) (- (/ h 2))))))
 
 (defn set-animation
   [s animation]
@@ -75,7 +70,50 @@
    [w h]
    [0 h]])
 
+(defn default-draw-fn
+  [{[x y] :pos :keys [w h] :as sprite}]
+  ;; @TODO: implement something better
+  (q/fill 255)
+  (q/rect x y w h))
+
 ;;; Basic Sprite types
+
+(defn sprite
+  "The simplest sensible sprite.
+
+  Contains a position, velocity, dimensions for collision detection,
+  can be enriched with any custom fields via the `:extra` kwarg."
+  [sprite-group pos &
+   {:keys [w
+           h
+           vel
+           update-fn
+           draw-fn
+           points
+           bounds-fn
+           extra]
+    :or   {w         20
+           h         20
+           vel       [0 0]
+           update-fn update-pos
+           draw-fn   default-draw-fn
+           extra     {}}}]
+  (merge
+   {:sprite-group sprite-group
+    :uuid         (java.util.UUID/randomUUID)
+    :pos          pos
+    :w            w
+    :h            h
+    :vel          vel
+    :animated?    false
+    :update-fn    update-fn
+    :draw-fn      draw-fn
+    :points       points
+    :bounds-fn    (or bounds-fn
+                      (if (seq points)
+                        :points
+                        default-bounding-poly))}
+   extra))
 
 (defn static-sprite
   [sprite-group pos w h image-file &
@@ -90,22 +128,18 @@
            draw-fn   draw-image-sprite
            extra     {}}}]
   (merge
-   {:sprite-group sprite-group
-    :uuid         (java.util.UUID/randomUUID)
-    :pos          pos
-    :rotation     rotation
-    :w            w
-    :h            h
-    :animated?    false
-    :static?      true
-    :update-fn    update-fn
-    :draw-fn      draw-fn
-    :points       points
-    :bounds-fn    (or bounds-fn
-                      (if (seq points)
-                        :points
-                        default-bounding-poly))
-    :image        (q/load-image image-file)}
+   (sprite sprite-group pos)
+   {:w         w
+    :h         h
+    :image     (q/load-image image-file)
+    :rotation  rotation
+    :update-fn identity
+    :draw-fn   draw-image-sprite
+    :points    points
+    :bounds-fn (or bounds-fn
+                   (if (seq points)
+                     :points
+                     default-bounding-poly))}
    extra))
 
 (defn image-sprite
@@ -119,27 +153,23 @@
            extra]
     :or   {rotation  0
            vel       [0 0]
-           update-fn update-image-sprite
+           update-fn update-pos
            draw-fn   draw-image-sprite
            extra     {}}}]
   (merge
-   {:sprite-group sprite-group
-    :uuid         (java.util.UUID/randomUUID)
-    :pos          pos
-    :rotation     rotation
-    :vel          vel
-    :w            w
-    :h            h
-    :animated?    false
-    :static?      false
-    :update-fn    update-fn
-    :draw-fn      draw-fn
-    :points       points
-    :bounds-fn    (or bounds-fn
-                      (if (seq points)
-                        :points
-                        default-bounding-poly))
-    :image        (q/load-image image-file)}
+   (sprite sprite-group pos)
+   {:w         w
+    :h         h
+    :image     (q/load-image image-file)
+    :rotation  rotation
+    :vel       vel
+    :update-fn update-fn
+    :draw-fn   draw-fn
+    :points    points
+    :bounds-fn (or bounds-fn
+                   (if (seq points)
+                     :points
+                     default-bounding-poly))}
    extra))
 
 (defn animated-sprite
@@ -163,15 +193,13 @@
            current-animation :none
            extra             {}}}]
   (merge
-   {:sprite-group      sprite-group
-    :uuid              (java.util.UUID/randomUUID)
-    :pos               pos
+   (sprite sprite-group pos)
+   {:w                 w
+    :h                 h
+    :spritesheet       (q/load-image spritesheet-file)
     :rotation          rotation
     :vel               vel
-    :w                 w
-    :h                 h
     :animated?         true
-    :static?           false
     :update-fn         update-fn
     :draw-fn           draw-fn
     :points            points
@@ -179,7 +207,6 @@
                            (if (seq points)
                              :points
                              default-bounding-poly))
-    :spritesheet       (q/load-image spritesheet-file)
     :animations        animations
     :current-animation current-animation
     :delay-count       0
@@ -213,15 +240,13 @@
            draw-fn      draw-text-sprite
            extra        {}}}]
   (merge
-   {:sprite-group sprite-group
-    :uuid         (java.util.UUID/randomUUID)
-    :content      content
-    :pos          pos
-    :offsets      offsets
-    :font         (q/create-font font size)
-    :color        color
-    :update-fn    update-fn
-    :draw-fn      draw-fn}
+   (sprite sprite-group pos)
+   {:content   content
+    :offsets   offsets
+    :font      (q/create-font font size)
+    :color     color
+    :update-fn update-fn
+    :draw-fn   draw-fn}
    extra))
 
 (defn update-scene-sprites
