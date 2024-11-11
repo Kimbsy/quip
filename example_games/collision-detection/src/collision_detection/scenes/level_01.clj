@@ -11,18 +11,19 @@
 (defn square
   "A simple sprite"
   [group pos vel size color]
-  {:sprite-group group
-   :pos pos
+  (qpsprite/sprite
+   group
+   pos
    :vel vel
    :w size
    :h size
-   :color color
    :update-fn (fn [{p :pos v :vel :as b}]
                 (assoc b :pos (mapv + p v)))
    :draw-fn (fn [{[x y] :pos c :color w :w h :h}]
               (qpu/fill c)
               (let [offset (/ w 2)]
-                (q/rect (- x offset) (- y offset) w h)))})
+                (q/rect (- x offset) (- y offset) w h)))
+   :extra {:color color}))
 
 (defn sprites
   "The initial list of sprites for this scene"
