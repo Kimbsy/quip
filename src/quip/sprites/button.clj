@@ -1,6 +1,6 @@
 (ns quip.sprites.button
   (:require [quil.core :as q]
-            [quip.utils :as qpu]
+            [quip.util :as qpu]
             [quip.sprite :as qpsprite]
             [quip.collision :as qpcollision]))
 

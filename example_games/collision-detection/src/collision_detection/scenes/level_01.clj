@@ -2,7 +2,7 @@
   (:require [quil.core :as q]
             [quip.collision :as qpcollision]
             [quip.sprite :as qpsprite]
-            [quip.utils :as qpu]))
+            [quip.util :as qpu]))
 
 (def grey [44 49 44])
 (def green [154 225 157])

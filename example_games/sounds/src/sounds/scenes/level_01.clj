@@ -2,7 +2,7 @@
   (:require [quil.core :as q]
             [quip.sprite :as qpsprite]
             [quip.sound :as qpsound]
-            [quip.utils :as qpu]))
+            [quip.util :as qpu]))
 
 ;; Nicer than actual white and black
 (def white [245 245 245])

@@ -1,4 +1,4 @@
-(ns quip.utils
+(ns quip.util
   "Miscellaneous utility functions.
 
   Vector math functions for position/rotation/velocity calculations.

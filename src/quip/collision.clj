@@ -2,7 +2,7 @@
   "Group-based sprite collision tools and sprite collision detection
   predicates."
   (:require [quil.core :as q]
-            [quip.utils :as qpu]))
+            [quip.util :as qpu]))
 
 (defn equal-pos?
   "Predicate to check if two sprites have the same position."
