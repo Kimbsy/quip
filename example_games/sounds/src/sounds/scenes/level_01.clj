@@ -1,8 +1,8 @@
 (ns sounds.scenes.level-01
   (:require [quil.core :as q]
-            [quip.sprite :as qpsprite]
-            [quip.sound :as qpsound]
-            [quip.util :as qpu]))
+            [quip.sprite :as sprite]
+            [quip.sound :as sound]
+            [quip.util :as u]))
 
 ;; Nicer than actual white and black
 (def white [245 245 245])
@@ -14,7 +14,7 @@
   [state e]
   (if (= :m (:key e))
     (do
-      (qpsound/loop-music "music/music.wav")
+      (sound/loop-music "music/music.wav")
       state)
     state))
 
@@ -30,7 +30,7 @@
   [state e]
   (if (= :s (:key e))
     (do
-      (qpsound/play (rand-nth blips))
+      (sound/play (rand-nth blips))
       state)
     state))
 
@@ -43,11 +43,11 @@
 (defn sprites
   "The initial list of sprites for this scene"
   []
-  [(qpsprite/text-sprite
+  [(sprite/text-sprite
     "Press <m> to restart music"
     [(* 0.5 (q/width)) (* 0.4 (q/height))]
     :color white)
-   (qpsprite/text-sprite
+   (sprite/text-sprite
     "Press <s> to play sound effect"
     [(* 0.5 (q/width)) (* 0.6 (q/height))]
     :color white)])
@@ -55,14 +55,14 @@
 (defn draw-level-01
   "Called each frame, draws the current scene to the screen"
   [state]
-  (qpu/background black)
-  (qpsprite/draw-scene-sprites state))
+  (u/background black)
+  (sprite/draw-scene-sprites state))
 
 (defn update-level-01
   "Called each frame, update the sprites in the current scene"
   [state]
   (-> state
-      qpsprite/update-state))
+      sprite/update-state))
 
 (defn init
   "Initialise this scene"

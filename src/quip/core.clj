@@ -3,9 +3,9 @@
   functions."
   (:require [quil.core :as q]
             [quil.middleware :as m]
-            [quip.input :as qpinput]
-            [quip.sound :as qpsound]
-            [quip.util :as qpu]))
+            [quip.input :as input]
+            [quip.sound :as sound]
+            [quip.util :as u]))
 
 (defn default-update
   [state]
@@ -16,7 +16,7 @@
   (q/background 0)
   (q/fill 255)
   (q/text-align :left :baseline)
-  (q/text-font (q/create-font qpu/default-font qpu/default-text-size))
+  (q/text-font (q/create-font u/default-font u/default-text-size))
   (q/text (str "No draw-fn found for current scene " (str current-scene)) 200 200))
 
 (defn update-framerate
@@ -50,8 +50,8 @@
 
 (defn draw-fps-counter
   [{:keys [average-fps] :as state}]
-  (let [text-h qpu/default-text-size
-        text-w (/ qpu/default-text-size 2)]
+  (let [text-h u/default-text-size
+        text-w (/ u/default-text-size 2)]
     ;; draw black box
     (q/fill 0)
     (q/rect 0 0 (* text-w 10) (* text-h 1))
@@ -59,7 +59,7 @@
     ;; draw white fps text (rounded to 2dp)
     (q/text-align :left :center)
     (q/fill 255)
-    (q/text-font (q/create-font qpu/default-font text-h))
+    (q/text-font (q/create-font u/default-font text-h))
     (q/text (str "FPS: " (format "%.2f" (float average-fps))) 0 (/ text-h 2))))
 
 (defn draw-state
@@ -91,10 +91,10 @@
    :setup          (constantly {})
    :update         update-wrapper
    :draw           draw-wrapper
-   :key-pressed    qpinput/key-pressed
-   :key-released   qpinput/key-released
-   :mouse-pressed  qpinput/mouse-pressed
-   :mouse-released qpinput/mouse-released
+   :key-pressed    input/key-pressed
+   :key-released   input/key-released
+   :mouse-pressed  input/mouse-pressed
+   :mouse-released input/mouse-released
    :middleware     [m/fun-mode]
    :on-close       default-on-close
    :frame-rate     60})
@@ -146,7 +146,7 @@
         ;; wrap the existing `:on-close` to stop music playing
         (update :on-close (fn [on-close]
                             (fn [state]
-                              (qpsound/stop-music)
+                              (sound/stop-music)
                               (on-close state)))))))
 
 (defn run

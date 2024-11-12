@@ -1,7 +1,7 @@
 (ns fabrik.scenes.level-01
   (:require [quil.core :as q]
-            [quip.sprite :as qpsprite]
-            [quip.util :as qpu]))
+            [quip.sprite :as sprite]
+            [quip.util :as u]))
 
 (def light-green [133 255 199])
 (def dark-blue [0 43 54])
@@ -25,8 +25,8 @@
 (defn draw-level-01
   "Called each frame, draws the current scene to the screen"
   [state]
-  (qpu/background dark-blue)
-  (qpsprite/draw-scene-sprites state)
+  (u/background dark-blue)
+  (sprite/draw-scene-sprites state)
 
   (let [chain (get-in state [:scenes :level-01 :chain])]
     (q/stroke orange)
@@ -45,7 +45,7 @@
   (->> chain
        (partition 2 1)
        (map (fn [[p1 p2]]
-              (qpu/magnitude (map - p2 p1))))))
+              (u/magnitude (map - p2 p1))))))
 
 (defn tail-to-root
   "Assuming the last (tail) joint of the chain is in place (at the mouse pos),
@@ -58,7 +58,7 @@
   (reduce (fn [acc [pos l i]]
             (let [next-joint (get acc (inc i))
                   direction (map - pos next-joint)
-                  move (map (partial * l) (qpu/unit-vector direction))                  
+                  move (map (partial * l) (u/unit-vector direction))
                   new-pos (mapv + next-joint move)]
               (assoc acc i new-pos)))
           chain
@@ -79,7 +79,7 @@
   (reduce (fn [acc [pos l i]]
             (let [prev-joint (get acc (dec i))
                   direction (map - pos prev-joint)
-                  move (map (partial * l) (qpu/unit-vector direction))                  
+                  move (map (partial * l) (u/unit-vector direction))
                   new-pos (mapv + prev-joint move)]
               (assoc acc i new-pos)))
           chain

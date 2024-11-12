@@ -1,20 +1,20 @@
 (ns delays.scenes.level-01
   (:require [quil.core :as q]
-            [quip.delay :as qpdelay]
-            [quip.sprite :as qpsprite]
-            [quip.tween :as qptween]
-            [quip.util :as qpu]))
+            [quip.delay :as delay]
+            [quip.sprite :as sprite]
+            [quip.tween :as tween]
+            [quip.util :as u]))
 
 (def blue [0 153 255])
 
 (def spin-tween
-  (qptween/tween
+  (tween/tween
    :rotation
    360))
 
 (defn captain
   [pos]
-  (qpsprite/animated-sprite
+  (sprite/animated-sprite
    :captain
    pos
    240
@@ -50,40 +50,40 @@
   "Define the delays which exist as the scene begins."
   []
   [;; We can have a simple side-effecting delayed function:
-   (qpdelay/delay 100 print-current-frame)
+   (delay/delay 100 print-current-frame)
 
    ;; We can add new sprites into the scene:
-   (qpdelay/add-sprites-to-scene 200 [(captain [(rand-int (q/width))
-                                                (rand-int (q/height))])])
+   (delay/add-sprites-to-scene 200 [(captain [(rand-int (q/width))
+                                              (rand-int (q/height))])])
 
    ;; We can add tweens to sprites in the scene:
-   (qpdelay/add-tween-to-sprites 300
-                                 spin-tween
-                                 (fn [s]
-                                   (= :captain (:sprite-group s))))
+   (delay/add-tween-to-sprites 300
+                               spin-tween
+                               (fn [s]
+                                 (= :captain (:sprite-group s))))
 
    ;; We can even delay adding new delays to the scene:
-   (qpdelay/delay
-    400
-    (fn [state]
-      (reduce qpdelay/add-delay
-              state
-              ;; add the same delays again!
-              (delays))))])
+   (delay/delay
+     400
+     (fn [state]
+       (reduce delay/add-delay
+               state
+               ;; add the same delays again!
+               (delays))))])
 
 (defn draw-level-01
   "Called each frame, draws the current scene to the screen"
   [state]
-  (qpu/background blue)
-  (qpsprite/draw-scene-sprites state))
+  (u/background blue)
+  (sprite/draw-scene-sprites state))
 
 (defn update-level-01
   "Called each frame, update the sprites in the current scene"
   [state]
   (-> state
-      qpsprite/update-state
-      qptween/update-state
-      qpdelay/update-state))
+      sprite/update-state
+      tween/update-state
+      delay/update-state))
 
 (defn init
   "Initialise this scene"

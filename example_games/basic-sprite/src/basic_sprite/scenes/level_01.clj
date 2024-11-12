@@ -1,12 +1,12 @@
 (ns basic-sprite.scenes.level-01
-  (:require [quip.sprite :as qpsprite]
-            [quip.util :as qpu]))
+  (:require [quip.sprite :as sprite]
+            [quip.util :as u]))
 
 (def blue [0 153 255])
 
 (defn captain
   [pos current-animation]
-  (qpsprite/animated-sprite
+  (sprite/animated-sprite
    :captain   ; sprite-group, used for group collision detection
    pos
    240   ; <- width and
@@ -35,14 +35,14 @@
 (defn draw-level-01
   "Called each frame, draws the current scene to the screen"
   [state]
-  (qpu/background blue)
-  (qpsprite/draw-scene-sprites state))
+  (u/background blue)
+  (sprite/draw-scene-sprites state))
 
 (defn update-level-01
   "Called each frame, update the sprites in the current scene"
   [state]
   (-> state
-      qpsprite/update-state))
+      sprite/update-state))
 
 (defn init
   "Initialise this scene"

@@ -4,7 +4,7 @@
   The basic sprites provided are useful if simple, feel free to
   implement your own."
   (:require [quil.core :as q]
-            [quip.util :as qpu]))
+            [quip.util :as u]))
 
 (defn offset-pos
   [[x y] w h]
@@ -52,8 +52,8 @@
     (q/with-graphics g
       (.clear g)
       (q/image spritesheet (- x-offset) (- y-offset)))
-    (qpu/wrap-trans-rot pos rotation
-                        #(q/image g (- (/ w 2)) (- (/ h 2))))))
+    (u/wrap-trans-rot pos rotation
+                      #(q/image g (- (/ w 2)) (- (/ h 2))))))
 
 (defn set-animation
   [s animation]
@@ -222,7 +222,7 @@
   (let [[x y] pos]
     (apply q/text-align offsets)
     (q/text-font font)
-    (qpu/fill color)
+    (u/fill color)
     (q/text content x y)))
 
 (defn text-sprite
@@ -237,9 +237,9 @@
            extra]
     :or   {offsets      [:center]
            sprite-group :text
-           font         qpu/default-font
-           size         qpu/default-text-size
-           color        qpu/black
+           font         u/default-font
+           size         u/default-text-size
+           color        u/black
            update-fn    identity
            draw-fn      draw-text-sprite
            extra        {}}}]
@@ -329,14 +329,14 @@
 
   Commonly used alongside `update-sprites-by-pred`:
 
-  (qpsprite/update-sprites-by-pred
+  (sprite/update-sprites-by-pred
     state
-    (qpsprite/group-pred :asteroids)
+    (sprite/group-pred :asteroids)
     sprite-update-fn)
 
-  (qpsprite/update-sprites-by-pred
+  (sprite/update-sprites-by-pred
     state
-    (qpsprite/group-pred [:asteroids :ships])
+    (sprite/group-pred [:asteroids :ships])
     sprite-update-fn)"
   [sprite-group]
   (if (coll? sprite-group)

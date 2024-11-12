@@ -1,13 +1,13 @@
 (ns sounds.core
   (:gen-class)
   (:require [quip.core :as qp]
-            [quip.sound :as qpsound]
+            [quip.sound :as sound]
             [sounds.scenes.level-01 :as level-01]))
 
 (defn setup
   "The initial state of the game"
   []
-  (qpsound/loop-music "music/music.wav")
+  (sound/loop-music "music/music.wav")
   ;; Empty state
   {})
 
