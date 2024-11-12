@@ -240,7 +240,7 @@
         (assoc group-b-key (:group-b results))
         (assoc group-a-key (:group-a results)))))
 
-(defn update-collisions
+(defn update-state
   "Update the sprites in the current scene based on the scene colliders."
   [{:keys [current-scene] :as state}]
   (let [sprites               (get-in state [:scenes current-scene :sprites])

@@ -138,8 +138,8 @@
   [state]
   (-> state
       update-selected-sprites
-      qpsprite/update-scene-sprites
-      qptween/update-sprite-tweens))
+      qpsprite/update-state
+      qptween/update-state))
 
 (defn init
   "Initialise this scene"

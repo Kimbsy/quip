@@ -65,9 +65,9 @@
   "Called each frame, update the sprites in the current scene"
   [state]
   (-> state
-      qpsprite/update-scene-sprites
+      qpsprite/update-state
       ;; NOTE: you must update collisions for them to work
-      qpcollision/update-collisions))
+      qpcollision/update-state))
 
 (defn init
   "Initialise this scene"

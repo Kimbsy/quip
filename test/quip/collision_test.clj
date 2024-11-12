@@ -58,7 +58,7 @@
                    :scenes        {:test {:sprites   sprites
                                           :colliders [collider-ab]}}}
 
-            results        (sut/update-collisions state)
+            results        (sut/update-state state)
             result-sprites (get-in results [:scenes :test :sprites])]
         (is (= 11 (count result-sprites)))
         (let [foo-sprites (filter #(#{:foo} (:sprite-group %)) result-sprites)
@@ -100,7 +100,7 @@
                    :scenes        {:test {:sprites   sprites
                                           :colliders [collider-aa]}}}
 
-            results        (sut/update-collisions state)
+            results        (sut/update-state state)
             result-sprites (get-in results [:scenes :test :sprites])]
         (is (= 11 (count result-sprites)))
         (let [foo-sprites (filter #(#{:foo} (:sprite-group %)) result-sprites)
@@ -122,7 +122,7 @@
                  :scenes        {:test {:sprites   only-foo-sprites
                                         :colliders [collider]}}}
 
-          results        (sut/update-collisions state)
+          results        (sut/update-state state)
           result-sprites (get-in results [:scenes :test :sprites])]
       (is (= result-sprites only-foo-sprites)))))
 
@@ -139,7 +139,7 @@
                  :scenes        {:test {:sprites   sprites
                                         :colliders [removing-a-collider]}}}
 
-          results        (sut/update-collisions state)
+          results        (sut/update-state state)
           result-sprites (get-in results [:scenes :test :sprites])]
       (is (= 9 (count result-sprites)))
       (let [foo-sprites (filter #(#{:foo} (:sprite-group %)) result-sprites)
@@ -160,7 +160,7 @@
                  :scenes        {:test {:sprites   sprites
                                         :colliders [removing-a-collider]}}}
 
-          results        (sut/update-collisions state)
+          results        (sut/update-state state)
           result-sprites (get-in results [:scenes :test :sprites])]
       (is (= 7 (count result-sprites)))
       (let [foo-sprites (filter #(#{:foo} (:sprite-group %)) result-sprites)
@@ -181,7 +181,7 @@
                  :scenes        {:test {:sprites   sprites
                                         :colliders [removing-a-collider]}}}
 
-          results        (sut/update-collisions state)
+          results        (sut/update-state state)
           result-sprites (get-in results [:scenes :test :sprites])]
       (is (= 10 (count result-sprites)))
       (let [foo-sprites (filter #(#{:foo} (:sprite-group %)) result-sprites)
