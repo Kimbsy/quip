@@ -5,7 +5,7 @@
             [quil.middleware :as m]
             [quip.input :as qpinput]
             [quip.sound :as qpsound]
-            [quip.utils :as qpu]))
+            [quip.util :as qpu]))
 
 (defn default-update
   [state]

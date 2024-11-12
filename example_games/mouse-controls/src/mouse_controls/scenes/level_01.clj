@@ -2,7 +2,7 @@
   (:require [quil.core :as q]
             [quip.sprite :as qpsprite]
             [quip.tween :as qptween]
-            [quip.utils :as qpu]))
+            [quip.util :as qpu]))
 
 (def grey [57 57 58])
 (def white [192 214 223])

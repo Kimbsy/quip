@@ -2,7 +2,7 @@
   (:require [quil.core :as q]
             [quip.sprite :as qpsprite]
             [quip.tween :as qptween]
-            [quip.utils :as qpu]))
+            [quip.util :as qpu]))
 
 (def gunmetal [0 43 54])
 (def jet [60 60 60])

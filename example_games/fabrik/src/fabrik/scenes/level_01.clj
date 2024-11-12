@@ -1,7 +1,7 @@
 (ns fabrik.scenes.level-01
   (:require [quil.core :as q]
             [quip.sprite :as qpsprite]
-            [quip.utils :as qpu]))
+            [quip.util :as qpu]))
 
 (def light-green [133 255 199])
 (def dark-blue [0 43 54])

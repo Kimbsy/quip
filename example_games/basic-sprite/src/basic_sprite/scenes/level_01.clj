@@ -1,6 +1,6 @@
 (ns basic-sprite.scenes.level-01
   (:require [quip.sprite :as qpsprite]
-            [quip.utils :as qpu]))
+            [quip.util :as qpu]))
 
 (def blue [0 153 255])
 

@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [quip.collision :as sut]
             [quip.sprite :as qpsprite]
-            [quip.utils :as qpu]))
+            [quip.util :as qpu]))
 
 (defn test-sprite
   [group pos]

@@ -1,6 +1,6 @@
-(ns quip.utils-test
+(ns quip.util-test
   (:require [clojure.test :refer :all]
-            [quip.utils :as sut]))
+            [quip.util :as sut]))
 
 (deftest lines-intersect?
   (testing "simple intersection"

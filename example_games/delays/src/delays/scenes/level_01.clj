@@ -3,7 +3,7 @@
             [quip.delay :as qpdelay]
             [quip.sprite :as qpsprite]
             [quip.tween :as qptween]
-            [quip.utils :as qpu]))
+            [quip.util :as qpu]))
 
 (def blue [0 153 255])
 

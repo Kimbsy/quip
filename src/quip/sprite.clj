@@ -4,7 +4,7 @@
   The basic sprites provided are useful if simple, feel free to
   implement your own."
   (:require [quil.core :as q]
-            [quip.utils :as qpu]))
+            [quip.util :as qpu]))
 
 (defn offset-pos
   [[x y] w h]
