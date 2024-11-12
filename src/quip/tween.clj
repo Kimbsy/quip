@@ -378,7 +378,7 @@
          (update s :tweens #(remove :completed? %)))
        sprites))
 
-(defn update-sprite-tweens
+(defn update-state
   [{:keys [current-scene] :as state}]
   (let [sprites         (get-in state [:scenes current-scene :sprites])
         updated-sprites (transduce (comp (map update-sprite)

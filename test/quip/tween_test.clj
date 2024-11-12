@@ -68,10 +68,10 @@
           s        (sut/add-tween {:foo 10} t)
           state    {:scenes        {:test {:sprites [s]}}
                     :current-scene :test}
-          state1   (sut/update-sprite-tweens state)
-          state99  ((n-times 99 sut/update-sprite-tweens) state)
-          state100 ((n-times 100 sut/update-sprite-tweens) state)
-          state200 ((n-times 200 sut/update-sprite-tweens) state)]
+          state1   (sut/update-state state)
+          state99  ((n-times 99 sut/update-state) state)
+          state100 ((n-times 100 sut/update-state) state)
+          state200 ((n-times 200 sut/update-state) state)]
       (is (= 1 (count (get-in state [:scenes :test :sprites]))))
       (is (= 1 (count (get-in state1 [:scenes :test :sprites]))))
       (is (= 1 (count (get-in state99 [:scenes :test :sprites]))))
@@ -95,11 +95,11 @@
                        (sut/add-tween t2))
           state    {:scenes        {:test {:sprites [s]}}
                     :current-scene :test}
-          state1   (sut/update-sprite-tweens state)
-          state50  ((n-times 50 sut/update-sprite-tweens) state)
-          state99  ((n-times 99 sut/update-sprite-tweens) state)
-          state100 ((n-times 100 sut/update-sprite-tweens) state)
-          state200 ((n-times 200 sut/update-sprite-tweens) state)]
+          state1   (sut/update-state state)
+          state50  ((n-times 50 sut/update-state) state)
+          state99  ((n-times 99 sut/update-state) state)
+          state100 ((n-times 100 sut/update-state) state)
+          state200 ((n-times 200 sut/update-state) state)]
       (is (equiv 10
                  (-> state (get-in [:scenes :test :sprites]) first :foo)))
       (is (equiv (+ 10 (* 1 20/100) (* 1 15/100))
@@ -133,13 +133,13 @@
           s        (sut/add-tween {:foo 1} t)
           state    {:scenes        {:test {:sprites [s]}}
                     :current-scene :test}
-          state1   (sut/update-sprite-tweens state)
-          state99  ((n-times 99 sut/update-sprite-tweens) state)
-          state100 ((n-times 100 sut/update-sprite-tweens) state)
-          state101 ((n-times 101 sut/update-sprite-tweens) state)
-          state199 ((n-times 199 sut/update-sprite-tweens) state)
-          state200 ((n-times 200 sut/update-sprite-tweens) state)
-          state250 ((n-times 250 sut/update-sprite-tweens) state)]
+          state1   (sut/update-state state)
+          state99  ((n-times 99 sut/update-state) state)
+          state100 ((n-times 100 sut/update-state) state)
+          state101 ((n-times 101 sut/update-state) state)
+          state199 ((n-times 199 sut/update-state) state)
+          state200 ((n-times 200 sut/update-state) state)
+          state250 ((n-times 250 sut/update-state) state)]
       (is (= 1 (count (get-in state [:scenes :test :sprites]))))
       (is (= 1 (count (get-in state1 [:scenes :test :sprites]))))
       (is (= 1 (count (get-in state99 [:scenes :test :sprites]))))
@@ -182,14 +182,14 @@
           s        (sut/add-tween {:foo 1} t)
           state    {:scenes        {:test {:sprites [s]}}
                     :current-scene :test}
-          state1   (sut/update-sprite-tweens state)
-          state5  ((n-times 5 sut/update-sprite-tweens) state)
-          state10 ((n-times 10 sut/update-sprite-tweens) state)
-          state15 ((n-times 15 sut/update-sprite-tweens) state)
-          state20 ((n-times 20 sut/update-sprite-tweens) state)
-          state25 ((n-times 25 sut/update-sprite-tweens) state)
-          state30 ((n-times 30 sut/update-sprite-tweens) state)
-          state35 ((n-times 35 sut/update-sprite-tweens) state)]
+          state1   (sut/update-state state)
+          state5  ((n-times 5 sut/update-state) state)
+          state10 ((n-times 10 sut/update-state) state)
+          state15 ((n-times 15 sut/update-state) state)
+          state20 ((n-times 20 sut/update-state) state)
+          state25 ((n-times 25 sut/update-state) state)
+          state30 ((n-times 30 sut/update-state) state)
+          state35 ((n-times 35 sut/update-state) state)]
       (is (equiv 1
                  (-> state (get-in [:scenes :test :sprites]) first :foo)))
       (is (equiv (+ 1 (* 1 300/10))
@@ -214,10 +214,10 @@
           s        (sut/add-tween {:foo 1} t)
           state    {:scenes        {:test {:sprites [s]}}
                     :current-scene :test}
-          state50  ((n-times 50 sut/update-sprite-tweens) state)
-          state100 ((n-times 50 sut/update-sprite-tweens) state50)
-          state150 ((n-times 50 sut/update-sprite-tweens) state100)
-          state200 ((n-times 50 sut/update-sprite-tweens) state150)]
+          state50  ((n-times 50 sut/update-state) state)
+          state100 ((n-times 50 sut/update-state) state50)
+          state150 ((n-times 50 sut/update-state) state100)
+          state200 ((n-times 50 sut/update-state) state150)]
       (is (equiv (-> state50 (get-in [:scenes :test :sprites]) first :foo)
                  (-> state100 (get-in [:scenes :test :sprites]) first :foo)
                  (-> state150 (get-in [:scenes :test :sprites]) first :foo)
@@ -268,8 +268,8 @@
           s      (sut/add-tween {:foo 1} t)
           state  {:scenes        {:test {:sprites [s]}}
                   :current-scene :test}
-          state4 ((n-times 4 sut/update-sprite-tweens) state)
-          state5 ((n-times 5 sut/update-sprite-tweens) state)]
+          state4 ((n-times 4 sut/update-state) state)
+          state5 ((n-times 5 sut/update-state) state)]
       (is (not (-> state4 (get-in [:scenes :test :sprites]) first :yoyoed?)))
       (is (-> state5 (get-in [:scenes :test :sprites]) first :yoyoed?))))
 
@@ -281,10 +281,10 @@
           s       (sut/add-tween {:foo 1 :counter 0} t)
           state   {:scenes        {:test {:sprites [s]}}
                    :current-scene :test}
-          state3  ((n-times 3 sut/update-sprite-tweens) state)
-          state5  ((n-times 5 sut/update-sprite-tweens) state)
-          state10 ((n-times 10 sut/update-sprite-tweens) state)
-          state15 ((n-times 15 sut/update-sprite-tweens) state)]
+          state3  ((n-times 3 sut/update-state) state)
+          state5  ((n-times 5 sut/update-state) state)
+          state10 ((n-times 10 sut/update-state) state)
+          state15 ((n-times 15 sut/update-state) state)]
       (is (zero? (-> state3 (get-in [:scenes :test :sprites]) first :counter)))
       (is (= 1 (-> state5 (get-in [:scenes :test :sprites]) first :counter)))
       (is (= 2 (-> state10 (get-in [:scenes :test :sprites]) first :counter)))
@@ -299,8 +299,8 @@
           s       (sut/add-tween {:foo 1} t)
           state   {:scenes        {:test {:sprites [s]}}
                    :current-scene :test}
-          state9  ((n-times 9 sut/update-sprite-tweens) state)
-          state10 ((n-times 10 sut/update-sprite-tweens) state)]
+          state9  ((n-times 9 sut/update-state) state)
+          state10 ((n-times 10 sut/update-state) state)]
       (is (not (-> state9 (get-in [:scenes :test :sprites]) first :completed?)))
       (is (-> state10 (get-in [:scenes :test :sprites]) first :completed?))))
 
@@ -315,11 +315,11 @@
           s       (sut/add-tween {:foo 1 :yoyo-counter 0 :repeat-counter 0} t)
           state   {:scenes        {:test {:sprites [s]}}
                    :current-scene :test}
-          state4  ((n-times 4 sut/update-sprite-tweens) state)
-          state5  ((n-times 5 sut/update-sprite-tweens) state)
-          state14 ((n-times 14 sut/update-sprite-tweens) state)
-          state15 ((n-times 15 sut/update-sprite-tweens) state)
-          state20 ((n-times 20 sut/update-sprite-tweens) state)]
+          state4  ((n-times 4 sut/update-state) state)
+          state5  ((n-times 5 sut/update-state) state)
+          state14 ((n-times 14 sut/update-state) state)
+          state15 ((n-times 15 sut/update-state) state)
+          state20 ((n-times 20 sut/update-state) state)]
       (is (= 0 (-> state4 (get-in [:scenes :test :sprites]) first :yoyo-counter)))
       (is (= 1 (-> state5 (get-in [:scenes :test :sprites]) first :yoyo-counter)))
       (is (= 1 (-> state14 (get-in [:scenes :test :sprites]) first :yoyo-counter)))

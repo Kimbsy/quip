@@ -253,7 +253,7 @@
     :draw-fn   draw-fn}
    extra))
 
-(defn update-scene-sprites
+(defn update-state
   "Update each sprite in the current scene using its `:update-fn`.
 
   Optionally accepts a key specifying the name of the sprite

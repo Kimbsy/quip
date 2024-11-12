@@ -40,7 +40,7 @@
 
 (def finished? (comp zero? :remaining))
 
-(defn update-delays
+(defn update-state
   "Update all the delays in the current scene and apply the ones that
   have finished."
   [{:keys [current-scene] :as state}]

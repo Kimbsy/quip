@@ -42,7 +42,7 @@
   "Called each frame, update the sprites in the current scene"
   [state]
   (-> state
-      qpsprite/update-scene-sprites))
+      qpsprite/update-state))
 
 (defn init
   "Initialise this scene"
