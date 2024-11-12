@@ -1,26 +1,26 @@
 (ns quip.sprites.button
   (:require [quil.core :as q]
-            [quip.util :as qpu]
-            [quip.sprite :as qpsprite]
-            [quip.collision :as qpcollision]))
+            [quip.util :as u]
+            [quip.sprite :as sprite]
+            [quip.collision :as collision]))
 
 (defn draw-button-sprite
   [{:keys [content pos w h offsets color font content-color content-pos held?]}]
   (q/no-stroke)
   (q/text-align :center :center)
   (q/text-font font)
-  (let [[x y]   (qpsprite/offset-pos pos w h)
+  (let [[x y]   (sprite/offset-pos pos w h)
         [cx cy] content-pos]
     (if held?
-      (do (qpu/fill color)
+      (do (u/fill color)
           (q/rect (+ 2 x) (+ 2 y) w h)
-          (qpu/fill content-color)
+          (u/fill content-color)
           (q/text content (+ 2 x cx) (+ 2 y cy)))
-      (do (qpu/fill (qpu/darken color))
+      (do (u/fill (u/darken color))
           (q/rect (+ 2 x) (+ 2 y) w h)
-          (qpu/fill color)
+          (u/fill color)
           (q/rect x y w h)
-          (qpu/fill content-color)
+          (u/fill content-color)
           (q/text content (+ x cx) (+ y cy))))))
 
 (defn button-sprite
@@ -39,15 +39,15 @@
                   :or   {offsets                [:center :center]
                          on-click               identity
                          size                   [200 100]
-                         color                  qpu/grey
-                         font                   qpu/default-font
-                         font-size              qpu/large-text-size
-                         content-color          qpu/black
+                         color                  u/grey
+                         font                   u/default-font
+                         font-size              u/large-text-size
+                         content-color          u/black
                          content-pos            [100 50]
                          held?                  false
                          update-fn              identity
                          draw-fn                draw-button-sprite
-                         collision-detection-fn qpcollision/pos-in-rect?}}]
+                         collision-detection-fn collision/pos-in-rect?}}]
   (let [[w h] size]
     {:sprite-group           :button
      :uuid                   (java.util.UUID/randomUUID)

@@ -1,7 +1,7 @@
 (ns quip.delay
   "Frame-based delays for executing arbitrary code, useful for cutscenes
   and complex animations."
-  (:require [quip.tween :as qptween]))
+  (:require [quip.tween :as tween]))
 
 ;;;; @TODO: Should delays be flagged for removeal/persistence across
 ;;;; scene transitions?
@@ -92,5 +92,5 @@
            relevant   (filter sprite-selection-fn sprites)
            irrelevant (remove sprite-selection-fn sprites)]
        (assoc-in state path (concat irrelevant
-                                    (map #(qptween/add-tween % tween)
+                                    (map #(tween/add-tween % tween)
                                          relevant)))))))

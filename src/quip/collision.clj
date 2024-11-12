@@ -2,12 +2,12 @@
   "Group-based sprite collision tools and sprite collision detection
   predicates."
   (:require [quil.core :as q]
-            [quip.util :as qpu]))
+            [quip.util :as u]))
 
 (defn equal-pos?
   "Predicate to check if two sprites have the same position."
   [{pos-a :pos} {pos-b :pos}]
-  (qpu/equal-pos? pos-a pos-b))
+  (u/equal-pos? pos-a pos-b))
 
 (defn w-h-rects-collide?
   "Predicate to check for overlap of the `w` by `h` rects of two sprites
@@ -26,8 +26,8 @@
         by1 (+ by (- (/ bh 2)))
         bx2 (+ bx bw (- (/ bw 2)))
         by2 (+ by bh (- (/ bh 2)))]
-    (qpu/rects-overlap? [ax1 ay1 ax2 ay2]
-                        [bx1 by1 bx2 by2])))
+    (u/rects-overlap? [ax1 ay1 ax2 ay2]
+                      [bx1 by1 bx2 by2])))
 
 (defn pos-in-rect?
   "Predicate to check if the position of sprite `a` is inside the `w` by
@@ -41,7 +41,7 @@
                 (+ by (- (/ bh 2)))
                 (+ bx bw (- (/ bw 2)))
                 (+ by bh (- (/ bh 2)))]]
-    (qpu/pos-in-rect? pos-a rect-b)))
+    (u/pos-in-rect? pos-a rect-b)))
 
 (defn rect-contains-pos?
   "Predicate to check if the position of sprite `b` is inside the `w` by
@@ -57,7 +57,7 @@
   (let [bounding-poly (->> (bounds-fn b)
                            (map (fn [p] (map - p [(/ w 2) (/ h 2)])))
                            (map (fn [p] (map + p pos-b))))]
-    (qpu/pos-in-poly? pos-a bounding-poly)))
+    (u/pos-in-poly? pos-a bounding-poly)))
 
 (defn poly-contains-pos?
   "Predicate to check if the position of sprite `b` is inside the
@@ -76,16 +76,16 @@
         poly-b (->> (bounds-fn-b b)
                     (map (fn [p] (map - p [(/ wb 2) (/ hb 2)])))
                     (map (fn [p] (map + p pos-b))))]
-    (qpu/polys-collide? poly-a poly-b)))
+    (u/polys-collide? poly-a poly-b)))
 
 (defn- maybe-rotate
   "Rotate a non-zero vector by an angle unless this represents an integer number
   of rotations."
   [v rotation]
   (if (or (zero? (mod (or rotation 0) 360))
-          (qpu/zero-vector? v))
+          (u/zero-vector? v))
     v
-    (qpu/rotate-vector v rotation)))
+    (u/rotate-vector v rotation)))
 
 (defn pos-in-rotating-poly?
   "Predicate to check if the position of sprite `a` is inside the
@@ -97,7 +97,7 @@
                            (map (fn [p] (map - p [(/ w 2) (/ h 2)])))
                            (map #(maybe-rotate % rotation))
                            (map (fn [p] (map + p pos-b))))]
-    (qpu/pos-in-poly? pos-a bounding-poly)))
+    (u/pos-in-poly? pos-a bounding-poly)))
 
 (defn rotating-poly-contains-pos?
   "Predicate to check if the position of sprite `b` is inside the
@@ -120,7 +120,7 @@
                     (map (fn [p] (map - p [(/ wb 2) (/ hb 2)])))
                     (map #(maybe-rotate % rotation-b))
                     (map (fn [p] (map + p pos-b))))]
-    (qpu/polys-collide? poly-a poly-b)))
+    (u/polys-collide? poly-a poly-b)))
 
 
 

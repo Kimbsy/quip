@@ -1,8 +1,8 @@
 (ns quip.collision-test
   (:require [clojure.test :refer :all]
             [quip.collision :as sut]
-            [quip.sprite :as qpsprite]
-            [quip.util :as qpu]))
+            [quip.sprite :as sprite]
+            [quip.util :as u]))
 
 (defn test-sprite
   [group pos]
@@ -326,9 +326,9 @@
             b [2 4]
             c [8 4]
             d [16 2]]
-        (is (qpu/coarse-pos-in-poly? b a))
-        (is (qpu/coarse-pos-in-poly? c a))
-        (is (not (qpu/coarse-pos-in-poly? d a)))))
+        (is (u/coarse-pos-in-poly? b a))
+        (is (u/coarse-pos-in-poly? c a))
+        (is (not (u/coarse-pos-in-poly? d a)))))
 
     (testing "fine collision detection"
       ;; ┌─────────┐
@@ -341,9 +341,9 @@
             b [2 4]
             c [8 4]
             d [16 2]]
-        (is (qpu/fine-pos-in-poly? b a))
-        (is (not (qpu/fine-pos-in-poly? c a)))
-        (is (not (qpu/fine-pos-in-poly? d a))))))
+        (is (u/fine-pos-in-poly? b a))
+        (is (not (u/fine-pos-in-poly? c a)))
+        (is (not (u/fine-pos-in-poly? d a))))))
 
   (testing "pos-in-poly? and poly-contains-pos?"
     (testing "works on rectangles"
@@ -352,7 +352,7 @@
       ;; │   a    │
       ;; │        │ .d
       ;; └───.c───┘
-      (let [a {:pos [4.5 2] :w 9 :h 4 :bounds-fn qpsprite/default-bounding-poly}
+      (let [a {:pos [4.5 2] :w 9 :h 4 :bounds-fn sprite/default-bounding-poly}
             b {:pos [2 1]}
             c {:pos [4 4]}
             d {:pos [11 3]}]
@@ -439,11 +439,11 @@
       ;; │ └─┼──┼─┘ │
       ;; │ d │  │ e │
       ;; └───┘  └───┘
-      (let [a {:pos [5.5 4] :w 7 :h 4 :bounds-fn qpsprite/default-bounding-poly}
-            b {:pos [2 1.5] :w 4 :h 3 :bounds-fn qpsprite/default-bounding-poly}
-            c {:pos [9 1.5] :w 4 :h 3 :bounds-fn qpsprite/default-bounding-poly}
-            d {:pos [2 6.5] :w 4 :h 3 :bounds-fn qpsprite/default-bounding-poly}
-            e {:pos [9 6.5] :w 4 :h 3 :bounds-fn qpsprite/default-bounding-poly}]
+      (let [a {:pos [5.5 4] :w 7 :h 4 :bounds-fn sprite/default-bounding-poly}
+            b {:pos [2 1.5] :w 4 :h 3 :bounds-fn sprite/default-bounding-poly}
+            c {:pos [9 1.5] :w 4 :h 3 :bounds-fn sprite/default-bounding-poly}
+            d {:pos [2 6.5] :w 4 :h 3 :bounds-fn sprite/default-bounding-poly}
+            e {:pos [9 6.5] :w 4 :h 3 :bounds-fn sprite/default-bounding-poly}]
         ;; a collides with every other sprite
         (is (and (sut/polys-collide? a b)
                  (sut/polys-collide? b a)))
@@ -479,9 +479,9 @@
       ;; ├────┴─┼────┘
       ;; │ c    │
       ;; └──────┘
-      (let [a {:pos [3.5 1.5] :w 7 :h 3 :bounds-fn qpsprite/default-bounding-poly}
-            b {:pos [8.5 1.5] :w 7 :h 3 :bounds-fn qpsprite/default-bounding-poly}
-            c {:pos [3.5 3.5] :w 7 :h 3 :bounds-fn qpsprite/default-bounding-poly}]
+      (let [a {:pos [3.5 1.5] :w 7 :h 3 :bounds-fn sprite/default-bounding-poly}
+            b {:pos [8.5 1.5] :w 7 :h 3 :bounds-fn sprite/default-bounding-poly}
+            c {:pos [3.5 3.5] :w 7 :h 3 :bounds-fn sprite/default-bounding-poly}]
         ;; all sprites collide with each other
         (is (and (sut/polys-collide? a b)
                  (sut/polys-collide? b a)))
@@ -496,8 +496,8 @@
       ;; ║ a  b ║
       ;; ║      ║
       ;; ╚══════╝
-      (let [a {:pos [3.5 2] :w 7 :h 4 :bounds-fn qpsprite/default-bounding-poly}
-            b {:pos [3.5 2] :w 7 :h 4 :bounds-fn qpsprite/default-bounding-poly}]
+      (let [a {:pos [3.5 2] :w 7 :h 4 :bounds-fn sprite/default-bounding-poly}
+            b {:pos [3.5 2] :w 7 :h 4 :bounds-fn sprite/default-bounding-poly}]
         (is (and (sut/polys-collide? a b)
                  (sut/polys-collide? b a)))))
 
@@ -508,8 +508,8 @@
       ;; ││  b   ││
       ;; │└──────┘│
       ;; └────────┘
-      (let [a {:pos [4.5 2.5] :w 9 :h 5 :bounds-fn qpsprite/default-bounding-poly}
-            b {:pos [4.5 3] :w 7 :h 2 :bounds-fn qpsprite/default-bounding-poly}]
+      (let [a {:pos [4.5 2.5] :w 9 :h 5 :bounds-fn sprite/default-bounding-poly}
+            b {:pos [4.5 3] :w 7 :h 2 :bounds-fn sprite/default-bounding-poly}]
         (is (and (sut/polys-collide? a b)
                  (sut/polys-collide? b a))))))
 
@@ -563,7 +563,7 @@
                 :rotation  0
                 :w         9
                 :h         3
-                :bounds-fn qpsprite/default-bounding-poly}
+                :bounds-fn sprite/default-bounding-poly}
             a2 (assoc a1 :rotation 90)
             b  {:pos [7 5]}
             c  {:pos [4 8]}
@@ -642,10 +642,10 @@
               :rotation  0
               :w         13
               :h         3
-              :bounds-fn qpsprite/default-bounding-poly}
+              :bounds-fn sprite/default-bounding-poly}
           a2 (assoc a1 :rotation 90)
-          b  {:pos [6.5 2.5] :w 9 :h 5 :bounds-fn qpsprite/default-bounding-poly}
-          c  {:pos [6.5 12.5] :w 9 :h 5 :bounds-fn qpsprite/default-bounding-poly}]
+          b  {:pos [6.5 2.5] :w 9 :h 5 :bounds-fn sprite/default-bounding-poly}
+          c  {:pos [6.5 12.5] :w 9 :h 5 :bounds-fn sprite/default-bounding-poly}]
       (is (and (not (sut/rotating-polys-collide? a1 b))
                (not (sut/rotating-polys-collide? b a1))))
       (is (and (sut/rotating-polys-collide? a2 b)

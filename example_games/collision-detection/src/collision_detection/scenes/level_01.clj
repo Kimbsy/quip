@@ -1,8 +1,8 @@
 (ns collision-detection.scenes.level-01
   (:require [quil.core :as q]
-            [quip.collision :as qpcollision]
-            [quip.sprite :as qpsprite]
-            [quip.util :as qpu]))
+            [quip.collision :as collision]
+            [quip.sprite :as sprite]
+            [quip.util :as u]))
 
 (def grey [44 49 44])
 (def green [154 225 157])
@@ -11,7 +11,7 @@
 (defn square
   "A simple sprite"
   [group pos vel size color]
-  (qpsprite/sprite
+  (sprite/sprite
    group
    pos
    :vel vel
@@ -20,7 +20,7 @@
    :update-fn (fn [{p :pos v :vel :as b}]
                 (assoc b :pos (mapv + p v)))
    :draw-fn (fn [{[x y] :pos c :color w :w h :h}]
-              (qpu/fill c)
+              (u/fill c)
               (let [offset (/ w 2)]
                 (q/rect (- x offset) (- y offset) w h)))
    :extra {:color color}))
@@ -35,7 +35,7 @@
 (defn colliders
   "Returns the list of colliders for the scene"
   []
-  [(qpcollision/collider
+  [(collision/collider
     :greens  ;; collision group `a`
     :reds    ;; collision group `b`
 
@@ -58,16 +58,16 @@
 (defn draw-level-01
   "Called each frame, draws the current scene to the screen"
   [state]
-  (qpu/background grey)
-  (qpsprite/draw-scene-sprites state))
+  (u/background grey)
+  (sprite/draw-scene-sprites state))
 
 (defn update-level-01
   "Called each frame, update the sprites in the current scene"
   [state]
   (-> state
-      qpsprite/update-state
+      sprite/update-state
       ;; NOTE: you must update collisions for them to work
-      qpcollision/update-state))
+      collision/update-state))
 
 (defn init
   "Initialise this scene"

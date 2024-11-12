@@ -1,8 +1,8 @@
 (ns squidgy-box.scenes.level-01
   (:require [quil.core :as q]
-            [quip.sprite :as qpsprite]
-            [quip.tween :as qptween]
-            [quip.util :as qpu]))
+            [quip.sprite :as sprite]
+            [quip.tween :as tween]
+            [quip.util :as u]))
 
 (def gunmetal [0 43 54])
 (def jet [60 60 60])
@@ -10,8 +10,8 @@
 
 (defn draw-box
   [{[x y] :pos :keys [w h l-offset r-offset u-offset d-offset] :as b}]
-  (qpu/stroke cultured)
-  (qpu/fill jet)
+  (u/stroke cultured)
+  (u/fill jet)
   (q/rect (- x (/ w 2) l-offset)
           (- y (/ h 2) u-offset)
           (+ w l-offset r-offset)
@@ -38,12 +38,12 @@
   (update-in state
              [:scenes :level-01 :sprites]
              (fn [sprites]
-               [(qptween/add-tween
+               [(tween/add-tween
                  (first sprites)
-                 (qptween/tween offset-key 50
-                                :step-count 10
-                                :yoyo? true
-                                :easing-fn qptween/ease-in-out-sine))])))
+                 (tween/tween offset-key 50
+                              :step-count 10
+                              :yoyo? true
+                              :easing-fn tween/ease-in-out-sine))])))
 
 (defn handle-key-pressed
   [state e]
@@ -65,15 +65,15 @@
 (defn draw-level-01
   "Called each frame, draws the current scene to the screen"
   [state]
-  (qpu/background gunmetal)
-  (qpsprite/draw-scene-sprites state))
+  (u/background gunmetal)
+  (sprite/draw-scene-sprites state))
 
 (defn update-level-01
   "Called each frame, update the sprites in the current scene"
   [state]
   (-> state
-      qpsprite/update-state
-      qptween/update-state))
+      sprite/update-state
+      tween/update-state))
 
 (defn init
   "Initialise this scene"

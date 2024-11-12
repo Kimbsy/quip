@@ -1,8 +1,8 @@
 (ns mouse-controls.scenes.level-01
   (:require [quil.core :as q]
-            [quip.sprite :as qpsprite]
-            [quip.tween :as qptween]
-            [quip.util :as qpu]))
+            [quip.sprite :as sprite]
+            [quip.tween :as tween]
+            [quip.util :as u]))
 
 (def grey [57 57 58])
 (def white [192 214 223])
@@ -10,7 +10,7 @@
 
 (defn heart
   [pos]
-  (qpsprite/animated-sprite
+  (sprite/animated-sprite
    :heart   ; sprite-group, used for group collision detection
    pos
    28   ; <- width and
@@ -34,8 +34,8 @@
   [{[sx sy] :selection-start} sprite]
   (let [ex (q/mouse-x)
         ey (q/mouse-y)]
-    (qpu/rects-overlap? (bounding-rect sprite)
-                        [(min sx ex) (min sy ey) (max sx ex) (max sy ey)])))
+    (u/rects-overlap? (bounding-rect sprite)
+                      [(min sx ex) (min sy ey) (max sx ex) (max sy ey)])))
 
 (defn update-selected-sprites
   [{:keys [selecting?] :as state}]
@@ -44,8 +44,8 @@
                (fn [sprites]
                  (map (fn [s]
                         (if (in-selection? state s)
-                          (qpsprite/set-animation s :selected)
-                          (qpsprite/set-animation s :none)))
+                          (sprite/set-animation s :selected)
+                          (sprite/set-animation s :none)))
                       sprites)))
     state))
 
@@ -62,25 +62,25 @@
                  (concat other
                          (map (fn [{[sx sy] :pos :as sprite}]
                                 (-> sprite
-                                    (qptween/add-tween
-                                     (qptween/tween
+                                    (tween/add-tween
+                                     (tween/tween
                                       :pos
                                       (- tx sx)
-                                      :update-fn qptween/tween-x-fn))
-                                    (qptween/add-tween
-                                     (qptween/tween
+                                      :update-fn tween/tween-x-fn))
+                                    (tween/add-tween
+                                     (tween/tween
                                       :pos
                                       (- ty sy)
-                                      :update-fn qptween/tween-y-fn))))
+                                      :update-fn tween/tween-y-fn))))
                               selected))))))
 
 (defn deselect-all
   [state]
-  (qpsprite/update-sprites-by-pred
+  (sprite/update-sprites-by-pred
    state
-   (qpsprite/group-pred :heart)
+   (sprite/group-pred :heart)
    (fn [s]
-     (qpsprite/set-animation s :none))))
+     (sprite/set-animation s :none))))
 
 (defn handle-mouse-pressed
   [state e]
@@ -113,13 +113,13 @@
 (defn draw-level-01
   "Called each frame, draws the current scene to the screen"
   [{:keys [selecting? selection-start] :as state}]
-  (qpu/background grey)
-  (qpsprite/draw-scene-sprites state)
+  (u/background grey)
+  (sprite/draw-scene-sprites state)
 
   (if selecting?
     ;; draw the selection box
     (do
-      (qpu/stroke white)
+      (u/stroke white)
       (q/no-fill)
       (let [x (first selection-start)
             y (second selection-start)
@@ -130,7 +130,7 @@
     ;; draw the target area
     (when (some selected? (get-in state [:scenes :level-01 :sprites]))
       (q/no-stroke)
-      (qpu/fill alpha-green)
+      (u/fill alpha-green)
       (q/ellipse (q/mouse-x) (q/mouse-y) 30 30))))
 
 (defn update-level-01
@@ -138,8 +138,8 @@
   [state]
   (-> state
       update-selected-sprites
-      qpsprite/update-state
-      qptween/update-state))
+      sprite/update-state
+      tween/update-state))
 
 (defn init
   "Initialise this scene"

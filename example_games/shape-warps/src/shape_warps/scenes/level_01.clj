@@ -1,8 +1,8 @@
 (ns shape-warps.scenes.level-01
   (:require [quil.core :as q]
-            [quip.sprite :as qpsprite]
-            [quip.tween :as qptween]
-            [quip.util :as qpu]))
+            [quip.sprite :as sprite]
+            [quip.tween :as tween]
+            [quip.util :as u]))
 
 (def dark-green [48 58 43])
 (def cyan [88 252 236])
@@ -21,7 +21,7 @@
   [pos radius point-angles]
   (->> point-angles
        (map (fn [angle]
-              (map (partial * radius) (qpu/direction-vector angle))))
+              (map (partial * radius) (u/direction-vector angle))))
        (map (fn [p]
               (map + pos p)))))
 
@@ -29,7 +29,7 @@
   "We have 12 points (regardless of shape), we use as many as required
   to draw the shape, and keep the rest at 360."
   [{:keys [pos radius point-angles]} & {:keys [color] :or {color cyan}}]
-  (qpu/fill color)
+  (u/fill color)
   (q/begin-shape)
   (doseq [[x y] (points pos radius point-angles)]
     (q/vertex x y))
@@ -37,20 +37,20 @@
 
 (defn multigon-tween
   [i a]
-  (qptween/tween
+  (tween/tween
    :point-angles
    a
    :update-fn (fn [point-angles d]
                 (update point-angles i (partial + d)))
    :step-count 50
-   :easing-fn qptween/ease-in-out-cubic))
+   :easing-fn tween/ease-in-out-cubic))
 
 (defn tween-to
   "Add tweens to each point-angle in the multigon based on the angles
   for an `n` sided multigon."
   [multigon n]
   (reduce (fn [m [i a]]
-            (qptween/add-tween m (multigon-tween i a)))
+            (tween/add-tween m (multigon-tween i a)))
           multigon
           (map vector (range) (map - (angles n) (:point-angles multigon)))))
 
@@ -59,9 +59,9 @@
   (let [n (read-string (name (:key e)))
         n (if (< n 3) (+ n 10) n)]
     (prn n)
-    (qpsprite/update-sprites-by-pred
+    (sprite/update-sprites-by-pred
      state
-     (qpsprite/group-pred :multigon)
+     (sprite/group-pred :multigon)
      (fn [m]
        (tween-to m n)))))
 
@@ -83,15 +83,15 @@
 (defn draw-level-01
   "Called each frame, draws the current scene to the screen"
   [state]
-  (qpu/background dark-green)
-  (qpsprite/draw-scene-sprites state))
+  (u/background dark-green)
+  (sprite/draw-scene-sprites state))
 
 (defn update-level-01
   "Called each frame, update the sprites in the current scene"
   [state]
   (-> state
-      qpsprite/update-state
-      qptween/update-state))
+      sprite/update-state
+      tween/update-state))
 
 (defn key-pressed
   [state e]
