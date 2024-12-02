@@ -1,6 +1,61 @@
 (ns quip.input
-  "Keyboard and mouse input handling."
+  "Keyboard and mouse input handling.
+
+  We allow scenes to define a collection of their own handlers for
+  each event type:
+  - `:focus-gained-fns`
+  - `:focus-lost-fns`
+  - `:mouse-pressed-fns`
+  - `:mouse-released-fns`
+  - `:mouse-entered-fns`
+  - `:mouse-exited-fns`
+  - `:mouse-clicked-fns`
+  - `:mouse-moved-fns`
+  - `:mouse-dragged-fns`
+  - `:mouse-wheel-fns`
+
+  When an event occurs the handlers for that type are applied to the
+  state in order. Most of the time you'll likely have at most one
+  handler for each type, but it's sometimes very helpful to be able to
+  split them out.
+  "
   (:require [quil.core :as q]))
+
+(defn identity-handler
+  "Returns the state unchanged, optionally takes any number of
+  additional arguments which it ignores."
+  [state & _args]
+  state)
+
+(defn handler-reducer
+  "Returns a function which reduces across the collection of
+  `handler-fns-key` functions in the current scene, applying each to
+  the accumulating state."
+  [handler-fns-key &
+   {:keys [default-handler]
+    :or {default-handler identity-handler}}]
+  (fn [{:keys [scenes current-scene] :as state}]
+    (let [default-handled-state (default-handler state)
+          scene-handlers        (get-in scenes [current-scene handler-fns-key])]
+      (reduce (fn [acc-state f]
+                (f acc-state))
+              default-handled-state
+              scene-handlers))))
+
+(defn handler-reducer-with-events
+  "Returns a function which reduces across the collection of
+  `handler-fns-key` functions in the current scene, applying each to
+  the accumulating state, passing in the event each time."
+  [handler-fns-key &
+   {:keys [default-handler]
+    :or {default-handler identity-handler}}]
+  (fn [{:keys [scenes current-scene] :as state} e]
+    (let [default-handled-state (default-handler state e)
+          scene-handlers        (get-in scenes [current-scene handler-fns-key])]
+      (reduce (fn [acc-state f]
+                (f acc-state e))
+              default-handled-state
+              scene-handlers))))
 
 ;;; Default handlers for key events.
 
@@ -21,82 +76,18 @@
   [state e]
   (update state :held-keys #(disj % (:key e))))
 
-;;; Default handlers for mouse events.
+(def focus-gained (handler-reducer :focus-gained-fns))
+(def focus-lost (handler-reducer :focus-lost-fns))
 
-;;; Currently haven't needed these to do anything, but they could
-;;; similarly be used to keep track of the currently held mouse
-;;; buttons.
+(def key-pressed (handler-reducer-with-events :key-pressed-fns :default-handler default-key-pressed))
+(def key-released (handler-reducer-with-events :key-released-fns :default-handler default-key-released))
 
-(defn default-mouse-pressed
-  [state e]
-  state)
-
-(defn default-mouse-released
-  [state e]
-  state)
-
-;;; We allow scenes to define a collection of their own handlers for
-;;; each event type.
-
-;;; We can then reduce accross this collection using an anonymous
-;;; apply-handler function (which is a closure over the event `e`) as
-;;; our reducing function.
-
-;;; Most of the time only one of the handlers will modifiy the state
-;;; as it goes through, but its totally fine for multiple to.
-
-(defn key-pressed
-  "Reduce applying a handler function:
-    (f state e)
-  accross the collection of `:key-pressed-fns` in the current scene."
-  [{:keys [input-enabled? scenes current-scene] :as state} e]
-  (if input-enabled?
-    (let [default-handled-state (default-key-pressed state e)
-          scene-handlers        (get-in scenes [current-scene :key-pressed-fns])]
-      (reduce (fn [acc-state f]
-                (f acc-state e))
-              default-handled-state
-              scene-handlers))
-    state))
-
-(defn key-released
-  "Reduce applying a handler function:
-    (f state e)
-  accross the collection of `:key-released-fns` in the current scene."
-  [{:keys [input-enabled? scenes current-scene] :as state} e]
-  (if input-enabled?
-    (let [default-handled-state (default-key-released state e)
-          scene-handlers        (get-in scenes [current-scene :key-released-fns])]
-      (reduce (fn [acc-state f]
-                (f acc-state e))
-              default-handled-state
-              scene-handlers))
-    state))
-
-(defn mouse-pressed
-  "Reduce applying a handler function:
-    (f state e)
-  accross the collection of `:mouse-pressed-fns` in the current scene."
-  [{:keys [input-enabled? scenes current-scene] :as state} e]
-  (if input-enabled?
-    (let [default-handled-state (default-mouse-pressed state e)
-          scene-handlers        (get-in scenes [current-scene :mouse-pressed-fns])]
-      (reduce (fn [acc-state f]
-                (f acc-state e))
-              default-handled-state
-              scene-handlers))
-    state))
-
-(defn mouse-released
-  "Reduce applying a handler function:
-    (f state e)
-  accross the collection of `:mouse-released-fns` in the current scene."
-  [{:keys [input-enabled? scenes current-scene] :as state} e]
-  (if input-enabled?
-    (let [default-handled-state (default-mouse-released state e)
-          scene-handlers        (get-in scenes [current-scene :mouse-released-fns])]
-      (reduce (fn [acc-state f]
-                (f acc-state e))
-              default-handled-state
-              scene-handlers))
-    state))
+(def mouse-pressed (handler-reducer-with-events :mouse-pressed-fns))
+(def mouse-released (handler-reducer-with-events :mouse-released-fns))
+(def mouse-entered (handler-reducer-with-events :mouse-entered-fns))
+(def mouse-exited (handler-reducer-with-events :mouse-exited-fns))
+(def mouse-clicked (handler-reducer-with-events :mouse-clicked-fns))
+(def mouse-moved (handler-reducer-with-events :mouse-moved-fns))
+(def mouse-dragged (handler-reducer-with-events :mouse-dragged-fns))
+;; "Called every time mouse wheel is rotated. Takes 1 argument - wheel rotation, an int. Negative values if the mouse wheel was rotated up/away from the user, and positive values if the mouse wheel was rotated down/towards the user."
+(def mouse-wheel (handler-reducer-with-events :mouse-wheel-fns))

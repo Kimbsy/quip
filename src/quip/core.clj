@@ -91,10 +91,18 @@
    :setup          (constantly {})
    :update         update-wrapper
    :draw           draw-wrapper
+   :focus-gained   input/focus-gained
+   :focus-lost     input/focus-lost
    :key-pressed    input/key-pressed
    :key-released   input/key-released
    :mouse-pressed  input/mouse-pressed
    :mouse-released input/mouse-released
+   :mouse-entered  input/mouse-entered
+   :mouse-exited   input/mouse-exited
+   :mouse-clicked  input/mouse-clicked
+   :mouse-moved    input/mouse-moved
+   :mouse-dragged  input/mouse-dragged
+   :mouse-wheel    input/mouse-wheel
    :middleware     [m/fun-mode]
    :on-close       default-on-close
    :frame-rate     60})
@@ -151,8 +159,10 @@
 
 (defn run
   "Run a quip game configuration as a quil sketch."
-  [{:keys [title size setup update draw key-pressed key-released
-           mouse-pressed mouse-released middleware on-close]
+  [{:keys [title size setup update draw focus-gained focus-lost
+           key-pressed key-released mouse-pressed mouse-released
+           mouse-entered mouse-exited mouse-clicked mouse-moved
+           mouse-dragged mouse-wheel middleware on-close]
     :as game}]
   (q/sketch
    :title title
@@ -160,9 +170,17 @@
    :setup setup
    :update update
    :draw draw
+   :focus-gained focus-gained
+   :focus-lost focus-lost
    :key-pressed key-pressed
    :key-released key-released
    :mouse-pressed mouse-pressed
    :mouse-released mouse-released
+   :mouse-entered mouse-entered
+   :mouse-exited mouse-exited
+   :mouse-clicked mouse-clicked
+   :mouse-moved mouse-moved
+   :mouse-dragged mouse-dragged
+   :mouse-wheel mouse-wheel
    :middleware middleware
    :on-close on-close))
