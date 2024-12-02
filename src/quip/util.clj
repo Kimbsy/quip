@@ -72,26 +72,65 @@
   [v]
   (every? zero? v))
 
+(defn squared-magnitude
+  "Sum the squares of the components of a vector.
+
+  The `if` check on `z` is a lot faster than doing an `apply` or
+  `reduce` across the vector."
+  [[x y z]]
+  (+ (* x x)
+     (* y y)
+     (if z (* z z) 0)))
+
 (defn magnitude
   "Calculate the length of a vector."
   [v]
-  (Math/sqrt (reduce + (map #(Math/pow % 2)
-                            v))))
+  (Math/sqrt (squared-magnitude v)))
 
-(defn unit-vector
-  "Calculate the unit vector of a given 2D vector."
+(defn v<
+  "Determine if the magnitude of a vector `a` is less than the magnitude
+  of vector `b`.
+
+  We can just compare the component squares to avoid the costly `sqrt`
+  operations."
+  [a b]
+  (< (squared-magnitude a) (squared-magnitude b)))
+
+(defn v<=
+  "Determine if the magnitude of a vector `a` is less than or equal to
+  the magnitude of vector `b`.
+
+  We can just compare the component squares to avoid the costly `sqrt`
+  operations."
+  [a b]
+  (<= (squared-magnitude a) (squared-magnitude b)))
+
+(defn normalize
+  "Calculate the unit vector of a given vector.
+
+  We calculate the reciprocal of the magnitude of the vector and
+  multiply the components by this factor to avoid multiple division
+  operations."
   [v]
   (when-not (zero-vector? v)
-    (map #(/ % (magnitude v)) v)))
+    (let [factor (/ 1 (magnitude v))]
+      (map #(* factor %) v))))
+
+(defn unit-vector
+  "Calculate the unit vector of a given vector."
+  [v]
+  (normalize v))
 
 (defn rotate-vector
   "Rotate a vector about the origin by `r` degrees."
   [[x y] r]
-  (let [radians (q/radians r)]
-    [(- (* x (q/cos radians))
-        (* y (q/sin radians)))
-     (+ (* x (q/sin radians))
-        (* y (q/cos radians)))]))
+  (let [radians (q/radians r)
+        cr (q/cos radians)
+        sr (q/sin radians)]
+    [(- (* x cr)
+        (* y sr))
+     (+ (* x sr)
+        (* y cr))]))
 
 (defn orthogonals
   "Calculate the two orthogonal vectors to a given 2D vector.
@@ -105,8 +144,9 @@
 (defn direction-vector
   "Calculate the unit direction vector based on the rotation angle."
   [r]
-  [(q/sin (q/radians r))
-   (- (q/cos (q/radians r)))])
+  (let [radians (q/radians r)]
+    [(q/sin radians)
+     (- (q/cos radians))]))
 
 (defn rotation-angle
   "Calculate the rotation angle of a vector."
