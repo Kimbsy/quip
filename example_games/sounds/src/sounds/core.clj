@@ -26,4 +26,4 @@
 (defn -main
   "Run the game"
   [& args]
-  (qp/run! sounds-game))
+  (qp/start! sounds-game))

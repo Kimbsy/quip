@@ -64,7 +64,7 @@
 
    ;; We can even delay adding new delays to the scene:
    (delay/delay
-     400
+     (u/ms->frames 3000) ;; we can specify the delay in milliseconds rather than number of frames
      (fn [state]
        (reduce delay/add-delay
                state
