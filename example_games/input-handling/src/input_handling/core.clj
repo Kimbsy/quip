@@ -24,4 +24,4 @@
 (defn -main
   "Run the game"
   [& args]
-  (qp/run input-handling-game))
+  (qp/run! input-handling-game))

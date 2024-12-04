@@ -110,11 +110,11 @@
    (heart [150 110])
    (heart [200 200])])
 
-(defn draw-level-01
+(defn draw-level-01!
   "Called each frame, draws the current scene to the screen"
   [{:keys [selecting? selection-start] :as state}]
   (u/background grey)
-  (sprite/draw-scene-sprites state)
+  (sprite/draw-scene-sprites! state)
 
   (if selecting?
     ;; draw the selection box
@@ -145,7 +145,7 @@
   "Initialise this scene"
   []
   {:sprites (sprites)
-   :draw-fn draw-level-01
+   :draw-fn draw-level-01!
    :update-fn update-level-01
    :mouse-pressed-fns [handle-mouse-pressed]
    :mouse-released-fns [handle-mouse-released]})

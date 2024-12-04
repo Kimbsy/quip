@@ -9,11 +9,11 @@
   []
   [])
 
-(defn draw-level-01
+(defn draw-level-01!
   "Called each frame, draws the current scene to the screen"
   [state]
   (u/background light-green)
-  (sprite/draw-scene-sprites state))
+  (sprite/draw-scene-sprites! state))
 
 (defn update-level-01
   "Called each frame, update the sprites in the current scene"
@@ -38,7 +38,7 @@
   "Initialise this scene"
   []
   {:sprites (sprites)
-   :draw-fn draw-level-01
+   :draw-fn draw-level-01!
    :update-fn update-level-01
    :focus-gained-fns [fg]
    :focus-lost-fns [fl]
@@ -51,5 +51,4 @@
    :mouse-clicked-fns [mc]
    :mouse-moved-fns [mm]
    :mouse-dragged-fns [md]
-   :mouse-wheel-fns [mw]
-   })
+   :mouse-wheel-fns [mw]})

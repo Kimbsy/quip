@@ -11,7 +11,7 @@
   [state]
   state)
 
-(defn default-draw
+(defn default-draw!
   [{:keys [scenes current-scene] :as state}]
   (q/background 0)
   (q/fill 255)
@@ -48,7 +48,7 @@
       (scene-update new-frame)
       new-frame)))
 
-(defn draw-fps-counter
+(defn draw-fps-counter!
   [{:keys [average-fps] :as state}]
   (let [text-h u/default-text-size
         text-w (/ u/default-text-size 2)]
@@ -62,13 +62,13 @@
     (q/text-font (q/create-font u/default-font text-h))
     (q/text (str "FPS: " (format "%.2f" (float average-fps))) 0 (/ text-h 2))))
 
-(defn draw-state
+(defn draw-state!
   [{:keys [display-fps? scenes current-scene] :as state}]
   (if-let [scene-draw (get-in scenes [current-scene :draw-fn])]
     (scene-draw state)
-    (default-draw state))
+    (default-draw! state))
   (when display-fps?
-    (draw-fps-counter state)))
+    (draw-fps-counter! state)))
 
 (defn update-wrapper
   "Allow us to change our update function."
@@ -118,7 +118,7 @@
    :average-fps         0
    :dt-window           []
    :parent-update-fn    update-state
-   :parent-draw-fn      draw-state})
+   :parent-draw-fn      draw-state!})
 
 (defn game
   "Create a quip game configuration.
@@ -154,10 +154,10 @@
         ;; wrap the existing `:on-close` to stop music playing
         (update :on-close (fn [on-close]
                             (fn [state]
-                              (sound/stop-music)
+                              (sound/stop-music!)
                               (on-close state)))))))
 
-(defn run
+(defn run!
   "Run a quip game configuration as a quil sketch."
   [{:keys [title size setup update draw focus-gained focus-lost
            key-pressed key-released mouse-pressed mouse-released

@@ -27,9 +27,9 @@
            first)
       (AudioSystem/getLine line-info)))
 
-(defn play
+(defn play!
   ([sound]
-   (play sound false))
+   (play! sound false))
   ([sound loop?]
    (let [input-stream (io/input-stream (io/resource (str "sound/" sound)))
          audio-stream (AudioSystem/getAudioInputStream input-stream)
@@ -45,16 +45,16 @@
      (.start audio-clip)
      audio-clip)))
 
-(defn stop
+(defn stop!
   [clip]
   (.stop clip))
 
-(defn stop-music
+(defn stop-music!
   []
   (when @*music*
-    (stop @*music*)))
+    (stop! @*music*)))
 
-(defn loop-music
+(defn loop-music!
   [track]
-  (stop-music)
-  (reset! *music* (play track true)))
+  (stop-music!)
+  (reset! *music* (play! track true)))

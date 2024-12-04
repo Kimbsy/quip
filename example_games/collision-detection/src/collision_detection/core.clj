@@ -17,4 +17,4 @@
 (defn -main
   "Run the game"
   [& args]
-  (qp/run collision-detection-game))
+  (qp/run! collision-detection-game))
