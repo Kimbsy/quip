@@ -3,7 +3,9 @@
 
   Vector math functions for position/rotation/velocity calculations.
 
-  Geometric collision detection predicates."
+  Geometric collision detection predicates.
+
+  Misc utilities."
   (:require [quil.core :as q]
             [clojure.math.combinatorics :as combo]
             [clojure.set :as s]))
@@ -53,6 +55,19 @@
 (def background (partial apply q/background))
 (def fill (partial apply q/fill))
 (def stroke (partial apply q/stroke))
+
+(defn ms->frames
+  "Determines the expected number of frames to be processed in `ms`
+  milliseconds. Useful for defining tweens or delays based on time
+  instead of frame count directly.
+
+  Optionally takes a specific framerate (in case you want to use the
+  `:average-fps` in the game state for a more stable result).
+
+  Minimum returned value is 1."
+  ([ms] (ms->frames ms (q/current-frame-rate)))
+  ([ms frame-rate]
+   (max 1 (int (* frame-rate (/ ms 1000))))))
 
 (defn wrap-trans-rot
   "Perform a translation, a rotation, invoke the supplied

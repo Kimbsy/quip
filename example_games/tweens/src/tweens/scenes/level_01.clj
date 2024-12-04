@@ -49,7 +49,9 @@
   We can alter the number of deltas generated and applied by the tween
   with the `:step-count` option. This defaults to 100 and determines
   how many updates will be applied to the sprite to achieve the
-  modified field value.
+  modified field value. We can use the `quip.util/ms->frames` function
+  to calculate the expected number of frames processed in a given
+  millisecond time interval.
 
   We can specify `:on-<x>-fn` functions to modify the sprite when it
   `repeat`s, `yoyo`s or `complete`s."

@@ -21,21 +21,16 @@
 
 (defn update-framerate
   "Keep track of the current average framerate."
-  [{:keys [display-fps? previous-frame-time dt-window] :as state}]
-  (if display-fps?
-    (let [current-time (System/currentTimeMillis)
-          dt (- current-time previous-frame-time)
-          dt-n (count dt-window)]
-      ;; record the delta-time of 30 frames and then average them
-      (if (< dt-n 30)
-        (-> state
-            (update :dt-window conj dt)
-            (assoc :previous-frame-time current-time))
-        (-> state
-            (assoc :dt-window [])
-            (assoc :average-fps (/ 1000 (/ (apply + dt-window) dt-n)))
-            (assoc :previous-frame-time current-time))))
-    state))
+  [{:keys [previous-frame-time fr-window] :as state}]
+  (let [current-time (System/currentTimeMillis)
+        fr (q/current-frame-rate)
+        fr-n (count fr-window)]
+    ;; record the delta-time of 30 frames and then average them
+    (if (< fr-n 30)
+      (update state :fr-window conj fr)
+      (-> state
+          (assoc :fr-window [])
+          (assoc :average-fps (/ (apply + fr-window) fr-n))))))
 
 (defn update-state
   [{:keys [scenes current-scene] :as state}]
@@ -51,16 +46,17 @@
 (defn draw-fps-counter!
   [{:keys [average-fps] :as state}]
   (let [text-h u/default-text-size
-        text-w (/ u/default-text-size 2)]
+        text-w (/ u/default-text-size 2)
+        content (str "FPS: " (format "%.2f" (float average-fps)))]
     ;; draw black box
     (q/fill 0)
-    (q/rect 0 0 (* text-w 10) (* text-h 1))
+    (q/rect 0 0 (* text-w (count content)) (* text-h 1))
 
     ;; draw white fps text (rounded to 2dp)
     (q/text-align :left :center)
     (q/fill 255)
     (q/text-font (q/create-font u/default-font text-h))
-    (q/text (str "FPS: " (format "%.2f" (float average-fps))) 0 (/ text-h 2))))
+    (q/text content 0 (/ text-h 2))))
 
 (defn draw-state!
   [{:keys [display-fps? scenes current-scene] :as state}]
