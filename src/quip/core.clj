@@ -157,7 +157,7 @@
                               (sound/stop-music!)
                               (on-close state)))))))
 
-(defn run!
+(defn start!
   "Run a quip game configuration as a quil sketch."
   [{:keys [title size setup update draw focus-gained focus-lost
            key-pressed key-released mouse-pressed mouse-released

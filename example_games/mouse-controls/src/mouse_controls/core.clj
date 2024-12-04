@@ -24,4 +24,4 @@
 (defn -main
   "Run the game"
   [& args]
-  (qp/run! mouse-controls-game))
+  (qp/start! mouse-controls-game))

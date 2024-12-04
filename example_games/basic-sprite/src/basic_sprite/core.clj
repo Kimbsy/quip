@@ -17,4 +17,4 @@
 (defn -main
   "Run the game"
   [& args]
-  (qp/run! basic-sprite-game))
+  (qp/start! basic-sprite-game))
