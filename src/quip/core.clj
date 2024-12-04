@@ -124,8 +124,9 @@
 
   Works with an empty `override-opts`, but needs a `:init-scenes-fn`
   and a `:current-scene` to start doing anything useful."
-  [{:keys [init-scenes-fn current-scene]
+  [{:keys [init-scenes-fn restart-fn current-scene]
     :or   {init-scenes-fn (constantly {})
+           restart-fn       identity
            current-scene  :none}
     :as   override-opts}]
   (let [opts (merge default-opts override-opts)]
@@ -139,6 +140,7 @@
                     (q/frame-rate (:frame-rate opts))
                     (let [initial-state-maps
                           [default-initial-state
+                           {:restart-fn restart-fn}
                            ;; invoke the supplied `:setup` function to
                            ;; allow overriding the initial `state` map
                            (setup)]]
@@ -180,3 +182,7 @@
    :mouse-wheel mouse-wheel
    :middleware middleware
    :on-close on-close))
+
+(defn restart
+  [{:keys [restart-fn] :as state}]
+  (restart-fn state))
