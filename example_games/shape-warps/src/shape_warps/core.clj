@@ -24,4 +24,4 @@
 (defn -main
   "Run the game"
   [& args]
-  (qp/run shape-warps-game))
+  (qp/run! shape-warps-game))

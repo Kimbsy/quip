@@ -17,4 +17,4 @@
 (defn -main
   "Run the game"
   [& args]
-  (qp/run tweens-game))
+  (qp/run! tweens-game))

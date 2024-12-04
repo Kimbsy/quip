@@ -24,4 +24,4 @@
 (defn -main
   "Run the game"
   [& args]
-  (qp/run fabrik-game))
+  (qp/run! fabrik-game))

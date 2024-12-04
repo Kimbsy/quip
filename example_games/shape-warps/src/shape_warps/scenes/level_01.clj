@@ -25,7 +25,7 @@
        (map (fn [p]
               (map + pos p)))))
 
-(defn draw-multigon
+(defn draw-multigon!
   "We have 12 points (regardless of shape), we use as many as required
   to draw the shape, and keep the rest at 360."
   [{:keys [pos radius point-angles]} & {:keys [color] :or {color cyan}}]
@@ -73,18 +73,18 @@
    :radius       200
    :point-angles (angles 3)
    :update-fn    identity
-   :draw-fn      draw-multigon})
+   :draw-fn      draw-multigon!})
 
 (defn sprites
   "The initial list of sprites for this scene"
   []
   [(multigon [(* (q/width) 0.5) (* (q/height) 0.5)])])
 
-(defn draw-level-01
+(defn draw-level-01!
   "Called each frame, draws the current scene to the screen"
   [state]
   (u/background dark-green)
-  (sprite/draw-scene-sprites state))
+  (sprite/draw-scene-sprites! state))
 
 (defn update-level-01
   "Called each frame, update the sprites in the current scene"
@@ -104,6 +104,6 @@
   "Initialise this scene"
   []
   {:sprites (sprites)
-   :draw-fn draw-level-01
+   :draw-fn draw-level-01!
    :update-fn update-level-01
    :key-pressed-fns [key-pressed]})

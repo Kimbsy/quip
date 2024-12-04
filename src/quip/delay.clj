@@ -3,7 +3,7 @@
   and complex animations."
   (:require [quip.tween :as tween]))
 
-;;;; @TODO: Should delays be flagged for removeal/persistence across
+;;;; @TODO: Should delays be flagged for removal/persistence across
 ;;;; scene transitions?
 
 (defn delay

@@ -22,11 +22,11 @@
                                 (map #(+ 100 (* joint-gap %))
                                      (range)))))
 
-(defn draw-level-01
+(defn draw-level-01!
   "Called each frame, draws the current scene to the screen"
   [state]
   (u/background dark-blue)
-  (sprite/draw-scene-sprites state)
+  (sprite/draw-scene-sprites! state)
 
   (let [chain (get-in state [:scenes :level-01 :chain])]
     (q/stroke orange)
@@ -125,6 +125,6 @@
   "Initialise this scene"
   []
   {:sprites (sprites)
-   :draw-fn draw-level-01
+   :draw-fn draw-level-01!
    :update-fn update-level-01
    :chain starting-chain})

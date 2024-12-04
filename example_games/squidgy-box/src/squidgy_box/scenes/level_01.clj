@@ -8,7 +8,7 @@
 (def jet [60 60 60])
 (def cultured [245 245 245])
 
-(defn draw-box
+(defn draw-box!
   [{[x y] :pos :keys [w h l-offset r-offset u-offset d-offset] :as b}]
   (u/stroke cultured)
   (u/fill jet)
@@ -31,7 +31,7 @@
    :d-offset 0
    :animated? false
    :update-fn identity
-   :draw-fn draw-box})
+   :draw-fn draw-box!})
 
 (defn add-squish-tween
   [state offset-key]
@@ -62,11 +62,11 @@
   []
   [(box [300 200])])
 
-(defn draw-level-01
+(defn draw-level-01!
   "Called each frame, draws the current scene to the screen"
   [state]
   (u/background gunmetal)
-  (sprite/draw-scene-sprites state))
+  (sprite/draw-scene-sprites! state))
 
 (defn update-level-01
   "Called each frame, update the sprites in the current scene"
@@ -79,6 +79,6 @@
   "Initialise this scene"
   []
   {:sprites (sprites)
-   :draw-fn draw-level-01
+   :draw-fn draw-level-01!
    :update-fn update-level-01
    :key-pressed-fns [handle-key-pressed]})

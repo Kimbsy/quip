@@ -8,13 +8,13 @@
 (def white [245 245 245])
 (def black [60 60 60])
 
-(defn handle-music
+(defn handle-music!
   "Handle a key-pressed event `e`.
   When the key was `m` reset the music."
   [state e]
   (if (= :m (:key e))
     (do
-      (sound/loop-music "music/music.wav")
+      (sound/loop-music! "music/music.wav")
       state)
     state))
 
@@ -24,21 +24,21 @@
    "sfx/blip-2.wav"
    "sfx/blip-3.wav"])
 
-(defn handle-sfx
+(defn handle-sfx!
   "handle a key-pressed event `e`.
   When the key was `s` play a random sound effect."
   [state e]
   (if (= :s (:key e))
     (do
-      (sound/play (rand-nth blips))
+      (sound/play! (rand-nth blips))
       state)
     state))
 
 (defn key-pressed-fns
   "Define the key-pressed handler functions for the scene."
   []
-  [handle-music
-   handle-sfx])
+  [handle-music!
+   handle-sfx!])
 
 (defn sprites
   "The initial list of sprites for this scene"
@@ -52,11 +52,11 @@
     [(* 0.5 (q/width)) (* 0.6 (q/height))]
     :color white)])
 
-(defn draw-level-01
+(defn draw-level-01!
   "Called each frame, draws the current scene to the screen"
   [state]
   (u/background black)
-  (sprite/draw-scene-sprites state))
+  (sprite/draw-scene-sprites! state))
 
 (defn update-level-01
   "Called each frame, update the sprites in the current scene"
@@ -68,6 +68,6 @@
   "Initialise this scene"
   []
   {:sprites (sprites)
-   :draw-fn draw-level-01
+   :draw-fn draw-level-01!
    :update-fn update-level-01
    :key-pressed-fns (key-pressed-fns)})

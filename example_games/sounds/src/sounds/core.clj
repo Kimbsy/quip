@@ -7,7 +7,7 @@
 (defn setup
   "The initial state of the game"
   []
-  (sound/loop-music "music/music.wav")
+  (sound/loop-music! "music/music.wav")
   ;; Empty state
   {})
 
@@ -26,4 +26,4 @@
 (defn -main
   "Run the game"
   [& args]
-  (qp/run sounds-game))
+  (qp/run! sounds-game))

@@ -17,4 +17,4 @@
 (defn -main
   "Run the game"
   [& args]
-  (qp/run squidgy-box-game))
+  (qp/run! squidgy-box-game))

@@ -71,11 +71,11 @@
                ;; add the same delays again!
                (delays))))])
 
-(defn draw-level-01
+(defn draw-level-01!
   "Called each frame, draws the current scene to the screen"
   [state]
   (u/background blue)
-  (sprite/draw-scene-sprites state))
+  (sprite/draw-scene-sprites! state))
 
 (defn update-level-01
   "Called each frame, update the sprites in the current scene"
@@ -89,6 +89,6 @@
   "Initialise this scene"
   []
   {:sprites (sprites)
-   :draw-fn draw-level-01
+   :draw-fn draw-level-01!
    :update-fn update-level-01
-   :delays    (delays)})
+   :delays (delays)})

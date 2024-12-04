@@ -70,7 +70,7 @@
    [w h]
    [0 h]])
 
-(defn default-draw-fn
+(defn default-draw-fn!
   [{[x y] :pos :keys [w h]}]
   (q/stroke-weight 2)
   (q/stroke 0 255 0)
@@ -100,7 +100,7 @@
            h         20
            vel       [0 0]
            update-fn update-pos
-           draw-fn   default-draw-fn
+           draw-fn   default-draw-fn!
            extra     {}}}]
   (merge
    {:sprite-group sprite-group
@@ -266,7 +266,7 @@
                       ((:update-fn s) s))
                     sprites))))
 
-(defn draw-scene-sprites
+(defn draw-scene-sprites!
   "Draw each sprite in the current scene using its `:draw-fn`.
 
   Optionally accepts a key specifying the name of the sprite
@@ -279,7 +279,7 @@
             ((:draw-fn s) s))
           sprites))))
 
-(defn draw-scene-sprites-by-layers
+(defn draw-scene-sprites-by-layers!
   "Draw each sprite in the current scene using its `:draw-fn` in the
   order their `:sprite-group` appears in the `layers` list.
 
