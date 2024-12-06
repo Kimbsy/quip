@@ -2,7 +2,8 @@
   "Group-based sprite collision tools and sprite collision detection
   predicates."
   (:require [quil.core :as q]
-            [quip.util :as u]))
+            [quip.util :as u]
+            [quip.sprite :as sprite]))
 
 (defn equal-pos?
   "Predicate to check if two sprites have the same position."
@@ -11,118 +12,129 @@
 
 (defn w-h-rects-collide?
   "Predicate to check for overlap of the `w` by `h` rects of two sprites
-  centered on their positions."
+  centered on their positions.
+
+  Accounts for the respective `:offsets` configuration of each sprite."
   [{[ax ay] :pos
     aw      :w
-    ah      :h}
+    ah      :h
+    :as     a}
    {[bx by] :pos
     bw      :w
-    bh      :h}]
-  (let [ax1 (+ ax (- (/ aw 2)))
-        ay1 (+ ay (- (/ ah 2)))
-        ax2 (+ ax aw (- (/ aw 2)))
-        ay2 (+ ay ah (- (/ ah 2)))
-        bx1 (+ bx (- (/ bw 2)))
-        by1 (+ by (- (/ bh 2)))
-        bx2 (+ bx bw (- (/ bw 2)))
-        by2 (+ by bh (- (/ bh 2)))]
+    bh      :h
+    :as     b}]
+  (let [[adx ady] (sprite/pos-offsets a)
+        [bdx bdy] (sprite/pos-offsets b)
+        ax1 (+ ax adx)
+        ay1 (+ ay ady)
+        ax2 (+ ax adx aw)
+        ay2 (+ ay ady ah)
+        bx1 (+ bx bdx)
+        by1 (+ by bdy)
+        bx2 (+ bx bdx bw)
+        by2 (+ by bdy bh)]
     (u/rects-overlap? [ax1 ay1 ax2 ay2]
                       [bx1 by1 bx2 by2])))
 
 (defn pos-in-rect?
   "Predicate to check if the position of sprite `a` is inside the `w` by
-  `h` rect of sprite `b` centered on its position."
-  [{pos-a :pos :as a}
+  `h` rect of sprite `b` centered on its position.
+
+  Accounts for the respective `:offsets` configuration of each sprite."
+  [{pos-a :pos
+    :as a}
    {[bx by] :pos
     bw      :w
     bh      :h
     :as     b}]
-  (let [rect-b [(+ bx (- (/ bw 2)))
-                (+ by (- (/ bh 2)))
-                (+ bx bw (- (/ bw 2)))
-                (+ by bh (- (/ bh 2)))]]
-    (u/pos-in-rect? pos-a rect-b)))
+  (let [a-offsets (sprite/pos-offsets a)
+        [bdx bdy] (sprite/pos-offsets b)
+        rect-b [(+ bx bdx)
+                (+ by bdy)
+                (+ bx bdx bw)
+                (+ by bdy bh)]]
+    (u/pos-in-rect? (map + pos-a a-offsets) rect-b)))
 
 (defn rect-contains-pos?
   "Predicate to check if the position of sprite `b` is inside the `w` by
-  `h` rect of sprite `a` centered on its position."
+  `h` rect of sprite `a` centered on its position.
+
+  Accounts for the respective `:offsets` configuration of each sprite."
   [a b]
   (pos-in-rect? b a))
 
 (defn pos-in-poly?
   "Predicate to check if the position of sprite `a` is inside the
-  bounding polygon of sprite `b` centered on its position."
+  bounding polygon of sprite `b` centered on its position.
+
+  Accounts for the respective `:offsets` configuration of each sprite."
   [{pos-a :pos :as a}
-   {bounds-fn :bounds-fn pos-b :pos w :w h :h :as b}]
+   {bounds-fn :bounds-fn pos-b :pos :as b}]
   (let [bounding-poly (->> (bounds-fn b)
-                           (map (fn [p] (map - p [(/ w 2) (/ h 2)])))
-                           (map (fn [p] (map + p pos-b))))]
+                           (map (fn [p] (map + p pos-b (sprite/pos-offsets b)))))]
     (u/pos-in-poly? pos-a bounding-poly)))
 
 (defn poly-contains-pos?
   "Predicate to check if the position of sprite `b` is inside the
-  bounding polygon of sprite `a` centered on its position."
+  bounding polygon of sprite `a` centered on its position.
+
+  Accounts for the respective `:offsets` configuration of each sprite."
   [a b]
   (pos-in-poly? b a))
 
 (defn polys-collide?
   "Predicate to check an intersection of the bounding polygons of
-  sprites `a` and `b` centered on their positions."
-  [{bounds-fn-a :bounds-fn pos-a :pos wa :w ha :h :as a}
-   {bounds-fn-b :bounds-fn pos-b :pos wb :w hb :h :as b}]
-  (let [poly-a (->> (bounds-fn-a a)
-                    (map (fn [p] (map - p [(/ wa 2) (/ ha 2)])))
-                    (map (fn [p] (map + p pos-a))))
-        poly-b (->> (bounds-fn-b b)
-                    (map (fn [p] (map - p [(/ wb 2) (/ hb 2)])))
-                    (map (fn [p] (map + p pos-b))))]
-    (u/polys-collide? poly-a poly-b)))
+  sprites `a` and `b` centered on their positions.
 
-(defn- maybe-rotate
-  "Rotate a non-zero vector by an angle unless this represents an integer number
-  of rotations."
-  [v rotation]
-  (if (or (zero? (mod (or rotation 0) 360))
-          (u/zero-vector? v))
-    v
-    (u/rotate-vector v rotation)))
+  Accounts for the respective `:offsets` configuration of each sprite."
+  [{bounds-fn-a :bounds-fn pos-a :pos :as a}
+   {bounds-fn-b :bounds-fn pos-b :pos :as b}]
+  (let [poly-a (->> (bounds-fn-a a)
+                    (map (fn [p] (map + p pos-a (sprite/pos-offsets a)))))
+        poly-b (->> (bounds-fn-b b)
+                    (map (fn [p] (map + p pos-b (sprite/pos-offsets b)))))]
+    (u/polys-collide? poly-a poly-b)))
 
 (defn pos-in-rotating-poly?
   "Predicate to check if the position of sprite `a` is inside the
   bounding polygon of sprite `b` centered on its position, taking into
-  account its rotation."
+  account its rotation.
+
+  Accounts for the respective `:offsets` configuration of each sprite."
   [{pos-a :pos :as a}
-   {bounds-fn :bounds-fn pos-b :pos rotation :rotation w :w h :h :as b}]
+   {bounds-fn :bounds-fn pos-b :pos rotation :rotation :as b}]
   (let [bounding-poly (->> (bounds-fn b)
-                           (map (fn [p] (map - p [(/ w 2) (/ h 2)])))
-                           (map #(maybe-rotate % rotation))
+                           (map (fn [p] (map + p (sprite/pos-offsets b))))
+                           (map #(u/rotate-vector % rotation))
                            (map (fn [p] (map + p pos-b))))]
     (u/pos-in-poly? pos-a bounding-poly)))
 
 (defn rotating-poly-contains-pos?
   "Predicate to check if the position of sprite `b` is inside the
   bounding polygon of sprite `a` centered on its position, taking into
-  account its rotation."
+  account its rotation.
+
+  Accounts for the respective `:offsets` configuration of each sprite."
   [a b]
   (pos-in-rotating-poly? b a))
 
 (defn rotating-polys-collide?
   "Predicate to check for an intersection of the bounding polys of
   sprites `a` and `b` centered on their positions, taking into account
-  the rotation of both sprites."
+  the rotation of both sprites.
+
+  Accounts for the respective `:offsets` configuration of each sprite."
   [{bounds-fn-a :bounds-fn pos-a :pos rotation-a :rotation wa :w ha :h :as a}
    {bounds-fn-b :bounds-fn pos-b :pos rotation-b :rotation wb :w hb :h :as b}]
   (let [poly-a (->> (bounds-fn-a a)
-                    (map (fn [p] (map - p [(/ wa 2) (/ ha 2)])))
-                    (map #(maybe-rotate % rotation-a))
+                    (map (fn [p] (map + p (sprite/pos-offsets a))))
+                    (map #(u/rotate-vector % rotation-a))
                     (map (fn [p] (map + p pos-a))))
         poly-b (->> (bounds-fn-b b)
-                    (map (fn [p] (map - p [(/ wb 2) (/ hb 2)])))
-                    (map #(maybe-rotate % rotation-b))
+                    (map (fn [p] (map + p (sprite/pos-offsets b))))
+                    (map #(u/rotate-vector % rotation-b))
                     (map (fn [p] (map + p pos-b))))]
     (u/polys-collide? poly-a poly-b)))
-
-
 
 ;;; Applying colliders across sprites in current scene
 
@@ -137,7 +149,7 @@
 ;;; equal, or their total gold is greater than an amount we can do
 ;;; this in the same way.
 ;;;
-;;; Should rename, probably wouldn't even need much refactoring.
+;;; Could rename, probably wouldn't even need much refactoring.
 
 (defn identity-collide-fn
   "Collide functions should return an optionally modified `a` sprite."

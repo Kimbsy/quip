@@ -6,10 +6,24 @@
   (:require [quil.core :as q]
             [quip.util :as u]))
 
-(defn offset-pos
-  [[x y] w h]
-  [(- x (/ w 2))
-   (- y (/ h 2))])
+(defn pos-offsets
+  "Determine the x and y offsets for a sprite based on it's `:w`, `:h`
+  and `:offsets` configuration.
+
+  Defaults to `[:center :center]`."
+  [{[x-off y-off] :offsets
+    :keys [w h]}]
+  (let [dx (cond
+             (= :left x-off) 0
+             (= :right x-off) (- w)
+             (#{:center :centre} x-off) (- (/ w 2))
+             :else (- (/ w 2)))
+        dy (cond
+             (= :top y-off) 0
+             (= :bottom y-off) (- h)
+             (#{:center :centre} y-off) (- (/ h 2))
+             :else (- (/ h 2)))]
+    [dx dy]))
 
 (defn update-pos
   [{:keys [pos vel] :as s}]
@@ -37,9 +51,10 @@
           update-pos))
 
 (defn draw-image-sprite
-  [{:keys [pos w h image]}]
-  (let [[x y] (offset-pos pos w h)]
-    (q/image image x y)))
+  [{:keys [pos rotation image] :as sprite}]
+  (u/wrap-trans-rot pos rotation
+                    #(let [[x y] (pos-offsets sprite)]
+                      (q/image image x y))))
 
 (def memo-graphics (memoize (fn [w h] (q/create-graphics w h))))
 
@@ -53,7 +68,8 @@
       (.clear g)
       (q/image spritesheet (- x-offset) (- y-offset)))
     (u/wrap-trans-rot pos rotation
-                      #(q/image g (- (/ w 2)) (- (/ h 2))))))
+                      #(let [[x y] (pos-offsets s)]
+                         (q/image g x y)))))
 
 (defn set-animation
   [s animation]
@@ -70,15 +86,16 @@
    [w h]
    [0 h]])
 
-(defn default-draw-fn!
-  [{[x y] :pos :keys [w h]}]
+(defn draw-default!
+  [{:keys [pos w h] :as s}]
   (q/stroke-weight 2)
   (q/stroke 0 255 0)
   (q/fill 0)
-  (q/rect x y w h)
-  (q/no-fill)
-  (q/line x y (+ x w) (+ y h))
-  (q/line (+ x w) y x (+ y h)))
+  (let [[x y] (map + pos (pos-offsets s))]
+    (q/rect x y w h)
+    (q/no-fill)
+    (q/line x y (+ x w) (+ y h))
+    (q/line (+ x w) y x (+ y h))))
 
 ;;; Basic Sprite types
 
@@ -95,12 +112,14 @@
            draw-fn
            points
            bounds-fn
+           offsets
            extra]
     :or   {w         20
            h         20
            vel       [0 0]
            update-fn update-pos
-           draw-fn   default-draw-fn!
+           draw-fn   draw-default!
+           offsets   [:center]
            extra     {}}}]
   (merge
    {:sprite-group sprite-group
@@ -116,7 +135,8 @@
     :bounds-fn    (or bounds-fn
                       (if (seq points)
                         :points
-                        default-bounding-poly))}
+                        default-bounding-poly))
+    :offsets      offsets}
    extra))
 
 (defn static-sprite
@@ -126,10 +146,12 @@
            draw-fn
            points
            bounds-fn
+           offsets
            extra]
     :or   {rotation  0
            update-fn identity
            draw-fn   draw-image-sprite
+           offsets   [:center]
            extra     {}}}]
   (merge
    (sprite sprite-group pos)
@@ -143,7 +165,8 @@
     :bounds-fn (or bounds-fn
                    (if (seq points)
                      :points
-                     default-bounding-poly))}
+                     default-bounding-poly))
+    :offsets   offsets}
    extra))
 
 (defn image-sprite
@@ -154,11 +177,13 @@
            draw-fn
            points
            bounds-fn
+           offsets
            extra]
     :or   {rotation  0
            vel       [0 0]
            update-fn update-pos
            draw-fn   draw-image-sprite
+           offsets   [:center]
            extra     {}}}]
   (merge
    (sprite sprite-group pos)
@@ -173,7 +198,8 @@
     :bounds-fn (or bounds-fn
                    (if (seq points)
                      :points
-                     default-bounding-poly))}
+                     default-bounding-poly))
+    :offsets offsets}
    extra))
 
 (defn animated-sprite
@@ -186,6 +212,7 @@
            current-animation
            points
            bounds-fn
+           offsets
            extra]
     :or   {rotation          0
            vel               [0 0]
@@ -195,6 +222,7 @@
                                      :y-offset    0
                                      :frame-delay 100}}
            current-animation :none
+           offsets           [:center]
            extra             {}}}]
   (merge
    (sprite sprite-group pos)
@@ -211,6 +239,7 @@
                            (if (seq points)
                              :points
                              default-bounding-poly))
+    :offsets offsets
     :animations        animations
     :current-animation current-animation
     :delay-count       0

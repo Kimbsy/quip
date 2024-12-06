@@ -136,16 +136,37 @@
   [v]
   (normalize v))
 
+(defn invert
+  "Multiply each component of the vector by -1.
+
+  Represents a rotation of 180 degrees."
+  [v]
+  (map (partial * -1) v))
+
 (defn rotate-vector
-  "Rotate a vector about the origin by `r` degrees."
-  [[x y] r]
-  (let [radians (q/radians r)
-        cr (q/cos radians)
-        sr (q/sin radians)]
-    [(- (* x cr)
-        (* y sr))
-     (+ (* x sr)
-        (* y cr))]))
+  "Rotate a vector about the origin by `r` degrees.
+
+  Checks first for `r` representing an integer number of rotations, in
+  with case the vector will be unchanged."
+  [[x y :as v] r]
+  (cond
+    ;; 360*n degree rotations
+    (or (zero? (mod (or r 0) 360))
+        (zero-vector? v))
+    v
+
+    ;; 180+(360*n) degree rotations
+    (= 180 (mod (or r 0) 360))
+    (invert v)
+
+    :else
+    (let [radians (q/radians r)
+          cr (q/cos radians)
+          sr (q/sin radians)]
+      [(- (* x cr)
+          (* y sr))
+       (+ (* x sr)
+          (* y cr))])))
 
 (defn orthogonals
   "Calculate the two orthogonal vectors to a given 2D vector.
