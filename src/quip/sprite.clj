@@ -7,6 +7,10 @@
             [quip.util :as u]))
 
 (defn pos-offsets
+  "Determine the x and y offsets for a sprite based on it's `:w`, `:h`
+  and `:offsets` configuration.
+
+  Defaults to `[:center :center]`."
   [{[x-off y-off] :offsets
     :keys [w h]}]
   (let [dx (cond

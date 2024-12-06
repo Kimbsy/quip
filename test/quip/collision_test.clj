@@ -226,33 +226,33 @@
           c {:pos [9 1.5] :w 4 :h 3}
           d {:pos [2 6.5] :w 4 :h 3}
           e {:pos [9 6.5] :w 4 :h 3}]
-      ;; a collides with every other sprite
-      (is (and (sut/w-h-rects-collide? a b)
-               (sut/w-h-rects-collide? b a)))
-      (is (and (sut/w-h-rects-collide? a c)
-               (sut/w-h-rects-collide? c a)))
-      (is (and (sut/w-h-rects-collide? a d)
-               (sut/w-h-rects-collide? d a)))
-      (is (and (sut/w-h-rects-collide? a e)
-               (sut/w-h-rects-collide? e a)))
+      (testing "a collides with every other sprite"
+        (is (and (sut/w-h-rects-collide? a b)
+                 (sut/w-h-rects-collide? b a)))
+        (is (and (sut/w-h-rects-collide? a c)
+                 (sut/w-h-rects-collide? c a)))
+        (is (and (sut/w-h-rects-collide? a d)
+                 (sut/w-h-rects-collide? d a)))
+        (is (and (sut/w-h-rects-collide? a e)
+                 (sut/w-h-rects-collide? e a))))
 
-      ;; b collides with no other sprite
-      (is (and (not (sut/w-h-rects-collide? b c))
-               (not (sut/w-h-rects-collide? c b))))
-      (is (and (not (sut/w-h-rects-collide? b d))
-               (not (sut/w-h-rects-collide? d b))))
-      (is (and (not (sut/w-h-rects-collide? b e))
-               (not (sut/w-h-rects-collide? e b))))
+      (testing "b collides with no other sprite"
+        (is (and (not (sut/w-h-rects-collide? b c))
+                 (not (sut/w-h-rects-collide? c b))))
+        (is (and (not (sut/w-h-rects-collide? b d))
+                 (not (sut/w-h-rects-collide? d b))))
+        (is (and (not (sut/w-h-rects-collide? b e))
+                 (not (sut/w-h-rects-collide? e b)))))
 
-      ;; c collides with no other sprite
-      (is (and (not (sut/w-h-rects-collide? c d))
-               (not (sut/w-h-rects-collide? d c))))
-      (is (and (not (sut/w-h-rects-collide? c e))
-               (not (sut/w-h-rects-collide? e c))))
+      (testing "c collides with no other sprite"
+        (is (and (not (sut/w-h-rects-collide? c d))
+                 (not (sut/w-h-rects-collide? d c))))
+        (is (and (not (sut/w-h-rects-collide? c e))
+                 (not (sut/w-h-rects-collide? e c)))))
 
-      ;; d collides with no other sprite
-      (is (and (not (sut/w-h-rects-collide? d e))
-               (not (sut/w-h-rects-collide? e d))))))
+      (testing "d collides with no other sprite"
+        (is (and (not (sut/w-h-rects-collide? d e))
+                 (not (sut/w-h-rects-collide? e d)))))))
 
   (testing "partial overlaps"
     ;; ┌────┬─┬────┐
@@ -303,9 +303,9 @@
     ;; │       │ .d
     ;; └───.c──┘
     (let [a {:pos [4 2] :w 8 :h 4}
-          b {:pos [2 1]}
-          c {:pos [4 4]}
-          d {:pos [10 3]}]
+          b {:pos [2 1] :w 0 :h 0}
+          c {:pos [4 4] :w 0 :h 0}
+          d {:pos [10 3] :w 0 :h 0}]
       (is (and (sut/pos-in-rect? b a)
                (sut/rect-contains-pos? a b)))
       (is (and (sut/pos-in-rect? c a)
@@ -444,33 +444,33 @@
             c {:pos [9 1.5] :w 4 :h 3 :bounds-fn sprite/default-bounding-poly}
             d {:pos [2 6.5] :w 4 :h 3 :bounds-fn sprite/default-bounding-poly}
             e {:pos [9 6.5] :w 4 :h 3 :bounds-fn sprite/default-bounding-poly}]
-        ;; a collides with every other sprite
-        (is (and (sut/polys-collide? a b)
-                 (sut/polys-collide? b a)))
-        (is (and (sut/polys-collide? a c)
-                 (sut/polys-collide? c a)))
-        (is (and (sut/polys-collide? a d)
-                 (sut/polys-collide? d a)))
-        (is (and (sut/polys-collide? a e)
-                 (sut/polys-collide? e a)))
+        (testing "a collides with every other sprite"
+          (is (and (sut/polys-collide? a b)
+                   (sut/polys-collide? b a)))
+          (is (and (sut/polys-collide? a c)
+                   (sut/polys-collide? c a)))
+          (is (and (sut/polys-collide? a d)
+                   (sut/polys-collide? d a)))
+          (is (and (sut/polys-collide? a e)
+                   (sut/polys-collide? e a))))
 
-        ;; b collides with no other sprite
-        (is (and (not (sut/polys-collide? b c))
-                 (not (sut/polys-collide? c b))))
-        (is (and (not (sut/polys-collide? b d))
-                 (not (sut/polys-collide? d b))))
-        (is (and (not (sut/polys-collide? b e))
-                 (not (sut/polys-collide? e b))))
+        (testing "b collides with no other sprite"
+          (is (and (not (sut/polys-collide? b c))
+                   (not (sut/polys-collide? c b))))
+          (is (and (not (sut/polys-collide? b d))
+                   (not (sut/polys-collide? d b))))
+          (is (and (not (sut/polys-collide? b e))
+                   (not (sut/polys-collide? e b)))))
 
-        ;; c collides with no other sprite
-        (is (and (not (sut/polys-collide? c d))
-                 (not (sut/polys-collide? d c))))
-        (is (and (not (sut/polys-collide? c e))
-                 (not (sut/polys-collide? e c))))
+        (testing "c collides with no other sprite"
+          (is (and (not (sut/polys-collide? c d))
+                   (not (sut/polys-collide? d c))))
+          (is (and (not (sut/polys-collide? c e))
+                   (not (sut/polys-collide? e c)))))
 
-        ;; d collides with no other sprite
-        (is (and (not (sut/polys-collide? d e))
-                 (not (sut/polys-collide? e d))))))
+        (testing "d collides with no other sprite"
+          (is (and (not (sut/polys-collide? d e))
+                   (not (sut/polys-collide? e d)))))))
 
     (testing "partial overlaps"
       ;; ┌────┬─┬────┐
@@ -482,13 +482,13 @@
       (let [a {:pos [3.5 1.5] :w 7 :h 3 :bounds-fn sprite/default-bounding-poly}
             b {:pos [8.5 1.5] :w 7 :h 3 :bounds-fn sprite/default-bounding-poly}
             c {:pos [3.5 3.5] :w 7 :h 3 :bounds-fn sprite/default-bounding-poly}]
-        ;; all sprites collide with each other
-        (is (and (sut/polys-collide? a b)
-                 (sut/polys-collide? b a)))
-        (is (and (sut/polys-collide? a c)
-                 (sut/polys-collide? c a)))
-        (is (and (sut/polys-collide? b c)
-                 (sut/polys-collide? c b)))))
+        (testing "all sprites collide with each other"
+          (is (and (sut/polys-collide? a b)
+                   (sut/polys-collide? b a)))
+          (is (and (sut/polys-collide? a c)
+                   (sut/polys-collide? c a)))
+          (is (and (sut/polys-collide? b c)
+                   (sut/polys-collide? c b))))))
 
     (testing "overlaps exactly"
       ;; ╔══════╗
@@ -685,3 +685,137 @@
                (not (sut/rotating-polys-collide? b a1))))
       (is (and (sut/rotating-polys-collide? a2 b)
                (sut/rotating-polys-collide? b a2))))))
+
+(deftest collisions-with-offsets
+  (testing "simple offset collisions"
+    ;; ┌────┐        ┌────┐
+    ;; │ b  │        │ c  │
+    ;; │  ┌─┼──┐  ┌──┼─┐  │
+    ;; └──┼─┘  │  │  └─┼──┘
+    ;;    │ a1 │  │ a2 │
+    ;;    │  ┌─┼──┼─┐  │
+    ;;    └──┼─┘  └─┼──┘
+    ;;       │  a0  │   ;; <- approximation, a1-4 should all touch in the middle
+    ;;    ┌──┼─┐  ┌─┼──┐
+    ;;    │  └─┼──┼─┘  │
+    ;;    │ a3 │  │ a4 │
+    ;; ┌──┼─┐  │  │  ┌─┼──┐
+    ;; │  └─┼──┘  └──┼─┘  │
+    ;; │ d  │        │ e  │
+    ;; └────┘        └────┘
+    ;; a0 = [:center :center]
+    ;; a1 = [:right :bottom]
+    ;; a2 = [:left :bottom]
+    ;; a3 = [:right :top]
+    ;; a4 = [:left :top]
+    (let [a0 {:pos [0 0] :w 20 :h 20 :bounds-fn sprite/default-bounding-poly}
+          a1 (assoc a0 :offsets [:right :bottom])
+          a2 (assoc a0 :offsets [:left :bottom])
+          a3 (assoc a0 :offsets [:right :top])
+          a4 (assoc a0 :offsets [:left :top])
+          b  {:pos [-20 -20] :w 10 :h 10 :bounds-fn sprite/default-bounding-poly}
+          c  {:pos [20  -20] :w 10 :h 10 :bounds-fn sprite/default-bounding-poly}
+          d  {:pos [-20  20] :w 10 :h 10 :bounds-fn sprite/default-bounding-poly}
+          e  {:pos [20   20] :w 10 :h 10 :bounds-fn sprite/default-bounding-poly}]
+
+      (testing "a0 does not collide with others"
+        (is (not (sut/polys-collide? a0 b)))
+        (is (not (sut/polys-collide? a0 c)))
+        (is (not (sut/polys-collide? a0 d)))
+        (is (not (sut/polys-collide? a0 e)))
+        (is (not (sut/w-h-rects-collide? a0 b)))
+        (is (not (sut/w-h-rects-collide? a0 c)))
+        (is (not (sut/w-h-rects-collide? a0 d)))
+        (is (not (sut/w-h-rects-collide? a0 e))))
+
+      (testing "a1 collides with only b"
+        (is (sut/polys-collide? a1 b))
+        (is (not (sut/polys-collide? a1 c)))
+        (is (not (sut/polys-collide? a1 d)))
+        (is (not (sut/polys-collide? a1 e)))
+        (is (sut/w-h-rects-collide? a1 b))
+        (is (not (sut/w-h-rects-collide? a1 c)))
+        (is (not (sut/w-h-rects-collide? a1 d)))
+        (is (not (sut/w-h-rects-collide? a1 e))))
+
+      (testing "a2 collides with only c"
+        (is (not (sut/polys-collide? a2 b)))
+        (is (sut/polys-collide? a2 c))
+        (is (not (sut/polys-collide? a2 d)))
+        (is (not (sut/polys-collide? a2 e)))
+        (is (not (sut/w-h-rects-collide? a2 b)))
+        (is (sut/w-h-rects-collide? a2 c))
+        (is (not (sut/w-h-rects-collide? a2 d)))
+        (is (not (sut/w-h-rects-collide? a2 e))))
+
+      (testing "a3 collides with only d"
+        (is (not (sut/polys-collide? a3 b)))
+        (is (not (sut/polys-collide? a3 c)))
+        (is (sut/polys-collide? a3 d))
+        (is (not (sut/polys-collide? a3 e)))
+        (is (not (sut/w-h-rects-collide? a3 b)))
+        (is (not (sut/w-h-rects-collide? a3 c)))
+        (is (sut/w-h-rects-collide? a3 d))
+        (is (not (sut/w-h-rects-collide? a3 e))))
+
+      (testing "a4 collides with only e"
+        (is (not (sut/polys-collide? a4 b)))
+        (is (not (sut/polys-collide? a4 c)))
+        (is (not (sut/polys-collide? a4 d)))
+        (is (sut/polys-collide? a4 e))
+        (is (not (sut/w-h-rects-collide? a4 b)))
+        (is (not (sut/w-h-rects-collide? a4 c)))
+        (is (not (sut/w-h-rects-collide? a4 d)))
+        (is (sut/w-h-rects-collide? a4 e)))))
+
+  (testing "rotated offset collisions"
+    (testing "using `[:center :center]` offsets"
+      ;;          ┌──┐
+      ;;          │  │
+      ;;          │  │
+      ;;          │  │
+      ;; ┌─────┐  │  │
+      ;; │ b ┌─┼──┼──┼────┐
+      ;; │   │ │  │  │ a2 │
+      ;; │   │ │  │  │    │
+      ;; │   └─┼──┼──┼────┘
+      ;; └─────┘  │  │
+      ;;          │a1│
+      ;;          │  │
+      ;;          │  │
+      ;;          └──┘
+      (let [a1 {:pos       [0 0]
+                :rotation  0
+                :w         5
+                :h         20
+                :bounds-fn sprite/default-bounding-poly}
+            a2 (assoc a1 :rotation 90)
+            b  {:pos [-10 0] :w 10 :h 10 :bounds-fn sprite/default-bounding-poly}]
+        (is (not (sut/rotating-polys-collide? a1 b)))
+        (is (sut/rotating-polys-collide? a2 b))))
+
+    (testing "using `[:left :top]` offsets"
+      ;;            ┌─────┐
+      ;; ┌──┬───────┼─┐ b │
+      ;; │  │ a2    │ │   │
+      ;; │  │       │ │   │
+      ;; ├──┼───────┼─┘   │
+      ;; │  │       └─────┘
+      ;; │  │
+      ;; │  │
+      ;; │  │
+      ;; │  │
+      ;; │a1│
+      ;; │  │
+      ;; │  │
+      ;; └──┘
+      (let [a1 {:pos       [0 0]
+                :rotation  0
+                :w         5
+                :h         20
+                :bounds-fn sprite/default-bounding-poly
+                :offsets   [:left :top]}
+            a2 (assoc a1 :rotation 270)
+            b  {:pos [20 0] :w 10 :h 10 :bounds-fn sprite/default-bounding-poly}]
+        (is (not (sut/rotating-polys-collide? a1 b)))
+        (is (sut/rotating-polys-collide? a2 b))))))
