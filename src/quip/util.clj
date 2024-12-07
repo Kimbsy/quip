@@ -6,9 +6,9 @@
   Geometric collision detection predicates.
 
   Misc utilities."
-  (:require [quil.core :as q]
-            [clojure.math.combinatorics :as combo]
-            [clojure.set :as s]))
+  (:require [clojure.math.combinatorics :as combo]
+            [clojure.set :as s]
+            [quil.core :as q]))
 
 (def black [0])
 (def white [255])
