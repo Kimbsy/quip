@@ -7,7 +7,7 @@
             [quip.util :as u]))
 
 (defn pos-offsets
-  "Determine the x and y offsets for a sprite based on it's `:w`, `:h`
+ "Determine the x and y offsets for a sprite based on it's `:w`, `:h`
   and `:offsets` configuration.
 
   Defaults to `[:center :center]`."
@@ -50,7 +50,7 @@
           update-animation
           update-pos))
 
-(defn draw-image-sprite
+(defn draw-image-sprite!
   [{:keys [pos rotation image] :as sprite}]
   (u/wrap-trans-rot pos rotation
                     #(let [[x y] (pos-offsets sprite)]
@@ -58,7 +58,7 @@
 
 (def memo-graphics (memoize (fn [w h] (q/create-graphics w h))))
 
-(defn draw-animated-sprite
+(defn draw-animated-sprite!
   [{:keys [pos rotation w h spritesheet current-animation animation-frame] :as s}]
   (let [animation (current-animation (:animations s))
         x-offset  (* animation-frame w)
@@ -150,7 +150,7 @@
            extra]
     :or   {rotation  0
            update-fn identity
-           draw-fn   draw-image-sprite
+           draw-fn   draw-image-sprite!
            offsets   [:center]
            extra     {}}}]
   (merge
@@ -160,7 +160,7 @@
     :image     (q/load-image image-file)
     :rotation  rotation
     :update-fn identity
-    :draw-fn   draw-image-sprite
+    :draw-fn   draw-fn
     :points    points
     :bounds-fn (or bounds-fn
                    (if (seq points)
@@ -182,7 +182,7 @@
     :or   {rotation  0
            vel       [0 0]
            update-fn update-pos
-           draw-fn   draw-image-sprite
+           draw-fn   draw-image-sprite!
            offsets   [:center]
            extra     {}}}]
   (merge
@@ -199,7 +199,7 @@
                    (if (seq points)
                      :points
                      default-bounding-poly))
-    :offsets offsets}
+    :offsets   offsets}
    extra))
 
 (defn animated-sprite
@@ -217,7 +217,7 @@
     :or   {rotation          0
            vel               [0 0]
            update-fn         update-animated-sprite
-           draw-fn           draw-animated-sprite
+           draw-fn           draw-animated-sprite!
            animations        {:none {:frames      1
                                      :y-offset    0
                                      :frame-delay 100}}
@@ -239,7 +239,7 @@
                            (if (seq points)
                              :points
                              default-bounding-poly))
-    :offsets offsets
+    :offsets           offsets
     :animations        animations
     :current-animation current-animation
     :delay-count       0

@@ -4,10 +4,7 @@
   There's no support for audio in Quil, so we're relying on interop
   with `javax.sound.sampled`."
   (:require [clojure.java.io :as io])
-  (:import javax.sound.sampled.AudioSystem
-           javax.sound.sampled.Clip
-           javax.sound.sampled.DataLine$Info
-           javax.sound.sampled.LineListener))
+  (:import (javax.sound.sampled AudioSystem Clip DataLine$Info LineListener)))
 
 (defonce ^:dynamic *music* (atom nil))
 
