@@ -19,7 +19,7 @@
           (-> state
               (scene/transition :level-01 :transition-length 30)))))])
 
-(defn draw-menu
+(defn draw-menu!
   "Called each frame, draws the current scene to the screen"
   [state]
   (u/background dark-green)
@@ -35,5 +35,5 @@
   "Initialise this scene"
   []
   {:sprites (sprites)
-   :draw-fn draw-menu
+   :draw-fn draw-menu!
    :update-fn update-menu})

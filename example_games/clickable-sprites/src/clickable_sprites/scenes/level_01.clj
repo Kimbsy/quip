@@ -49,6 +49,7 @@
                          (q/no-stroke)))
        (input/on-click
         (fn [state {:keys [current-animation] :as captain}]
+          ;; Choose a random animation for the captain
           (sprite/update-sprites-by-pred
            state
            (sprite/group-pred :captain)
@@ -57,7 +58,7 @@
                (prn "new animation: " anim)
                (sprite/set-animation s anim)))))))])
 
-(defn draw-level-01
+(defn draw-level-01!
   "Called each frame, draws the current scene to the screen"
   [state]
   (u/background light-green)
@@ -73,5 +74,5 @@
   "Initialise this scene"
   []
   {:sprites (sprites)
-   :draw-fn draw-level-01
+   :draw-fn draw-level-01!
    :update-fn update-level-01})
