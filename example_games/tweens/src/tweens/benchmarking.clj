@@ -75,7 +75,6 @@
 
 (def base-state
   {:held-keys #{:space},
-   :input-enabled? true,
    :global-frame 431,
    :parent-update-fn quip.core/update-state,
    :parent-draw-fn quip.core/draw-state,
