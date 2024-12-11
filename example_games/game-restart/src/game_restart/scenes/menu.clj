@@ -1,5 +1,6 @@
 (ns game-restart.scenes.menu
   (:require [quil.core :as q]
+            [quip.input :as input]
             [quip.scene :as scene]
             [quip.sprite :as sprite]
             [quip.sprites.button :as button]
@@ -17,12 +18,12 @@
 (defn sprites
   "The initial list of sprites for this scene"
   []
-  [(button/button-sprite "Play"
-                         [(* 0.5 (q/width))
-                          (* 0.5 (q/height))]
-                         :color grey
-                         :content-color white
-                         :on-click on-click-play)
+  [(-> (button/button-sprite "Play"
+                             [(* 0.5 (q/width))
+                              (* 0.5 (q/height))]
+                             :color grey
+                             :content-color white)
+       (input/on-click on-click-play))
    (sprite/text-sprite "Highscore: 0"
                        [(* 0.5 (q/width))
                         (* 0.7 (q/height))]

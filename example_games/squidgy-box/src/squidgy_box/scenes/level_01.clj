@@ -20,18 +20,16 @@
 
 (defn box
   [pos]
-  {:sprite-group :box
-   ::uuid (java.util.UUID/randomUUID)
-   :pos pos
+  (sprite/sprite
+   :box
+   pos
    :w 100
    :h 100
-   :l-offset 0
-   :r-offset 0
-   :u-offset 0
-   :d-offset 0
-   :animated? false
-   :update-fn identity
-   :draw-fn draw-box!})
+   :draw-fn draw-box!
+   :extra {:l-offset 0
+           :r-offset 0
+           :u-offset 0
+           :d-offset 0}))
 
 (defn add-squish-tween
   [state offset-key]

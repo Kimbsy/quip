@@ -283,26 +283,18 @@
    extra))
 
 (defn update-state
-  "Update each sprite in the current scene using its `:update-fn`.
-
-  Optionally accepts a key specifying the name of the sprite
-  collection on the scene."
-  [{:keys [current-scene] :as state} &
-   {:keys [sprite-key] :or {sprite-key :sprites}}]
-  (update-in state [:scenes current-scene sprite-key]
+  "Update each sprite in the current scene using its `:update-fn`."
+  [{:keys [current-scene] :as state}]
+  (update-in state [:scenes current-scene :sprites]
              (fn [sprites]
                (map (fn [s]
                       ((:update-fn s) s))
                     sprites))))
 
 (defn draw-scene-sprites!
-  "Draw each sprite in the current scene using its `:draw-fn`.
-
-  Optionally accepts a key specifying the name of the sprite
-  collection on the scene."
-  [{:keys [current-scene] :as state} &
-   {:keys [sprite-key] :or {sprite-key :sprites}}]
-  (let [sprites (get-in state [:scenes current-scene sprite-key])]
+  "Draw each sprite in the current scene using its `:draw-fn`."
+  [{:keys [current-scene] :as state}]
+  (let [sprites (get-in state [:scenes current-scene :sprites])]
     (doall
      (map (fn [s]
             ((:draw-fn s) s))
@@ -312,13 +304,9 @@
   "Draw each sprite in the current scene using its `:draw-fn` in the
   order their `:sprite-group` appears in the `layers` list.
 
-  Any sprites with groups not found in `layers` will be drawn last.
-
-  Optionally accepts a key specifying the name of the sprite
-  collection on the scene."
-  [{:keys [current-scene] :as state} layers &
-   {:keys [sprite-key] :or {sprite-key :sprites}}]
-  (let [sprites     (get-in state [:scenes current-scene sprite-key])
+  Any sprites with groups not found in `layers` will be drawn last."
+  [{:keys [current-scene] :as state} layers]
+  (let [sprites     (get-in state [:scenes current-scene :sprites])
         unspecified (filter #(not ((set layers) (:sprite-group %))) sprites)]
     (doall
      (map (fn [group]
@@ -333,25 +321,24 @@
             ((:draw-fn s) s))
           unspecified))))
 
-(defn update-sprites-by-pred
-  "Update sprites in the current scene with the update function `f`
-  filtering by a predicate function `pred`.
+(defn update-sprites
+  "Update sprites in the current scene with the update function `f`.
 
-  Optionally accepts a key specifying the name of the sprite
-  collection on the scene."
-  [{:keys [current-scene] :as state} pred f &
-   {:keys [sprite-key] :or {sprite-key :sprites}}]
-  (update-in state [:scenes current-scene sprite-key]
-             (fn [sprites]
-               (pmap (fn [s]
-                       (if (pred s)
-                         (f s)
-                         s))
-                     sprites))))
+  Optionally takes a filtering function `pred`."
+  ([state f]
+   (update-sprites state (constantly true) f))
+  ([{:keys [current-scene] :as state} pred f]
+   (update-in state [:scenes current-scene :sprites]
+              (fn [sprites]
+                (pmap (fn [s]
+                        (if (pred s)
+                          (f s)
+                          s))
+                      sprites)))))
 
-(defn group-pred
-  "Defines a predicate that filters sprites based on their
-  sprite-group.
+(defn has-group
+  "Creates a predicate function that filters sprites based on their
+  `:sprite-group.`
 
   Takes either a single `:sprite-group` keyword, or a collection of
   them.
@@ -360,12 +347,12 @@
 
   (sprite/update-sprites-by-pred
     state
-    (sprite/group-pred :asteroids)
+    (sprite/has-group :asteroids)
     sprite-update-fn)
 
   (sprite/update-sprites-by-pred
     state
-    (sprite/group-pred [:asteroids :ships])
+    (sprite/has-group [:asteroids :ships])
     sprite-update-fn)"
   [sprite-group]
   (if (coll? sprite-group)
@@ -373,3 +360,19 @@
       ((set sprite-group) (:sprite-group s)))
     (fn [s]
       (= sprite-group (:sprite-group s)))))
+
+(defn is-sprite
+  [{:keys [uuid]}]
+  "Creates a predicate function that filters sprites based on their
+  `:uuid`.
+
+  Takes a map with a `:uuid` key (such as a sprite).
+
+  Commonly used alongside `update-sprites-by-pred`:
+
+  (sprite/update-sprites-by-pred
+    state
+    (sprite/is-sprite player)
+    sprite-update-fn)"
+  (fn [s]
+    (= uuid (:uuid s))))

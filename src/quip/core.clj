@@ -21,9 +21,8 @@
 
 (defn update-framerate
   "Keep track of the current average framerate."
-  [{:keys [previous-frame-time fr-window] :as state}]
-  (let [current-time (System/currentTimeMillis)
-        fr (q/current-frame-rate)
+  [{:keys [fr-window] :as state}]
+  (let [fr (q/current-frame-rate)
         fr-n (count fr-window)]
     ;; record the delta-time of 30 frames and then average them
     (if (< fr-n 30)
@@ -107,10 +106,8 @@
   "Default initial values for the `state` map. The result of the game's
   `:setup` function will be merged on top."
   {:held-keys           #{}
-   :input-enabled?      true
    :global-frame        1
    :display-fps?        false ;; @TODO: should this be part of a broader `debug` mode?
-   :previous-frame-time (System/currentTimeMillis)
    :average-fps         0
    :dt-window           []
    :parent-update-fn    update-state
@@ -126,7 +123,7 @@
   and a `:current-scene` to start doing anything useful."
   [{:keys [init-scenes-fn restart-fn current-scene]
     :or   {init-scenes-fn (constantly {})
-           restart-fn       identity
+           restart-fn     identity
            current-scene  :none}
     :as   override-opts}]
   (let [opts (merge default-opts override-opts)]
