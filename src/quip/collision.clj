@@ -251,7 +251,7 @@
         (assoc group-b-key (:group-b results))
         (assoc group-a-key (:group-a results)))))
 
-;; @TODO: we could make the `collide-fn-a|b` functions take the whole game state and the sprite (like how we do with `quip.input/clickable-spites`). Would require a bit of refactoring for uncertain benefit.
+;; @TODO: we could make the `collide-fn-a|b` functions take the whole game state and the sprite (like how we do with `quip.input/on-click`). Would require a bit of refactoring for uncertain benefit.
 
 (defn update-state
   "Update the sprites in the current scene based on the scene colliders."

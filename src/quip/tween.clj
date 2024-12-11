@@ -378,7 +378,7 @@
          (update s :tweens #(remove :completed? %)))
        sprites))
 
-;; @TODO: we could make the `on-foo` handlers take the whole game state and the sprite the tween was attached to (like how we do with `quip.input/clickable-spites`)
+;; @TODO: we could make the `on-foo` handlers take the whole game state and the sprite the tween was attached to (like how we do with `quip.input/on-click`)
 
 (defn update-state
   [{:keys [current-scene] :as state}]
