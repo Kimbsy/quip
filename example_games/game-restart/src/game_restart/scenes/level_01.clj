@@ -25,8 +25,8 @@
   [{:keys [current-score] :as state}]
   (-> state
       sprite/update-state
-      (sprite/update-sprites-by-pred
-       (sprite/group-pred :current-score-text)
+      (sprite/update-sprites
+       (sprite/has-group :current-score-text)
        (fn [s]
          (assoc s :content (str "Current Score: " current-score))))))
 

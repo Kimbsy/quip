@@ -90,8 +90,8 @@
     (reduce (fn [acc {:keys [on-click-fn] :as s}]
               ;; Using our most powerful (albeit expensive) collision detection.
               (if (collision/pos-in-rotating-poly? {:pos ((juxt :x :y) e)} s)
-                (on-click-fn state s)
-                state))
+                (on-click-fn acc s)
+                acc))
             state
             clickable)))
 

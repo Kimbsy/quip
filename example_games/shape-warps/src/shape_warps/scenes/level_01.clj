@@ -59,9 +59,9 @@
   (let [n (read-string (name (:key e)))
         n (if (< n 3) (+ n 10) n)]
     (prn n)
-    (sprite/update-sprites-by-pred
+    (sprite/update-sprites
      state
-     (sprite/group-pred :multigon)
+     (sprite/has-group :multigon)
      (fn [m]
        (tween-to m n)))))
 
