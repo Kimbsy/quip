@@ -50,12 +50,12 @@
        (input/on-click
         (fn [state {:keys [current-animation] :as captain}]
           ;; Choose a random animation for the captain
-          (sprite/update-sprites-by-pred
+          (sprite/update-sprites
            state
-           (sprite/group-pred :captain)
+           (sprite/has-group :captain)
            (fn [s]
              (let [anim (rand-nth animations)]
-               (prn "new animation: " anim)
+               (prn (str "new animation: " anim))
                (sprite/set-animation s anim)))))))])
 
 (defn draw-level-01!

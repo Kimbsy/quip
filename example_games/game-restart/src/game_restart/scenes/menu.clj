@@ -41,8 +41,8 @@
   [{:keys [high-score] :as state}]
   (-> state
       sprite/update-state
-      (sprite/update-sprites-by-pred
-       (sprite/group-pred :highscore-text)
+      (sprite/update-sprites
+       (sprite/has-group :highscore-text)
        (fn [s]
          (assoc s :content (str "Highscore: " high-score))))))
 
@@ -51,6 +51,4 @@
   []
   {:sprites (sprites)
    :draw-fn draw-menu!
-   :update-fn update-menu
-   :mouse-pressed-fns [button/handle-buttons-pressed]
-   :mouse-released-fns [button/handle-buttons-released]})
+   :update-fn update-menu})
