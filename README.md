@@ -1,6 +1,6 @@
 # quip
 
-[![Clojars Project](https://img.shields.io/clojars/v/quip.svg)](https://clojars.org/quip)
+[![Clojars Project](https://img.shields.io/clojars/v/com.kimbsy/quip.svg)](https://clojars.org/com.kimbsy/quip)
 
 A Clojure game engine made using [Quil](http://quil.info/).
 
