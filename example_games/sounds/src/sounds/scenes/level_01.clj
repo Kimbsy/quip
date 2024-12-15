@@ -45,11 +45,11 @@
   []
   [(sprite/text-sprite
     "Press <m> to restart music"
-    [(* 0.5 (q/width)) (* 0.4 (q/height))]
+    (u/make-pos [0.5 0.4])
     :color white)
    (sprite/text-sprite
     "Press <s> to play sound effect"
-    [(* 0.5 (q/width)) (* 0.6 (q/height))]
+    (u/make-pos [0.5 0.6])
     :color white)])
 
 (defn draw-level-01!
