@@ -25,6 +25,7 @@
              init-fn           identity}}]
   (-> state
       (assoc :transition-progress 0)
+      (assoc :input-enabled? false)
       (assoc :parent-update-fn (fn [{:keys [transition-progress] :as state}]
                                  (if (< (or transition-progress 0) transition-length)
                                    (update state :transition-progress inc)
@@ -32,6 +33,7 @@
                                        (assoc :current-scene target-scene)
                                        (assoc :parent-update-fn parent-update-fn)
                                        (assoc :parent-draw-fn parent-draw-fn)
+                                       (assoc :input-enabled? true)
                                        (dissoc :transition-progress)
                                        init-fn))))
       (assoc :parent-draw-fn (fn [{:keys [transition-progress] :as state}]

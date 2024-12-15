@@ -105,13 +105,14 @@
 (def default-initial-state
   "Default initial values for the `state` map. The result of the game's
   `:setup` function will be merged on top."
-  {:held-keys           #{}
-   :global-frame        1
-   :display-fps?        false ;; @TODO: should this be part of a broader `debug` mode?
-   :average-fps         0
-   :dt-window           []
-   :parent-update-fn    update-state
-   :parent-draw-fn      draw-state!})
+  {:held-keys        #{}
+   :input-enabled?   true
+   :global-frame     1
+   :display-fps?     false ;; @TODO: should this be part of a broader `debug` mode?
+   :average-fps      0
+   :dt-window        []
+   :parent-update-fn update-state
+   :parent-draw-fn   draw-state!})
 
 (defn game
   "Create a quip game configuration.
