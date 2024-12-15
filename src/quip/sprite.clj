@@ -139,36 +139,6 @@
     :offsets      offsets}
    extra))
 
-(defn static-sprite
-  [sprite-group pos w h image-file &
-   {:keys [rotation
-           update-fn
-           draw-fn
-           points
-           bounds-fn
-           offsets
-           extra]
-    :or   {rotation  0
-           update-fn identity
-           draw-fn   draw-image-sprite!
-           offsets   [:center]
-           extra     {}}}]
-  (merge
-   (sprite sprite-group pos)
-   {:w         w
-    :h         h
-    :image     (q/load-image image-file)
-    :rotation  rotation
-    :update-fn identity
-    :draw-fn   draw-fn
-    :points    points
-    :bounds-fn (or bounds-fn
-                   (if (seq points)
-                     :points
-                     default-bounding-poly))
-    :offsets   offsets}
-   extra))
-
 (defn image-sprite
   [sprite-group pos w h image-file &
    {:keys [rotation
