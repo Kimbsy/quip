@@ -34,13 +34,15 @@
   [handler-fns-key &
    {:keys [default-handler]
     :or {default-handler identity-handler}}]
-  (fn [{:keys [scenes current-scene] :as state}]
-    (let [default-handled-state (default-handler state)
-          scene-handlers        (get-in scenes [current-scene handler-fns-key])]
-      (reduce (fn [acc-state f]
-                (f acc-state))
-              default-handled-state
-              scene-handlers))))
+  (fn [{:keys [input-enabled? scenes current-scene] :as state}]
+    (if input-enabled?
+      (let [default-handled-state (default-handler state)
+            scene-handlers        (get-in scenes [current-scene handler-fns-key])]
+        (reduce (fn [acc-state f]
+                  (f acc-state))
+                default-handled-state
+                scene-handlers))
+      state)))
 
 (defn handler-reducer-with-events
   "Returns a function which reduces across the collection of
@@ -49,13 +51,15 @@
   [handler-fns-key &
    {:keys [default-handler]
     :or {default-handler identity-handler}}]
-  (fn [{:keys [scenes current-scene] :as state} e]
-    (let [default-handled-state (default-handler state e)
-          scene-handlers        (get-in scenes [current-scene handler-fns-key])]
-      (reduce (fn [acc-state f]
-                (f acc-state e))
-              default-handled-state
-              scene-handlers))))
+  (fn [{:keys [input-enabled? scenes current-scene] :as state} e]
+    (if input-enabled?
+      (let [default-handled-state (default-handler state e)
+            scene-handlers        (get-in scenes [current-scene handler-fns-key])]
+        (reduce (fn [acc-state f]
+                  (f acc-state e))
+                default-handled-state
+                scene-handlers))
+      state)))
 
 ;;; Default handlers for key events.
 
