@@ -9,6 +9,6 @@
   :plugins [[lein-codox "0.10.8"]
             [lein-ancient "1.0.0-RC3"]]
   :deploy-repositories [["clojars" {:url           "https://clojars.org/repo/"
-                                    :username      :env/clojars_user
-                                    :password      :env/clojars_pass
+                                    :username      :env/CLOJARS_USER
+                                    :password      :env/CLOJARS_PASS
                                     :sign-releases false}]])
