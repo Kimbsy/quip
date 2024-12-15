@@ -6,7 +6,8 @@
   Geometric collision detection predicates.
 
   Misc utilities."
-  (:require [clojure.math.combinatorics :as combo]
+  (:require [clojure.java.io :as io]
+            [clojure.math.combinatorics :as combo]
             [clojure.set :as s]
             [quil.core :as q]))
 
@@ -48,9 +49,11 @@
 (def default-text-size 25)
 (def small-text-size 15)
 
-(def default-font "Ubuntu Mono")
-(def bold-font "Ubuntu Mono Bold")
-(def italic-font "Ubuntu Mono Italic")
+(def default-font (io/resource "font/UbuntuMono-Regular.ttf"))
+(def bold-font (io/resource "font/UbuntuMono-Bold.ttf"))
+(def italic-font (io/resource "font/UbuntuMono-Italic.ttf"))
+(def bold-italic-font (io/resource "font/UbuntuMono-BoldItalic.ttf"))
+(def italic-bold-font bold-italic-font)
 
 (def background (partial apply q/background))
 (def fill (partial apply q/fill))
