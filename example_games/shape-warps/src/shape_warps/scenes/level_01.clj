@@ -13,7 +13,7 @@
 (defn angles
   [n]
   (vec (take max-n
-             (concat 
+             (concat
               (range 0 360 (/ 360 n))
               (repeat 360)))))
 
@@ -78,7 +78,7 @@
 (defn sprites
   "The initial list of sprites for this scene"
   []
-  [(multigon [(* (q/width) 0.5) (* (q/height) 0.5)])])
+  [(multigon (u/make-pos [0.5 0.5]))])
 
 (defn draw-level-01!
   "Called each frame, draws the current scene to the screen"

@@ -10,8 +10,7 @@
   "The initial list of sprites for this scene"
   []
   [(sprite/text-sprite "Current Score: 0"
-                       [(* 0.5 (q/width))
-                        (* 0.7 (q/height))]
+                       (u/make-pos [0.5 0.7])
                        :sprite-group :current-score-text)])
 
 (defn draw-level-01!

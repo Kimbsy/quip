@@ -19,14 +19,12 @@
   "The initial list of sprites for this scene"
   []
   [(-> (button/button-sprite "Play"
-                             [(* 0.5 (q/width))
-                              (* 0.5 (q/height))]
+                             (u/make-pos [0.5 0.5])
                              :color grey
                              :content-color white)
        (input/on-click on-click-play))
    (sprite/text-sprite "Highscore: 0"
-                       [(* 0.5 (q/width))
-                        (* 0.7 (q/height))]
+                       (u/make-pos [0.5 0.7])
                        :sprite-group :highscore-text
                        :color u/white)])
 

@@ -69,6 +69,12 @@
   ([ms frame-rate]
    (max 1 (int (* frame-rate (/ ms 1000))))))
 
+(defn make-pos
+  "Create an `[x y]` vector based on the supplied factors and the
+  current game width and height."
+  [[x-factor y-factor]]
+  [(* (q/width) x-factor) (* (q/height) y-factor)])
+
 (defn wrap-trans-rot
   "Perform a translation, a rotation, invoke the supplied
   function (probably drawing a sprite, then reset the transform matrix
