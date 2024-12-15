@@ -2,6 +2,11 @@ name: Deploy to Clojars
 
 on:
   workflow_call:
+    secrets:
+      CLOJARS_USERNAME:
+        required: true
+      CLOJARS_PASSWORD:
+        required: true
 
 jobs:
   build:
