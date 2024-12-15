@@ -28,7 +28,7 @@
   ([sound]
    (play! sound false))
   ([sound loop?]
-   (let [input-stream (io/input-stream (io/resource (str "sound/" sound)))
+   (let [input-stream (io/input-stream (io/resource sound))
          audio-stream (AudioSystem/getAudioInputStream input-stream)
          audio-format (.getFormat audio-stream)
          line-info    (DataLine$Info. Clip audio-format)
