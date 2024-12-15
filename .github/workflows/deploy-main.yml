@@ -12,3 +12,6 @@ jobs:
   deploy:
     needs: test
     uses: ./.github/workflows/_deploy.yml
+    secrets:
+      CLOJARS_USERNAME: ${{ secrets.CLOJARS_USERNAME }}
+      CLOJARS_PASSWORD: ${{ secrets.CLOJARS_PASSWORD }}
