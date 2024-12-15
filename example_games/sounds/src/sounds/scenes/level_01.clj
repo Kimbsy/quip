@@ -14,15 +14,15 @@
   [state e]
   (if (= :m (:key e))
     (do
-      (sound/loop-music! "music/music.wav")
+      (sound/loop-music! "sound/music/music.wav")
       state)
     state))
 
 ;; Available sound effects
 (def blips
-  ["sfx/blip-1.wav"
-   "sfx/blip-2.wav"
-   "sfx/blip-3.wav"])
+  ["sound/sfx/blip-1.wav"
+   "sound/sfx/blip-2.wav"
+   "sound/sfx/blip-3.wav"])
 
 (defn handle-sfx!
   "handle a key-pressed event `e`.

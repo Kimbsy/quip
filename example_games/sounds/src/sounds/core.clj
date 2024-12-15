@@ -7,7 +7,7 @@
 (defn setup
   "The initial state of the game"
   []
-  (sound/loop-music! "music/music.wav")
+  (sound/loop-music! "sound/music/music.wav")
   ;; Empty state
   {})
 
