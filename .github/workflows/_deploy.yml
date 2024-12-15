@@ -27,15 +27,6 @@ jobs:
     - name: Run tests
       run: lein test
 
-    - name: Debug Environment Variables
-      run: |
-        if [ -z "$CLOJARS_USER" ]; then echo "CLOJARS_USERNAME is not set"; exit 1; fi
-        if [ -z "$CLOJARS_PASS" ]; then echo "CLOJARS_PASSWORD is not set"; exit 1; fi
-        echo "Environment variables are set correctly."
-      env:
-        CLOJARS_USER: ${{ secrets.CLOJARS_USERNAME }}
-        CLOJARS_PASS: ${{ secrets.CLOJARS_PASSWORD }}
-
     - name: Publish
       env:
         CLOJARS_USER: ${{ secrets.CLOJARS_USERNAME }}
