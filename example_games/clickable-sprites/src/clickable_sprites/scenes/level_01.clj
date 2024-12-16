@@ -33,7 +33,7 @@
 (defn sprites
   "The initial list of sprites for this scene"
   []
-  [(-> (captain (u/make-pos [0.5 0.5]) :idle)
+  [(-> (captain (u/center) :idle)
        ;; @TODO: would be nice to generify this `draw-bounding-box`
        ;; function and have it part of the base sprites.
        (assoc :draw-fn (fn [{:keys [pos w h] :as s}]
