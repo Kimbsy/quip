@@ -9,7 +9,7 @@ A Clojure game engine made using [Quil](http://quil.info/).
 The easiest way to get going is to use the quip Leiningen template:
 
 ``` bash
-lein new com.github.kimbsy/quip <project-name>
+lein new com.kimbsy/quip <project-name>
 ```
 
 This will create a game project containing two scenes, `menu` and `level-01`.
