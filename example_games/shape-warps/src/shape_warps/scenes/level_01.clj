@@ -78,7 +78,7 @@
 (defn sprites
   "The initial list of sprites for this scene"
   []
-  [(multigon (u/make-pos [0.5 0.5]))])
+  [(multigon (u/center))])
 
 (defn draw-level-01!
   "Called each frame, draws the current scene to the screen"

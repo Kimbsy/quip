@@ -19,7 +19,7 @@
   "The initial list of sprites for this scene"
   []
   [(-> (button/button-sprite "Play"
-                             (u/make-pos [0.5 0.5])
+                             (u/center)
                              :color grey
                              :content-color white)
        (input/on-click on-click-play))

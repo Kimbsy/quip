@@ -13,7 +13,7 @@
 (defn sprites
   "The initial list of sprites for this scene"
   []
-  [(-> (button/button-sprite "play" (u/make-pos [0.5 0.5]))
+  [(-> (button/button-sprite "play" (u/center))
        (input/on-click
         (fn [state button]
           (-> state
