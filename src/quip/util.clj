@@ -78,6 +78,14 @@
   [[x-factor y-factor]]
   [(* (q/width) x-factor) (* (q/height) y-factor)])
 
+(defn center
+  "Create an `[x y]` position at the centre of the current game width
+  and height."
+  []
+  [(* (q/width) 0.5) (* (q/height) 0.5)])
+
+(def centre center)
+
 (defn wrap-trans-rot
   "Perform a translation, a rotation, invoke the supplied
   function (probably drawing a sprite, then reset the transform matrix
