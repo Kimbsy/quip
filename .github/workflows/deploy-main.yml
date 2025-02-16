@@ -1,4 +1,4 @@
-name: Deploy when tagging `main`
+name: Deploy when pushing to `main`
 
 on:
   push:
