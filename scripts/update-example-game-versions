@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# Exit immediately on error
+set -e
+
+# Ensure a version argument was provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <new-version>"
+    exit 1
+fi
+
+NEW_VERSION=$1
+
+# For each 'project.clj' file in example_games
+for file in example_games/*/project.clj
+do
+    # Replace any old quip version with the new one
+    sed -i "s/\[com\.kimbsy\/quip \"[^\"]*\"\]/[com.kimbsy\/quip \"$NEW_VERSION\"]/" "$file"
+    echo "Updated $file"
+done
+
+echo "Done! All project.clj files in example_games/* have been updated to $NEW_VERSION."
