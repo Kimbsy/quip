@@ -313,14 +313,14 @@
   Takes either a single `:sprite-group` keyword, or a collection of
   them.
 
-  Commonly used alongside `update-sprites-by-pred`:
+  Commonly used alongside `update-sprites`:
 
-  (sprite/update-sprites-by-pred
+  (sprite/update-sprites
     state
     (sprite/has-group :asteroids)
     sprite-update-fn)
 
-  (sprite/update-sprites-by-pred
+  (sprite/update-sprites
     state
     (sprite/has-group [:asteroids :ships])
     sprite-update-fn)"
@@ -338,9 +338,9 @@
 
   Takes a map with a `:uuid` key (such as a sprite).
 
-  Commonly used alongside `update-sprites-by-pred`:
+  Commonly used alongside `update-sprites`:
 
-  (sprite/update-sprites-by-pred
+  (sprite/update-sprites
     state
     (sprite/is-sprite player)
     sprite-update-fn)"
