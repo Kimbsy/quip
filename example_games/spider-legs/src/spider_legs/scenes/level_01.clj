@@ -8,19 +8,15 @@
 (def light-green [133 255 199])
 (def dark-green [41 115 115])
 
-(defn distance
-  [{[fx fy] :pos
-    [ox oy] :reset-offset}
-   {[sx sy] :pos}]
-  (Math/sqrt (+ (Math/pow (- (/ (+ sx (+ sx ox)) 2) fx) 2)
-                (Math/pow (- (/ (+ sy (+ sy oy)) 2) fy) 2))))
-
-(def max-distance 120)
+(def min-length 50)
+(def max-length 160)
+(def max-angle 45)
 
 (defn move-foot-tween-x
-  [idx spider-pos foot-pos reset-offset]
-  (tween/tween :feet (first (map + spider-pos reset-offset))
-               :from-value (first foot-pos)
+  [idx [fx _] [tx _]]
+  (tween/tween :feet
+               tx
+               :from-value fx
                :step-count (u/ms->frames 80)
                :update-fn (fn [feet d]
                             (update-in feet
@@ -31,9 +27,10 @@
                                          assoc idx false))))
 
 (defn move-foot-tween-y
-  [idx spider-pos foot-pos reset-offset]
-  (tween/tween :feet (second (map + spider-pos reset-offset))
-               :from-value (second foot-pos)
+  [idx [_ fy] [_ ty]]
+  (tween/tween :feet
+               ty
+               :from-value fy
                :step-count (u/ms->frames 80)
                :update-fn (fn [feet d]
                             (update-in feet
@@ -43,16 +40,35 @@
                ;; already does it.
                ))
 
+(defn length
+  [[ax ay] [bx by]]
+  (Math/sqrt (+ (Math/pow (- ax bx) 2)
+                (Math/pow (- ay by) 2))))
+
+(defn should-move?
+  [spider-pos foot-pos reset-pos]
+  (let [leg-length (length spider-pos foot-pos)]
+    (or (< leg-length min-length)
+        (< max-length leg-length)
+        (< max-angle
+           (abs (- (u/rotation-angle (map - foot-pos spider-pos))
+                   (u/rotation-angle (map - reset-pos spider-pos))))))))
+
 (defn update-spider
   [{:keys [feet pos moving-feet] :as spider}]
   (let [movements (keep-indexed
                    (fn [i {:keys [reset-offset]
                            foot-pos :pos
                            :as foot}]
-                     (when (and (not (moving-feet i))
-                                (< max-distance (distance foot spider)))
-                       [i [(move-foot-tween-x i pos foot-pos reset-offset)
-                           (move-foot-tween-y i pos foot-pos reset-offset)]]))
+                     (let [reset-pos (map + pos reset-offset)]
+                       (when (and (not (moving-feet i))
+                                  (should-move? pos foot-pos reset-pos))
+                         (let [target-pos (map +
+                                               foot-pos
+                                               (map #(* 1.5 %)
+                                                    (map - reset-pos foot-pos)))]
+                           [i [(move-foot-tween-x i foot-pos target-pos)
+                               (move-foot-tween-y i foot-pos target-pos)]]))))
                    feet)]
     (reduce (fn [acc-spider [i [tween-x tween-y]]]
               (-> acc-spider
