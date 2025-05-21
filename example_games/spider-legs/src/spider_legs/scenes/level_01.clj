@@ -2,6 +2,7 @@
   (:require [quil.core :as q]
             [quip.sprite :as sprite]
             [quip.scene :as scene]
+            [quip.tween :as tween]
             [quip.util :as u]))
 
 (def light-green [133 255 199])
@@ -16,18 +17,50 @@
 
 (def max-distance 120)
 
+(defn move-foot-tween-x
+  [idx spider-pos foot-pos reset-offset]
+  (tween/tween :feet (first (map + spider-pos reset-offset))
+               :from-value (first foot-pos)
+               :step-count (u/ms->frames 80)
+               :update-fn (fn [feet d]
+                            (update-in feet
+                                       [idx :pos 0]
+                                       + d))
+               :on-complete-fn (fn [spider]
+                                 (update spider :moving-feet
+                                         assoc idx false))))
+
+(defn move-foot-tween-y
+  [idx spider-pos foot-pos reset-offset]
+  (tween/tween :feet (second (map + spider-pos reset-offset))
+               :from-value (second foot-pos)
+               :step-count (u/ms->frames 80)
+               :update-fn (fn [feet d]
+                            (update-in feet
+                                       [idx :pos 1]
+                                       + d))
+               ;; @NOTE don't need the on-complete for Y, since X
+               ;; already does it.
+               ))
+
 (defn update-spider
-  [spider]
-  (update spider
-          :feet
-          (fn [feet]
-            (map (fn [{:keys [pos reset-offset] :as foot}]
-                   (if (< max-distance (distance foot spider))
-                     (assoc foot
-                            :pos
-                            (map + (:pos spider) reset-offset))
-                     foot))
-                 feet))))
+  [{:keys [feet pos moving-feet] :as spider}]
+  (let [movements (keep-indexed
+                   (fn [i {:keys [reset-offset]
+                           foot-pos :pos
+                           :as foot}]
+                     (when (and (not (moving-feet i))
+                                (< max-distance (distance foot spider)))
+                       [i [(move-foot-tween-x i pos foot-pos reset-offset)
+                           (move-foot-tween-y i pos foot-pos reset-offset)]]))
+                   feet)]
+    (reduce (fn [acc-spider [i [tween-x tween-y]]]
+              (-> acc-spider
+                  (tween/add-tween tween-x)
+                  (tween/add-tween tween-y)
+                  (update :moving-feet assoc i true)))
+            spider
+            movements)))
 
 (defn draw-spider
   [{[x y] :pos
@@ -62,10 +95,11 @@
      :update-fn update-spider
      :draw-fn draw-spider
      :extra {:initial-offsets initial-offsets
-             :feet (map (fn [offset]
-                          {:reset-offset offset
-                           :pos (map + pos offset)})
-                        initial-offsets)})))
+             :feet (mapv (fn [offset]
+                           {:reset-offset offset
+                            :pos (mapv + pos offset)})
+                         initial-offsets)
+             :moving-feet {}})))
 
 (defn sprites
   "The initial list of sprites for this scene"
@@ -82,7 +116,8 @@
   "Called each frame, update the sprites in the current scene"
   [state]
   (-> state
-      sprite/update-state))
+      sprite/update-state
+      tween/update-state))
 
 (defn key-pressed
   [state e]
@@ -102,7 +137,7 @@
        (sprite/has-group :spider)
        (fn [spider]
          (-> spider
-             (update :pos #(map + [dx dy] %))
+             (update :pos #(mapv + [dx dy] %))
              #_(update :feet #(map (partial map + [dx dy]) %))))))))
 
 (defn init
