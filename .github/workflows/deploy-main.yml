@@ -2,6 +2,9 @@ name: Deploy when pushing to `main`
 
 on:
   push:
+    paths:
+      - '**'
+      - '!example_games/**'
     branches:
       - main
 
