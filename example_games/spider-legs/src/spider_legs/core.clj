@@ -6,7 +6,7 @@
 (defn setup
   "The initial state of the game"
   []
-  {:moving? false})
+  {})
 
 (defn init-scenes
   "Map of scenes in the game"
